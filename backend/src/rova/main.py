@@ -7,8 +7,11 @@ for no functional gain, and a forward-only migration cannot rename id
 prefixes already written into rows. The brand lives in `APP_TITLE`; the
 codename lives in the import path. Nothing user-facing says `ROVA`.
 """
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from rova.admin.router import router as admin_router
 from rova.assistant.router import router as assistant_router
@@ -70,5 +73,15 @@ def create_app() -> FastAPI:
     app.include_router(notifications_router)
     app.include_router(ops_router)
     app.include_router(assistant_router)
+
+    # The pharmacy client, served from this same origin so a pharmacist can
+    # open it in a browser instead of installing the APK. Mounted last so it
+    # can never shadow an API route, and only when `ui_dir` is set and real —
+    # a missing directory leaves the API exactly as it was rather than
+    # refusing to boot. StaticFiles adds nothing to the OpenAPI schema, so
+    # the endpoint inventory is unaffected.
+    ui_dir = get_settings().ui_dir.strip()
+    if ui_dir and Path(ui_dir).is_dir():
+        app.mount("/app", StaticFiles(directory=ui_dir, html=True), name="app")
 
     return app

@@ -146,7 +146,13 @@ const store = {
 };
 
 /* ---------------- config ---------------- */
-const DEFAULT_API = "http://127.0.0.1:8099";
+// Served from the API itself (http://host:8099/app) the API is this same
+// origin, so there is nothing for the pharmacist to type. Loaded from
+// file:///android_asset/ inside the APK there is no origin to borrow, so the
+// Servidor field decides and this local default is only a first guess.
+const DEFAULT_API = (location.protocol === "http:" || location.protocol === "https:")
+  ? location.origin
+  : "http://127.0.0.1:8099";
 function apiBase(){ return (store.get("api") || DEFAULT_API).replace(/\/+$/,""); }
 
 /* ---------------- state ---------------- */

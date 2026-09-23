@@ -27,6 +27,12 @@ class Settings(BaseSettings):
     # Production is expected to set this to the real web origins.
     cors_origins: str = "*"
 
+    # Directory holding the pharmacy web client (apps/ui). Empty means the
+    # API serves no HTML at all, which is the default and what every test
+    # runs with. A deployment that wants the app reachable from a browser
+    # points this at the checked-out apps/ui and it appears under /app.
+    ui_dir: str = ""
+
     def cors_origin_list(self) -> list[str]:
         raw = self.cors_origins.strip()
         if raw == "*":
