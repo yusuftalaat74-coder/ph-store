@@ -11,6 +11,8 @@ GET,/v1/assistant/summary
 GET,/v1/auth/me
 GET,/v1/catalogue/products/{product_id}
 GET,/v1/catalogue/search
+GET,/v1/catalogue/shelf
+GET,/v1/catalogue/shelves
 GET,/v1/consents
 GET,/v1/credit-exposure/summary
 GET,/v1/credit-facilities

@@ -1,0 +1,1008 @@
+case_number,enterprise,commercial_name,active_substance,dosage,form,presentation,manufacturer,registration_number,authorised_on
+OO/H/20013/1,MEDIMPORT LDA,CLAVAMOX 125,Amoxicilina + Ácido Clavulânico,125mg/5ml + 31.25mg/5ml,Pó para Suspensão Oral,"Frasco de 60ml, 75ml, 100ml e de 150ml",LABORATÓRIO,54,30-12-2005
+OO/H/20027/5,"SOCIEDADE MOÇAMBICANA DE MEDICAMENTOS, SA",CLORETO DE SÓDIO,Cloreto de Sódio,0.009,Solução injectável,Balões 500ml e 1000ml,SOCIEDADE M,1,19-09-2002
+OO/H/200210/8,"SOCIEDADE MOÇAMBICANA DE MEDICAMENTOS, SA",GLICOSE,Glicose,0.05,Solução Injectável,Balões de 1000ml,SOCIEDADE M,2,19-09-2002
+OO/H/20039/18,MEDIMPORT LDA,TRICEF 400,CEFIXIMA,400mg,Comprimidos Revestidos,"CXS de 1, 6, 8 ou 12 COMP",LABORATÓRIO,55,30-12-2005
+OO/H/200310/21,MEDIMPORT LDA,TRICEF SUSP,CEFIXIMA,100mg / 5ml,Pó para Suspensão Oral,Frasco de 60 e 100 ml,LABORATÓRIO,56,30-12-2005
+OO/H/200310/22,MEDIMPORT LDA,MIOSTENIL,Aspartato de potássio hemi-hidratado + aspartato de magnésio tetra-hidratado,250mg + 250mg,Comprimidos,CXS 60 COMP,Bial - Portela &,72,30-12-2005
+OO/H/200310/35,MEDIMPORT LDA,UROFLOX,NORFLOXACINA,400mg,Comprimidos,CXS 16 COMP,BIAL- Portela &,67,30-12-2005
+OO/H/200310/34,MEDIMPORT LDA,URIPRIM 300,Alopurinol,300mg,Comprimidos,CXS 60 COMP,BIAL- Portela &,71,30-12-2005
+OO/H/200310/33,MEDIMPORT LDA,URIPRIM 100,Alopurinol,100mg,Comprimidos,CAIXA 20 ou 60 comprimidos,BIAL- Portela &,70,30-12-2005
+OO/H/200310/31,MEDIMPORT LDA,NEUFIL,Diprofilina,"6,67mg/ml",Xarope,FRS 200 ML,BIAL- Portela &,75,30-12-2005
+OO/H/200310/30,MEDIMPORT LDA,NEUFIL,Diprofilina,500 mg,Comprimidos,CXS 60 COMP,BIAL- Portela &,74,30-12-2005
+OO/H/200310/28,MEDIMPORT LDA,BIALZEPAM Retard,Diazepam,10mg,Cápsula de libertação prolongada,CAIXA COM 20 40 ou 60 CAPS,LABORATÓRIO,65,30-12-2005
+OO/H/200310/26,MEDIMPORT LDA,BIALZEPAM 6,Diazepam,6mg,Cápsulas,CAIXA COM 20 40 ou 60 CAPS,LABORATÓRIO,64,30-12-2005
+OO/H/200310/25,MEDIMPORT LDA,BIALZEPAM 3,Diazepam,3mg,Cápsulas,"CAIXA COM 20 0U 40 CAPS, 60",LABORATÓRIO,63,30-12-2005
+OO/H/200310/24,MEDIMPORT LDA,BIALMINAL FORTE,Fenobarbital,200mg,Comprimidos,Caixa de Cartolina com 20 ou 60 Comp,LABORATÓRIO,1880,03-06-2010
+OO/H/200310/23,MEDIMPORT LDA,BIALMINAL,Fenobarbital,100mg,Comprimidos,Caixa de Cartolina com 20 ou 60 Comp,LABORATÓRIO,1879,03-06-2010
+OO/H/20042/38,"GENERICS & SPECIALITIES, Lda",CANDIGEN CREME,Clotrimazol,1%,Creme tópico,Bisnaga de 20g,GALENTIC PHA,552,03-08-2008
+OO/H/20045/57,"MEDIS FARMACÊUTICA, LDA",NALBIX 10mg/g CREME,Clotrimazol,10mg/g,Creme tópico,TUBO 20 GR,Sofarimex - Indu,18,30-12-2005
+OO/H/20045/56,"MEDIS FARMACÊUTICA, LDA",NALBIX COMPRIMIDOS VAGINAIS,Clotrimazol,100mg,Comprimidos vaginais,CXS 6 comprimidos vaginais,Sofarimex - Indu,19,30-12-2005
+OO/H/20045/53,"MEDIS FARMACÊUTICA, LDA",DERMOFIX CREME,"Sertaconazol, Nitrato",2% p/p,Creme,TUBO 30g,Sofarimex - Indu,29,30-12-2005
+OO/H/20045/51,"MEDIS FARMACÊUTICA, LDA",CINON FORTE,Cinarizina,75mg,Cápsulas,CXS DE 20 E 60 CÁPS,Sofarimex - Indu,17,30-12-2005
+OO/H/20046/59,"GENERICS & SPECIALITIES, Lda",DERMOSONE CREAM,"Betametasona, dipropionato",0%,Creme,Bisnaga de 30g,GALENTIC PHA,428,28-02-2008
+OO/H/20046/63,"GENERICS & SPECIALITIES, Lda",WHITFIELD´S OINTMENT,Ácido Salicílico + Ácido Benzóico,30mg + 60mg,Pomada,"TUBO 25 GRS, 100g",GALENTIC PHA,44,01-03-2005
+OO/H/20046/62,"GENERICS & SPECIALITIES, Lda",NETRAVIR® EYE OINTMENT,Aciclovir,3% w/w,Pomada Oftálmica,Bisnaga de Alumínio de 4.5g,GALENTIC PHA,87,30-12-2005
+OO/H/20046/61,"GENERICS & SPECIALITIES, Lda",KLORAXIN EYE OINTMENT,Cloranfenicol,1%,Pomada Oftálmica,Bisnaga de 5g,GALENTIC PHA,42,02-03-2005
+OO/H/20046/60,"GENERICS & SPECIALITIES, Lda",FUNGIGEN® CREAM,"Miconazol, nitrato",2% (20mg),Creme,Bisnaga de 15g,GALENTIC PHA,43,02-03-2005
+OO/H/20048/65,"GENERICS & SPECIALITIES, Lda",PYLOOCAIN ® OINTMENT,"Betametasona,valerato + Fenilefrina, cloridrato + Lidocaína, cloridrato",0.5mg + 1mg + 25mg,Pomada anti-hemorroidal,TUBO DE 30G,GALENTIC PHA,86,30-12-2005
+OO/H/20048/67,PROFARMA,NYSTATIN-V,Nistatina,100.000 U.I,Comprimidos vaginais,CAIXA COM 14 COMP C/APLICADOR,"BDH industries,",128,06-04-2006
+OO/H/200410/69,MEDIMPORT LDA,FOLICIL,Ácido Fólico,5mg,Comprimidos,"EMBALAGEM 20,50 OU 500 COMP, 60comp",LABORATÓRIO,145,06-04-2006
+OO/H/200410/72,"MEDÁFRICA, Lda",REGESTEN,Clotrimazol,1%,Creme tópico,TUBO 15g,BAL PHARMA L,36,30-12-2005
+OO/H/200410/71,"MEDÁFRICA, Lda",OCIUM 500,"Cálcio, Carbonato + Colecalciferol (Vit.D3)",1275mg + 12.505mg,Comprimidos,CX 3 blister de 10 comprimidos,BAL PHARMA L,48,30-12-2005
+OO/H/200410/70,"MEDÁFRICA, Lda",DIAMET®,"Metformina, Cloridrato",500mg,Comprimidos Revestidos,Embalagem contendo 10 blisters de 10 comprimidos revestidos,BAL PHARMA L,116,27-03-2006
+OO/H/200410/75,WELL WORTH LDA,COTRIM,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,Blisters 10x10,Medopharma Ltd,101,27-03-2006
+OO/H/200410/76,"MEDÁFRICA, Lda",GLUCONIL,Glibenclamida,5mg,Comprimidos,10blister de 10comp,BAL PHARMA L,870,06-03-2009
+OO/H/200411/81,MEDIMPORT LDA,DIACOL,"Dextrometorfano, Bromidrato",27mg/15ml,Xarope,Frasco de 200ml,BIAL- Portela &,146,18-07-2005
+OO/H/200411/80,MEDIMPORT LDA,ACARILBIAL,Benzoato de Benzilo,0.3,Solução cutânea,Frasco de 200ml,LABORATÓRIO,62,30-12-2005
+OO/H/200411/83,"GENERICS & SPECIALITIES, Lda",TETRACICLINA,"Tetraciclina, Hidrocloreto",1%w/w,Pomada Oftálmica,Bisnaga de 5g,GALENTIC PHA,1297,13-01-2008
+OO/H/200411/94,MEDIMPORT LDA,SEDOXIL,MEXAZOLAM,1mg,Comprimidos,"CXS 20, 40 OU 60 COMP",LABORATÓRIO,147,05-07-2005
+OO/H/200411/93,MEDIMPORT LDA,OMPRANYT,Omeprazol,20mg,Cápsulas duras,"CAIXA DE 14,28 OU 500COMP",BIAL- Portela &,61,30-12-2005
+OO/H/200411/92,MEDIMPORT LDA,MIGRETIL,ERGOTAMINA tartarato+CAFEINA+ALCALOIDES DE BELADONA+PARACETAMOL,1mg + 100mg + 400 mg + 0.1mg,Comprimidos Revestidos,CAIXA 20 COMP,BIAL- Portela &,76,30-12-2005
+OO/H/200411/91,MEDIMPORT LDA,FOLIFER,SULFATO FERROSO+ÁCIDO FÓLICO,1mg + 90mg,Comprimido de Libertação Prolongada,CX 20 OU 60 COMP,LABORATÓRIO,148,05-07-2005
+OO/H/200411/96,"MEDÁFRICA, Lda",SEREGRA,Citrato de Sildenafil,100mg,Comprimidos Revestidos,1blister de 4 comprimidos,BAL PHARMA L,34,30-12-2005
+OO/H/20051/101,MAPUTO HEALTH CARE Lda,TETRACIN-500,"Tetraciclina, Hidrocloreto",500mg,Cápsulas,BLISTERE CÁPS 10 x 10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20051/100,MAPUTO HEALTH CARE Lda,Parador - 500,Paracetamol,500mg,Comprimidos,blister de comp 10 x 10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20051/99,MAPUTO HEALTH CARE Lda,LUXCEE,Ácido Ascórbico,500mg,Comprimidos,CXS 10 x 10 COMPRIMIDOS,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20051/103,MAPUTO HEALTH CARE Lda,KAUSIMOX-500,"Amoxicilina, Trihidrato",500mg,Cápsulas,BLISTERES 10 X 10 CÁPSULAS,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20051/102,MAPUTO HEALTH CARE Lda,IBUFLAM 200,Ibuprofeno,200mg,Comprimidos Revestidos,EMBALAGEM 10 x 10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20051/105,"MEDIFARMA, LDA",GLICOSE A 5%,Glicose,5%,Solução injectável,Frasco de 1000ml,Claris Lifescienc,82,30-12-2005
+OO/H/20051/104,MOZPHARMA LDA,CLORETO DE SÓDIO 0.9%,Cloreto de Sódio,1%,Solução injectável,Balão de 1000 ML,Claris Lifescienc,78,30-12-2005
+OO/H/20051/108,WELL WORTH LDA,NEOTON,"Clorfeniramina, maleato",4mg,Comprimidos,Blisters 10x10,Medopharma Ltd,181,27-04-2007
+OO/H/20051/107,WELL WORTH LDA,DUOVIR,Lamivudina + Zidovudina,150mg + 300mg,Comprimidos,Frasco de 60 Comprimidos,Cipla Limited - I,390,13-01-2008
+OO/H/20051/112,"MEDÁFRICA, Lda",SUPRAFLOX 500,Ciprofloxacina,500mg,Comprimidos,BLISTERES DE 10 X 10 COMP,KHANDELWAL,80,30-12-2005
+OO/H/20052/114,WELL WORTH LDA,LAMIVIR,Lamivudina,50mg/5ml,Solução Oral,Frasco de 100ml,Cipla Limited - I,443,26-02-2008
+OO/H/20052/118,MAPUTO HEALTH CARE Lda,MUVON,Diclofenac,50mg,Comprimidos Revestidos,embalagem de 10X10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20052/117,MAPUTO HEALTH CARE Lda,CARETENOL-50,ATENOLOL,50mg,Comprimidos,EMBALAGEM 10 x 10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20052/130,"MEDIS FARMACÊUTICA, LDA",VOMIDRINE,DIMENIDRINATO,50mg,Comprimidos,CXS DE 10 E 20 COMP,Sofarimex - Indu,374,30-12-2005
+OO/H/20052/129,"MEDIS FARMACÊUTICA, LDA",TANDIX,Indapamida,2.5mg,Comprimidos Revestidos,"CXS DE 15, 30 E 6O COMPRIMIDOS REVESTIDOS",Sofarimex - Indu,23,30-12-2005
+OO/H/20052/128,"MEDIS FARMACÊUTICA, LDA",REMOTIL,"Domperidona, maleato",10mg,Comprimidos,CXS 20 COMP CXS 60 COMP,Sofarimex - Indu,27,30-12-2005
+OO/H/20052/131,WELL WORTH LDA,Neotenolol,Atenolol,100mg,Comprimidos,Blisters 10x10,Medopharma Ltd,119,03-04-2006
+OO/H/20053/134,AFRI FARMÁCIA LDA,LOGICAN 200,Fluconazol,200mg,Cápsulas,4 blister de 10 cápsulas,WIN MEDICARE,110,27-03-2006
+OO/H/20053/133,AFRI FARMÁCIA LDA,LOGICAN 150,Fluconazol,150mg,Cápsulas,4 blister de 10 cápsulas,WIN MEDICARE,109,27-03-2006
+OO/H/20053/132,AFRI FARMÁCIA LDA,DICLOMOL GEL,Diclofenac,1.16%w/w,Gel,Bisnaga de 20g,WIN MEDICARE,94,30-12-2008
+OO/H/20053/135,MAPUTO HEALTH CARE Lda,TYLINE-25,AMITRIPTILINA,25mg,Comprimidos Revestidos,EMBALAGEM 10 X10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20053/136,WELL WORTH LDA,NEODOL,Paracetamol,500mg,Comprimidos,Blisters 10x10,Medopharma Ltd,131,03-04-2006
+OO/H/20053/137,WELL WORTH LDA,NEONALDIX 500,Ácido Nalidíxico,500mg,Comprimidos,Blisters 10x10,Medopharma Ltd,83,30-12-2005
+OO/H/20053/139,WELL WORTH LDA,NEOCICLINA 500,Tetraciclina,500mg,Cápsulas,Blisters 10x10,Medopharma Ltd,84,30-12-2005
+OO/H/20053/138,WELL WORTH LDA,NEOBENDEX,Mebendazol,100mg,Comprimidos,Blisters 25x6,Medopharma Ltd,102,27-03-2006
+OO/H/20054/142,FARMACÊUTICA AUSTRAL,ALERJON,"Oximetazolina, Cloridrato",0.25mg/ml,Colírio,Frascos de 10ml,LABORATÓRIO,480,03-04-2008
+OO/H/20054/145,MAPUTO HEALTH CARE Lda,CHLORAMPHENICOL SODIUM SUCCINATE FOR INJECTI,"O Cloranfenicol,succinato sódico",1 G,Pó para suspensão injectável,FRASCO DE VIDRO,KARNATAKA AN,115,27-03-2006
+OO/H/20054/146,FARMACÊUTICA AUSTRAL,ANESTOCIL,"Oxibuprocaína, Cloridrato",4mg/ml,Colírio,Frasco de 10ml,LABORATÓRIO,259,30-09-2007
+OO/H/20054/148,AFRI FARMÁCIA LDA,RL (Lactato de Ringer),cloreto de sódio+sódio+K+Kcl+Cl+Cacl+Ca+lactato Na+glactato,"(0,32 g + 0.6 g + 0,040 g + 0.027 g)/100 ml",Solução injectável,Balões de 1000 ML e Balões de 500 ML,Fresenius Kabi I,95,30-12-2005
+OO/H/20055/149,"MEDIS FARMACÊUTICA, LDA",AERO-OM,Simeticone,42mg,Comprimidos mastigáveis,"CX 20, 60 e 100 COMP","OM Portuguesa,",60,30-12-2005
+OO/H/20055/151,AFRI FARMÁCIA LDA,DICLOMOL SR,Diclofenac,100mg,Cápsula de libertação prolongada,BLISTER 10X10 COMPRIMIDOS LIBERTAÇÃO PROLONGADA,WIN MEDICARE,173,21-08-2006
+OO/H/20055/150,AFRI FARMÁCIA LDA,DICLOMOL Injectável,Diclofenac,25mg/3ml,Solução Injectável,10 AMPOLAS DE 3ML,WIN MEDICARE,408,26-02-2008
+OO/H/20055/152,AFRI FARMÁCIA LDA,AMINOPHYLLINE,Aminofilina,100mg,Comprimidos,10 blister de 10 comprimidos,UMEDICA LABO,190,31-05-2007
+OO/H/20055/155,AFRI FARMÁCIA LDA,ELYVATE CREME,"Betametasona, valerato",0.001,Creme,Bisnaga de 15g,Elys Chemical In,92,30-12-2005
+OO/H/20055/154,AFRI FARMÁCIA LDA,ELYVATE POMADA,"Betametasona, valerato",0.001,Pomada,Bisnaga de 15g,Elys Chemical In,93,30-12-2005
+OO/H/20055/156,MEDIMPORT LDA,CLAVAMOX DT 400,Amoxicilina + Ácido Clavulânico,400mg + 57mg,Pó para Suspensão Oral,Frasco de 70ml,Glaxo Wellcome,50,30-12-2005
+OO/H/20055/157,"MEDIS FARMACÊUTICA, LDA",AERO OM EMULSÃO,Simeticone,100mg/ml,Emulsão Oral,Frasco de 25ml,"OM Portuguesa,",59,30-12-2005
+OO/H/20055/159,MAPUTO HEALTH CARE Lda,KAYVIR 400,Aciclovir,400mg,Comprimido,5 blister de 10 comprimidos e 10x10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20055/158,MAPUTO HEALTH CARE Lda,KAYVIR 200,Aciclovir,200mg,Comprimidos revestidos,5BLISTER DE 6 COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20055/162,AFRI FARMÁCIA LDA,"VARIACE 2,5",Ramipril,2.5mg,Cápsulas,CAIXA COM BLISTERS (3X10) )capsulas,WIN MEDICARE,111,27-03-2006
+OO/H/20055/161,AFRI FARMÁCIA LDA,VARIACE,Ramipril,5mg,Cápsulas,CAIXA COM BLISTERS (3X10) )capsulas,WIN MEDICARE,112,27-03-2006
+OO/H/20056/173,WELL WORTH LDA,NEOVENT 4,"Salbutamol, Sulfato",4mg,Comprimidos,Blisters 10x10,Medopharma Ltd,100,27-03-2006
+OO/H/20056/172,WELL WORTH LDA,NEOVENT 2,"Salbutamol, Sulfato",2mg,Comprimidos,Blisters 10x10,Medopharma Ltd,99,27-03-2006
+OO/H/20056/171,WELL WORTH LDA,Ibufen 400,Ibuprofeno,400mg,Comprimidos,Blisters 10x10,Medopharma Ltd,106,27-03-2006
+OO/H/20056/170,WELL WORTH LDA,Ibufen 200,Ibuprofeno,200mg,Comprimidos,Blisters 10x10,Medopharma Ltd,105,27-03-2006
+OO/H/20056/166,MAPUTO HEALTH CARE Lda,ANTACIL - 500,Hidróxido de Alumínio,500mg,Comprimido Mastigável,blister com 10 x10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20056/174,FARMACÊUTICA AUSTRAL,BERTOCIL,"BETAXOLOL, cloridrato",5.6mg/ml,Colírio,Frasco de 5ml,LABORATÓRIO,155,29-05-2006
+OO/H/20057/178,WELL WORTH LDA,NEOFENAC 50,Diclofenac,50mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,108,27-03-2006
+OO/H/20057/177,WELL WORTH LDA,NEOFENAC 25,Diclofenac,25mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,107,27-03-2006
+OO/H/20057/176,WELL WORTH LDA,NEOFAGE,Metformina,500mg,Comprimidos,Blisters 10x10,Medopharma Ltd,98,27-03-2006
+OO/H/20057/180,AFRI FARMÁCIA LDA,SHELADOL,Paracetamol,120mg/5ml,Suspensão Oral,Frasco de 100ml,Shelys Pharmac,446,30-09-2007
+OO/H/20057/181,MAPUTO HEALTH CARE Lda,ORAL REHIDRATATION SALTS,Cloreto de Sódio+ Citrato de sódio+ Cloreto de potassio + GLUCOSE ANIDRA,3.5g + 2.9g + 1.5g + 20g,Pó para Suspensão Oral,SAQUINHO COM 27.9G,AJANTA PHARM,681,21-10-2006
+OO/H/20057/179,AFRI FARMÁCIA LDA,MEGAVIT,Vit. A + Vit. D3 + Vit. B1 + Vit. B2 + Vit. B6 + Vit B12 + Vit. C + D-Pantenol + Nicotinamida,5000IU + 400IU + 3mg + 0.856mg + 2mg + 5mcg + 10mg + 5mg + 20mg,Xarope,Frasco de 100ml,Shelys Pharmac,218,27-07-2007
+OO/H/20057/183,AFRI FARMÁCIA LDA,SULPHADAR,Sulfadoxina + Pirimetamina,500mg + 25mg,Comprimidos,EMBALAGEM 30x3 COMP,Shelys Pharmac,216,24-07-2007
+OO/H/20057/182,AFRI FARMÁCIA LDA,PRAZIQUANTEL,Praziquantel,600mg,Comprimidos,BLISTER 10X10 COMP,Shelys Pharmac,199,24-08-2007
+OO/H/20057/190,WELL WORTH LDA,NEOCID,Hidróxido de alumínio + Hidróxido de magnésio + simeticone,200mg + 200mg + 25mg,Comprimido Mastigável,Blisters 5 X4,Medopharma Ltd,186,03-08-2008
+OO/H/20057/188,FARMACÊUTICA AUSTRAL,CLOROCIL,Cloranfenicol,10mg/g,Pomada Oftálmica,Bisnaga de 5g,LABORATÓRIO,322,29-05-2006
+OO/H/20057/187,FARMACÊUTICA AUSTRAL,CLOROCIL,Cloranfenicol,8mg/ml,Colírio,Frasco de 5ml,LABORATÓRIO,482,30-09-2007
+OO/H/20057/193,FARMACÊUTICA AUSTRAL,TERRICIL,"OXITETRACICLINA, Cloridrato",5mg/g,Pomada Oftálmica,TUBO 5g,LABORATÓRIO,275,30-09-2007
+OO/H/20057/192,FARMACÊUTICA AUSTRAL,RONIC,"Dexametasona, fosfato",1mg/ml,Colírio,Frasco de 5ml,LABORATÓRIO,236,26-02-2008
+OO/H/20057/197,MEDIMPORT LDA,EPSICAPROM 2.5,Ácido Aminocapróico,2.5g/10ml,Solução injectável,CX de 6 ampolas,Sofarimex - Indu,202,22-06-2007
+OO/H/20058/199,MAPUTO HEALTH CARE Lda,PROCAINE BENZYL PENICILLIN FOR INJECTION,PENICILINA PROCAÍNA,3mega,Pó para Injectável,embalagem de 50 FRASCOs,KARNATAKA AN,114,13-04-2009
+OO/H/20058/200,MAPUTO HEALTH CARE Lda,AMPICILLIN SODIUM FOR INJECTION,Ampicilina,500mg,Solução injectável,embalagem de 50 ampolas de 2ml,KARNATAKA AN,120,13-04-2009
+OO/H/20058/202,FARMACÊUTICA AUSTRAL,FLOXEDOL,Ofloxacina,3mg/ml,Colírio,Frasco de 10ml,Laboratório Edol,117,27-03-2006
+OO/H/20058/205,WELL WORTH LDA,NEOZOL,Metronidazol,250mg,Comprimidos,blisters 10x10,Medopharma Ltd,196,31-05-2007
+OO/H/20058/204,WELL WORTH LDA,CIMADIN 400,Cimetidina,400mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,215,31-05-2007
+OO/H/20058/203,WELL WORTH LDA,CIMADIN 200,Cimetidina,200mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,197,31-05-2007
+OO/H/20058/208,"GENERICS & SPECIALITIES, Lda",GEN- C,Ácido Ascórbico (Vit. C) + Ascorbato de sódio,200mg +338mg,Comprimido Mastigável,5 Blister X 10 Comprimidos,Medopharma Ltd,505,16-06-2008
+OO/H/20058/212,AFRI FARMÁCIA LDA,UCETAXIME 1000,Cefotaxima,1000mg,Injectável,5 CAIXAS COM 1 FRASCO DE VIDRO,UMEDICA LABO,664,21-10-2008
+OO/H/20058/211,AFRI FARMÁCIA LDA,TRESIVAC,VÍRUS do sarampo+VIRUS da parotite+VÍRUS da rubéola,1000 CCID50 + 5000 CCID50 + 100 CCID50,Pó para Injectável,FRASCO DE 1 DOSE + AMPOLA C/ DILUENTE,Serum Institute o,140,04-06-2006
+OO/H/20058/210,AFRI FARMÁCIA LDA,Tetanus Toxoid Vaccine Adsorbed (VAT),Vacina de Tetano,≥ 5LF (≥ 40UI)/ 0.5ml (1 dose),Suspensão Injectável,50 Frascos de 5ml (10doses) e 25 frascos de 10ml (20doses),Serum Institute o,157,29-05-2006
+OO/H/20058/209,AFRI FARMÁCIA LDA,SII RABIVAX,ANTÍGENO DA RAIVA,»2.5IU,Suspensão injectável,Frasco de 10 ml com 1 dose,Serum Institute o,142,04-06-2006
+OO/H/20059/218,MAPUTO HEALTH CARE Lda,SALBID 4,"Salbutamol, Sulfato",4mg,Comprimidos,EMBALAGEM 10 x 10 BLISTERS DE COMP,EROS PHARMA,393,13-01-2008
+OO/H/20059/214,AFRI FARMÁCIA LDA,KOFLYN,Cloreto de amónia+clorfeniramina maleato+citrato de Na+mentol,"100mg+2,2mg+40mg+1,1mg",Xarope,Frasco de 100ml,Shelys Pharmac,179,27-04-2007
+OO/H/20059/216,MAPUTO HEALTH CARE Lda,ENTOLOL 5O,ATENOLOL,50mg,Comprimidos,EMBALAGEM 10 x 10,EROS PHARMA,166,24-07-2006
+OO/H/20059/215,MAPUTO HEALTH CARE Lda,ENTOLOL 100,ATENOLOL,100mg,Comprimidos,EMBALAGEM 10 x 10,EROS PHARMA,167,24-07-2006
+OO/H/20059/219,AFRI FARMÁCIA LDA,MUCOLYN PEDIÁTRICO,Dextrometofano + Clorfeniramina + Pseudoefedrina + amónia,5mg + 2mg + 10mg + 50mg,Xarope,Frasco de 100ml,Shelys Pharmac,175,21-08-2006
+OO/H/20059/221,MAPUTO HEALTH CARE Lda,DIVON 50,Diclofenac,50mg,Comprimidos Revestidos,EMBALAGEM 10 BLIS DE COMP,EROS PHARMA,171,31-05-2007
+OO/H/20059/220,MAPUTO HEALTH CARE Lda,DIVON 25,Diclofenac sódico,25mg,Comprimidos Revestidos,EMBALAGEM 10 BLIS DE 10 COMP,EROS PHARMA,193,31-05-2007
+OO/H/20059/222,MAPUTO HEALTH CARE Lda,XENDA SUSPENSION,Albendazol,200mg/5ml,Suspensão Oral,FRASCO DE 10 ML,EROS PHARMA,138,06-04-2006
+OO/H/20059/224,MAPUTO HEALTH CARE Lda,XENDA 400,Albendazol,400mg,Comprimido Mastigável,BLISTERE 1 X 1 COMP,EROS PHARMA,139,06-04-2006
+OO/H/20059/226,WELL WORTH LDA,IBUCODAL,Ibuprofeno+Paracetamol+Cafeína,200mg + 325mg + 40mg,Cápsulas,Blisters 20x2x10,Medopharma Ltd,497,03-04-2008
+OO/H/20059/225,WELL WORTH LDA,FACIDAR,Sulfadoxina + Pirimetamina,500mg + 25mg,Comprimidos,blisters 25x1x3,Medopharma Ltd,192,31-05-2007
+OO/H/20059/223,MAPUTO HEALTH CARE Lda,EROX DS,"Amoxicilina, Trihidrato",250mg/5ml,Pó para Suspensão Oral,Frasco de 100ml,EROS PHARMA,161,24-07-2006
+OO/H/20059/231,"MEDIS FARMACÊUTICA, LDA",CO-ARINATE FDC ® JUNIOR,Artesunato + Sulfametoxipirazina + Pirimetamina,100 mg + 250mg + 12.5mg,Comprimidos,Embalagens de 3 Comp,DAFRA PHARM,1064,20-04-2009
+OO/H/20059/230,"MEDIS FARMACÊUTICA, LDA",CO ARINATE ADULTO,Artesunato + Sulfametoxipirazina + Pirimetamina,200mg + 500mg +25mg,Comprimidos,Embalagens de 3 Comp,DAFRA PHARM,1063,20-04-2009
+OO/H/20059/232,WELL WORTH LDA,NEODOX,"Doxiciclina, Hiclato",100mg,Cápsulas,Blisters 10x10,Medopharma Ltd,345,01-12-2007
+OO/H/200510/23,"SHANI, LIMITADA",POWERGESIC,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200510/23,MAPUTO HEALTH CARE Lda,ORALCON-F,Levonorgestrel + Etinilestradiol + FUMARATO FERROSO,"0,15mg + 0,03mg + 75mg",Comprimidos Revestidos,Embalagem contendo 3 blisters de 28 comprimidos,Mylan Laborator,189,24-05-2007
+OO/H/200510/23,AFRI FARMÁCIA LDA,MERIQUINE,"Cloroquina, fosfato",250mg,Comprimidos,10 blister de 10 comprimidos,Mercury laborato,1231,15-06-2009
+OO/H/200510/23,AFRI FARMÁCIA LDA,MALAGO,AMODIAQUINA HCL,200mg,Comprimidos,EMBALAGEM DE 150 COMP,Mercury laborato,238,24-08-2007
+OO/H/200510/23,MAPUTO HEALTH CARE Lda,HYAN,LEVONORGESTREL,0.03mg,Comprimidos Revestidos,BLISTER DE 28 COMP,Jai Pharma Ltd -,200,22-06-2007
+OO/H/200510/24,MAPUTO HEALTH CARE Lda,METOLUX-10,"Metoclopramida, Cloridrato",10mg,Comprimidos,EMBALAGEM 10 x 10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200510/24,AFRI FARMÁCIA LDA,FORMET,Metformina,500mg,Comprimidos,EMBALAGEM 100 COMP (10X10),Mercury laborato,187,24-05-2007
+OO/H/200510/24,AFRI FARMÁCIA LDA,FERIX FOLIQUE,SULFATO FERROSO + ÁCIDO FÓLICO,200mg+0.25mg,Comprimidos,EMBALAGEM 100 COMP,Mercury laborato,572,08-03-2008
+OO/H/200510/24,MAPUTO HEALTH CARE Lda,BLOCARE- 40,"Propranolol, Cloridrato",40mg,Comprimidos,EMBALAGEM 10 x 10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200510/25,AFRI FARMÁCIA LDA,MULTONE FORTE,MULTIVITAMINAS,2000IU+200IU+0.5mg+0.1mg+0.1mg+0.1mg+5mg,Comprimidos,CAIXA 100 COMP COM 10 BLISTERS DE 10,Mercury laborato,141,04-06-2006
+OO/H/200510/25,AFRI FARMÁCIA LDA,BIOSCINE,BROMETO DE BUTIL HISCINA (Butilescopulamina),100mg,Comprimidos,EMBALAGEM 100 COMP(2x50),Mercury laborato,403,13-01-2008
+OO/H/200510/25,"SHANI, LIMITADA",TRIOSHA,Tiamina (Vit. B1) + Piridoxina (Vit. B6) + Cianocobalamina (Vit. B12),50mg + 50mg + 250mg,Comprimidos Revestidos,2 Blisters 50,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200510/25,MAPUTO HEALTH CARE Lda,MOTRAM,Tramadol,50mg,Comprimidos,10blister de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200510/25,"MEDÁFRICA, Lda",CONVERTEN 5,"Enalapril, maleato",5mg,Comprimidos,CAIXA 10 X 10,KHANDELWAL,456,03-04-2008
+OO/H/200510/25,"MEDÁFRICA, Lda",CONVERTEN 10,"Enalapril, maleato",10mg,Comprimidos,Embalagem 10X10,KHANDELWAL,457,03-04-2008
+OO/H/200511/26,MAPUTO HEALTH CARE Lda,INDOCIN 25,Indometacina,25mg,Cápsulas,BLISTERES 10 X 10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200511/25,MAPUTO HEALTH CARE Lda,CETCARE-10,"Cetirizina, cloridrato",10mg,Comprimidos Revestidos,BLISTERES 10 X 10 COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200511/26,FARMACÊUTICA AUSTRAL,EDOLFENE,FLURBIPROFENO SÓDICO,0.3mg/ml,Colírio,Frasco de 5ml,LABORATÓRIO,134,04-06-2006
+OO/H/200511/26,AFRI FARMÁCIA LDA,AMYN-125,"Amoxicilina, Trihidrato",125mg/5ml,Suspensão Oral,Frasco de 100 ml,Kopran Ltda - In,164,24-07-2006
+OO/H/200511/26,AFRI FARMÁCIA LDA,AMYN 250,"Amoxicilina, Trihidrato",250mg/5ml,Suspensão Oral,FR 100ML,Kopran Ltda - In,165,24-07-2006
+OO/H/200511/26,WELL WORTH LDA,NEOMETACIN,Indometacina,25mg,Cápsulas,Blisters 10x10,Medopharma Ltd,180,27-04-2007
+OO/H/200511/26,WELL WORTH LDA,NEOFENOPEN 500,Fenoximetilpenicilina (Penicilina V),500mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,195,31-05-2007
+OO/H/200511/26,WELL WORTH LDA,NEOCIPRO,Ciprofloxacina,500mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,194,31-05-2007
+OO/H/200511/26,WELL WORTH LDA,ASCOBEX,Ácido Ascórbico,100mg,Comprimidos,Blisters 10x10,Medopharma Ltd,506,16-06-2008
+OO/H/200511/27,AFRI FARMÁCIA LDA,UMETAC-150,Ranitidina,150mg,Comprimidos,EMBALAGEM 100 COMP Blisters (10x10),UMEDICA LABO,163,24-07-2006
+OO/H/200511/27,WELL WORTH LDA,PREDILON,Prednisolona,5mg,Comprimidos,"Blisters 5x20, Blisters 10x10",Medopharma Ltd,156,29-05-2006
+OO/H/200511/27,AFRI FARMÁCIA LDA,PARALGET,Paracetamol,500mg,Comprimidos,CAIXAS 100 COMP(10x10),Kopran Ltda - In,242,24-08-2007
+OO/H/200511/27,AFRI FARMÁCIA LDA,ERYKO-500,Eritromicina,500mg,Comprimidos Revestidos,BLISTER 10X10,Kopran Ltda - In,1397,28-09-2009
+OO/H/200511/27,AFRI FARMÁCIA LDA,BREN-400,Ibuprofeno,400mg,Comprimidos,10 blister de 10 comprimidos,Kopran Ltda - In,223,27-04-2007
+OO/H/200511/27,AFRI FARMÁCIA LDA,BREN-200,Ibuprofeno,200mg,Comprimidos,EMBALAGEM DE 100 COMP(10x10),Kopran Ltda - In,177,27-04-2007
+OO/H/200511/28,WELL WORTH LDA,NEOFLOX,Norfloxacina,400mg,Comprimidos Revestidos,Blisters 1x10,Medopharma Ltd,668,21-10-2008
+OO/H/200512/28,"MEDÁFRICA, Lda",LONOL 50,ATENOLOL,50mg,Comprimidos,Blister de 10 comprimidos,KHANDELWAL,361,01-12-2007
+OO/H/200512/28,"MEDÁFRICA, Lda",LONOL 100,ATENOLOL,100mg,Comprimidos,Blister de 10 comprimidos,KHANDELWAL,362,01-12-2007
+OO/H/200512/28,AFRI FARMÁCIA LDA,DIFISAL,Diclofenac,50mg,Comprimidos,10 blister de 10 comprimidos,Kopran Ltda - In,185,24-05-2007
+OO/H/200512/29,"MEDIS FARMACÊUTICA, LDA",TRIFENE 200,Ibuprofeno,200mg,Comprimidos Revestidos,CXS 20 COMP,LABORATÓRIO,634,08-09-2008
+OO/H/200512/29,AFRI FARMÁCIA LDA,NUBEND-400,Albendazol,400mg,Comprimidos,STRIP 1 COMP E EMBALAGEM DE 20 COMP,Kopran Ltda - In,243,24-08-2007
+OO/H/200512/29,MAPUTO HEALTH CARE Lda,Microflox 500,"Ciprofloxacina, Hcl",500mg,Comprimidos,10blister de 10 comp,MICRO LABS LT,320,27-10-2007
+OO/H/200512/29,MAPUTO HEALTH CARE Lda,MELMET 850,"Metformina, hidrocloreto",850mg,Comprimidos Revestidos,10blister de 10 comp,MICRO LABS LT,673,21-10-2008
+OO/H/200512/29,AFRI FARMÁCIA LDA,AZ-1,Azitromicina,250mg,Cápsulas,5 BLISTER X 6 CAPS,Kopran Limited -,136,24-04-2006
+OO/H/200512/30,AFRI FARMÁCIA LDA,KETOTIF,KETOTIFENO,1 MG,Comprimidos,CXS 100 COMP(10x10),Kopran Ltda - In,486,03-04-2008
+OO/H/200512/31,WELL WORTH LDA,NEOMOX 500,"Amoxicilina, Trihidrato",500mg,Cápsulas,Blisters 10x10,Medopharma Ltd,1031,20-04-2009
+OO/H/200512/30,WELL WORTH LDA,NEOMOX 250 Susp,"Amoxicilina, Trihidrato",250mg/5ml,Suspensão Oral,Frascos 100ml,Medopharma Ltd,250,24-04-2006
+OO/H/200512/30,WELL WORTH LDA,NEOMOX 125 Susp,"Amoxicilina, Trihidrato",125mg/5ml,Suspensão Oral,Frascos 100ml,Medopharma Ltd,129,29-04-2006
+OO/H/200512/30,WELL WORTH LDA,NEOFENICOL SUSP,Cloranfenicol,125mg/5ml,Suspensão Oral,Frasco 100ml,Medopharma Ltd,559,03-08-2008
+OO/H/200512/30,WELL WORTH LDA,NEOFENICOL CÁPSULAS,Cloranfenicol,250mg,Cápsulas,Blisters 10x10,Medopharma Ltd,558,03-08-2008
+OO/H/200512/31,MAPUTO HEALTH CARE Lda,PULMOXYL DRY SYRUP 125,"Amoxicilina, Trihidrato",125mg/5ml,Suspensão Oral,FRASCOS 100ml,MICRO LABS LT,286,30-09-2007
+OO/H/200512/31,MAPUTO HEALTH CARE Lda,PULMOXYL 500,"Amoxicilina, Trihidrato",500mg,Cápsulas,BLISTERES 10 X 10 CÁPS,MICRO LABS LT,285,30-09-2007
+OO/H/20061/315,MAPUTO HEALTH CARE Lda,AVAS 20,Atorvastatina,20mg,Comprimidos Revestidos,3 x 10 COMP,MICRO LABS LT,352,01-12-2007
+OO/H/20061/314,MAPUTO HEALTH CARE Lda,AVAS 10,Atorvastatina,10mg,Comprimidos Revestidos,2 x 10 COMP,MICRO LABS LT,351,01-12-2007
+OO/H/20061/316,MAPUTO HEALTH CARE Lda,FRUZEL 40,Furosemida,40mg,Comprimidos,blister de 10 x 10comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20061/317,"SHANI, LIMITADA",ALMEX 200,Albendazol,200mg/5ml,Suspensão Oral,Frascos 10ml,Square Pharmac,518,16-06-2008
+OO/H/20061/319,MAPUTO HEALTH CARE Lda,AMLONG 5,"Amlodipina, besilato",5mg,Comprimidos,BLISTER 3X1O COMP,MICRO LABS LT,245,24-08-2007
+OO/H/20061/318,MAPUTO HEALTH CARE Lda,AMLONG 10,"Amlodipina, besilato",10mg,Comprimidos,BLISTER 3X1O COMP,MICRO LABS LT,244,24-08-2007
+OO/H/20061/320,BAYER SCHERING PHARMA MOÇAMBIQUE,NEBIDO,"Testosterona, undeccanoato",1000mg/4ml,Solução Injectável,AMPOLA,JENAHEXAL PH,246,24-08-2007
+OO/H/20062/324,MAPUTO HEALTH CARE Lda,SIMVAS 20,Sinvastatina,20mg,Comprimidos Revestidos,3blister de 10 comp,MICRO LABS LT,777,18-02-2009
+OO/H/20062/323,MAPUTO HEALTH CARE Lda,SIMVAS 10,Sinvastatina,10mg,Comprimidos Revestidos,3blister de 10 comp,MICRO LABS LT,776,18-02-2009
+OO/H/20062/326,"MEDIS FARMACÊUTICA, LDA",SEPTIL PÓ,Iodopovidona,4.4g/100g,Pó,Frasco de 10g,Sofarimex - Indu,334,27-10-2007
+OO/H/20062/325,"MEDIS FARMACÊUTICA, LDA",CYMERION,"Zolpidem, hemitartarato",10mg,Comprimidos Revestidos,EMBALAGEM DE 14 COMP,Sofarimex - Indu,234,24-08-2007
+OO/H/20062/339,"SHANI, LIMITADA",SHANI WHITFIELD,Ácido Salicílico + Ácido Benzóico,3% +6%,Pomada,"Bisnaga de 30g, 25g",INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20062/338,"SHANI, LIMITADA",LORATIN,Loratadina,5mg/5ml,Suspensão Oral,Frasco de 60ml,Square Pharmac,436,26-02-2008
+OO/H/20062/334,"MEDIS FARMACÊUTICA, LDA",LISOPAN 1000,Paracetamol,1000mg,Comprimidos efervescentes,Embalagem de 10 COMPRIMIDOS,SMB Technology,233,24-08-2007
+OO/H/20062/337,"SHANI, LIMITADA",GLUCOSHA,Metformina,500mg,Comprimidos Revestidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20062/343,WELL WORTH LDA,PROBECO XAROPE,"Sal ferroso + Tiamina, cloridrato (Vit.B1) + Riboflavina(Vit.B2) + Piridoxina,cloridrato(Vit.B6) + Ácido fólic","15mg + 2,5mg + 1,0mg + 0,5mg + 3,0mg + 25mg + 5mg + 500mg",Xarope,Frasco de 100ml,TORQUE PHAR,282,30-09-2007
+OO/H/20062/346,AFRI FARMÁCIA LDA,TRIM-480,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,EMBALAGEM DE 100 COMP(10x10),Kopran Ltda - In,241,24-08-2007
+OO/H/20062/344,AFRI FARMÁCIA LDA,AMYN-500,"Amoxicilina, Trihidrato",500mg,Cápsulas,10 blister de 10 cápsulas,Kopran Ltd - Indi,400,13-01-2008
+OO/H/20063/354,WELL WORTH LDA,SCABOMA LOTION,Lindamo locao,1%,Loção,Frascos 100ml,GLENMARK PH,794,04-03-2009
+OO/H/20063/351,BAYER SCHERING PHARMA MOÇAMBIQUE,GINO-CANESTEN,Clotrimazol,10mg/g,Creme vaginal,BISNAGA DE 50g,Kern Pharma SL,208,22-06-2007
+OO/H/20063/353,WELL WORTH LDA,DR. MAYER´S COLD FLU PLUS,"Paracetamol + Cafeina + Fenilefrina, hidrocloreto + Clorfeniramina, maleato",500mg +30mg +2.5mg + 2mg,Comprimidos,Blister 20x1x4,Meyer Organic P,440,26-02-2008
+OO/H/20063/352,WELL WORTH LDA,COLICAID®,DIMETILPOLISSILOXANO (DIMETICONE) + ÓLEO DE ENDRO + ÓLEO DE FUNCHO,"40mg + 0,005ml + 0,0007ml",Gotas Orais,Frasco 15ml,Meyer Organic P,257,24-08-2007
+OO/H/20063/350,BAYER SCHERING PHARMA MOÇAMBIQUE,BAYCUTEN CREME,CLOTRIMAZOL+ ACETATO DE DEXAMETASONA,10mg/g + 0.443mg/g,Creme tópico,Bisnaga de 15g e de 30g,Kern Pharma SL,321,27-10-2007
+OO/H/20063/349,BAYER SCHERING PHARMA MOÇAMBIQUE,ASPIRINA GR 100,Ácido Acetilsalicílico,100mg,Comprimido gastro-resistente,EMBALAGEM DE 30 COMP,BAYER Bitterfeld,210,22-06-2007
+OO/H/20063/348,BAYER SCHERING PHARMA MOÇAMBIQUE,ADALAT CR 60,Nifedipina,60mg,Comprimido de Libertação Prolongada,EMBALAGENS DE 28 COMP,BAYER SCHERI,224,22-06-2007
+OO/H/20063/347,BAYER SCHERING PHARMA MOÇAMBIQUE,ADALAT CR 30,Nifedipina,30mg,Comprimido de Libertação Prolongada,EMBALAGENS DE 28 COMP,BAYER PHARM,201,22-06-2007
+OO/H/20063/359,"MEDIS FARMACÊUTICA, LDA",ANTIBIOPHILUS PÓ,"LACTOBACILUS CASEI VARIEDADE RHAMNOS, CULTURA LIOFILIZADA",1500mg,Pó para Solução Oral,20 saquetas de 1.5g,"Biose industries,",219,24-07-2007
+OO/H/20063/367,WELL WORTH LDA,SILAGRA 50,Citrato de Sildenafil,50mg,Comprimidos Revestidos,Blisters 10x1x4,Cipla Limited - I,510,16-06-2008
+OO/H/20063/362,AFRI FARMÁCIA LDA,SHELADOL,Paracetamol,500mg,Comprimidos,embalagem de 100 comprimidos,Shelys Pharmac,251,30-09-2007
+OO/H/20063/366,WELL WORTH LDA,NEOFULVIN,Griseofulvina,500mg,Comprimidos,Blisters 10x10,Medopharma Ltd,498,03-04-2008
+OO/H/20063/365,WELL WORTH LDA,CANDIDERM,Clotrimazol + Diproprionato de Betametasona + Sulfato de Gentamicina,1% + 0.025% + 0.1%,Creme,Bisnaga de 15g,GLENMARK PH,494,03-04-2008
+OO/H/20063/364,"MEDIS FARMACÊUTICA, LDA",AMLODIPINA AZEVEDOS,"Amlodipina, besilato",10mg,Comprimidos,"Embalagem de 10, 30 e 60 Comp.",Sofarimex - Indú,217,24-07-2007
+OO/H/20063/363,"MEDIS FARMACÊUTICA, LDA",AFEBRYL,PARACETAMOL+ÁCIDO ACETILSALICÍLICO+ÁCIDO ASCÓRBICO,200mg + 300mg + 300mg,Comprimido Efervescente,CXS 16 COMP. EFERVESCENTES,SMB Technology,473,03-04-2008
+OO/H/20063/369,WELL WORTH LDA,NEORYTH,"Eritromicina, Estearato",500mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,1206,15-06-2009
+OO/H/20063/368,WELL WORTH LDA,NEOCLARITY,Loratadina,10mg,Comprimidos Revestidos,Blisters 1x10,Medopharma Ltd,442,26-02-2008
+OO/H/20063/370,BAYER SCHERING PHARMA MOÇAMBIQUE,GINO CANESTEN 1,Clotrimazol,500mg,Comprimidos vaginais,EMBALAGEM DE 1COMP VAGINAL COM APLICADOR,Bayer Pharma A,207,22-06-2007
+OO/H/20063/374,BAYER SCHERING PHARMA MOÇAMBIQUE,CANESPOR UNIDIA CRÈME,Bifonazol,10mg/g,Creme,Bisnagas de 15g,BAYER SCHERI,204,22-06-2007
+OO/H/20063/376,MAPUTO HEALTH CARE Lda,BACTOCLAV 625,"Amoxicilina, Trihidrato + Clavulanato de Potássio",500mg + 125mg,Comprimidos Revestidos,BLISTER DE 6 COMP,MICRO LABS LT,264,30-09-2007
+OO/H/20064/378,"SHANI, LIMITADA",BETASHA N,"Betametasona,valerato + Neomicina, sulfato",0.025% + 0.5%,Creme,Bisnaga de 30g,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20065/384,"SHANI, LIMITADA",VENTOSHA 4,"Salbutamol, Sulfato",4mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20065/383,"SHANI, LIMITADA",VENTOSHA 2,"Salbutamol, Sulfato",2mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20065/382,"SHANI, LIMITADA",DOPASHA,METILDOPA,250mg,Comprimidos Revestidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20066/388,"SHANI, LIMITADA",DOXYSHA,DOXICICLINA,100mg,Cápsulas,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20066/390,MEDIMPORT LDA,RINIALER,Rupatadina,10mg,Comprimidos,EMBALAGEM DE 20 COMP,Bial - Portela &C,294,30-09-2007
+OO/H/20066/401,WELL WORTH LDA,VITAMIX XAROPE,"Gluconato de ferro (eq. A Ferro elementar) + Tiamina, Hidrocloreto (Vit.B1) + Riboflavina (Vit.B2) + pirid",26mg + 1.5mg + 1mg + 10mg + 10mg + 2.5mg + 44mg + 1mcg + 200IU + 1600IU,Xarope,Frasco de 100ml,TORQUE PHAR,281,30-09-2007
+OO/H/20066/400,WELL WORTH LDA,Neodol Susp,Paracetamol,120mg/5ml,Suspensão Oral,Frasco 100ml,TORQUE PHAR,1199,04-06-2009
+OO/H/20066/397,"MEDIS FARMACÊUTICA, LDA",NALBIX 10mg/ml SOLUÇÃO CUTÂNEA,Clotrimazol,1%,Solução cutânea,Frasco 30ml,Sofarimex - Indu,739,11-12-2008
+OO/H/20066/394,AFRI FARMÁCIA LDA,MUCOLYN,"Clorfeniramina, Maleato + Dextrometorfano , Hidrobromide + Amonio,Cloridre + Pseudoefedrina",2mg/5ml + 5mg/5ml + 50mg/5ml + 10mg/5ml,Xarope,FRASCO DE 100 ML,Shelys Pharmac,358,12-08-2008
+OO/H/20066/393,AFRI FARMÁCIA LDA,MERIGENTA ® COLÍRIO/ GOTAS AURICULARES,"Gentamicina, sulfato",0%,Colírio/ Gotas auriculares,Frascos de 10ml e 5ml,Mercury laborato,266,30-09-2007
+OO/H/20066/396,"MEDIS FARMACÊUTICA, LDA",MENTOCAÍNA - R,Tirotricina + Benzocaína,1.05mg + 2.5mg,Pastilha,CXS 20 PASTILHAS,Sofarimex - Indu,479,03-04-2008
+OO/H/20066/399,WELL WORTH LDA,HEMOVIT XAROPE,"Ferro, citrato de amónio + Piridoxina, cloridrato(Vit.B6) + Zinco, sulfato + Ácido fólico + Cianocobalamin",a 200mg +1.5mg + 7mg + 0.5mg + 7.5mcg,Xarope,Frasco de 225ml,TORQUE PHAR,344,01-12-2007
+OO/H/20066/392,AFRI FARMÁCIA LDA,GASTRALGINE,Hidróxido de alumínio + Hidróxido de magnésio + dimeticone,(200+200+25)mg / 5ml,Suspensão Oral,Frasco de 200ml,Mercury laborato,305,27-10-2007
+OO/H/20066/395,AFRI FARMÁCIA LDA,FERROUS SULPHATE TABLETS BP,SULFATO FERROSO,200mg,Comprimidos,EMBALAGEM 100 COMP(10x10),Mercury laborato,512,16-06-2008
+OO/H/20066/391,AFRI FARMÁCIA LDA,CHLORANPHENICOL,Cloranfenicol,5mg/ml,Colírio,Frasco de 5ml e de 10ml,Mercury laborato,602,08-09-2008
+OO/H/20066/398,WELL WORTH LDA,APETIMAX XAROPE,"Ciproheptadina , cloridrato",2mg/5ml,Xarope,Frasco de 100ml,TORQUE PHAR,270,30-09-2007
+OO/H/20066/403,MAPUTO HEALTH CARE Lda,ERYTHROCARE 500,"Eritromicina, Estearato",500mg,Comprimidos Revestidos,EMBALAGEM 10 x 10 COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20066/402,MAPUTO HEALTH CARE Lda,CEFTAZIDIMA 1G,CEFTAZIDIMA,1000mg,Pó para Solução Injectável,EMBALAGEM DE 50 FRAS,KARNATAKA AN,293,30-09-2007
+OO/H/20067/410,"MEDIS FARMACÊUTICA, LDA",SYNDOL COMPRIMIDOS,"PARACETAMOL+DOXILAMINA,succinato+CAFEÍNA+CODEÍNA,fosfato",10mg + 450mg + 5mg + 30mg,Comprimidos,"EMBALAGEM de 10, 18, 54 e 100 Comprimidos",Adcock Ingram,394,13-01-2008
+OO/H/20067/408,"MEDIS FARMACÊUTICA, LDA",CEPACOL COUGH LINCTUS,"Dextrometorfano + Doxilamina, Succinato + Cetilperidinio, cloreto + Citrato de Sódio",30mg + 6mg + 500mg + 2.5mg,Xarope,Frasco de 100ml e de 200ml,Adcock Ingram,327,27-10-2007
+OO/H/20067/409,"MEDIS FARMACÊUTICA, LDA",CEPACOL ANTIBACTERIAL THROAT GARGLE,"Cetilperidinio, cloreto",50mg,Solução Espuma,Frasco de 200ml,Adcock Ingram,328,27-10-2007
+OO/H/20067/407,"MEDIS FARMACÊUTICA, LDA",BETAPYN COMPRIMIDOS,"Paracetamol + Doxilamina, Succinato + Cafeína + Codeína, Fosfatoo",450mg + 5mg + 50mg + 10mg,Comprimidos,"Embalagem de 18, 54 e 100 Comprimidos",Adcock Ingram,395,13-01-2008
+OO/H/20067/404,"MEDIS FARMACÊUTICA, LDA",ANTIBIOPHILUS Cápsulas,"LACTOBACILUS CASEI VARIEDADE RHAMNOS, CULTURA LIOFILIZADA",250mg,Cápsulas,EMBALAGEM DE 20 CÁPS,"Biose industries,",235,24-08-2007
+OO/H/20067/416,"SHANI, LIMITADA",BETASHA 3,Clotrimazol + Diproprionato de Betametasona + Sulfato de Gentamicina,0.05% + 1% + 3%,Creme tópico,TUBO C/ 30GR,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20067/414,"SHANI, LIMITADA",ATENOSHA 50,ATENOLOL,50mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20067/413,"SHANI, LIMITADA",ATENOSHA 100,ATENOLOL,100mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20067/420,"GENERICS & SPECIALITIES, Lda",DICLOGEN 50,Diclofenac,50mg,Comprimidos Revestidos,CAIXA C/ 10 X10 COMP,FOURRTS Labo,684,21-10-2008
+OO/H/20067/419,"GENERICS & SPECIALITIES, Lda",DICLOGEN 25,Diclofenac,25mg,Comprimidos Revestidos,CX 10 X10 COMP,FOURRTS Labo,683,21-10-2008
+OO/H/20067/423,AFRI FARMÁCIA LDA,D 5,GLUCOSE anidra,5g/100ml OU 50g/1000ml,Solução Injectável,Frascos de 500ml E 1000ml,Fresenius Kabi I,271,30-09-2007
+OO/H/20067/433,BAYER SCHERING PHARMA MOÇAMBIQUE,YASMIN,Etinilestradiol + Drospirenona,3mg + 0.03mg,Comprimidos Revestidos,BLISTER DE 21 E 63 UNIDADES,BAYER SCHERI,239,24-08-2007
+OO/H/20067/436,MEDIMPORT LDA,VICOMBIL,"Retinol (Vit. A) + Ergocalciferol + Tocoferol, acetato + Tiamina Cloridato + Riboflavina + Piridoxina, Clori",d 5000UI + 500UI + 10mg + 3mg + 2mg + 3mg + 1mcg + 75mg + 20mg + 0.2mg + 5mg,Comprimidos revestidos,CXS DE 20 E 60 COMP,BIAL- Portela &,309,27-10-2007
+OO/H/20067/429,AFRI FARMÁCIA LDA,P-ZONE,Prednisolona,5mg,Comprimidos,EMBALAGEM DE 100 (2x5x10) COMPRIMIDOS,Mercury laborato,312,27-10-2007
+OO/H/20067/428,AFRI FARMÁCIA LDA,M1 INJECTION,"Tiamina, Hidrocloreto",100mg/2ml,Solução Injectável,100 ampolas de 2ml,Mercury laborato,399,13-01-2008
+OO/H/20067/427,AFRI FARMÁCIA LDA,M 12 INJECTION,Cianocobalamina (Vit.B12),1000mcg/2ml,Solução Injectável,Ampola de 2ml,Mercury laborato,1135,27-05-2009
+OO/H/20067/426,AFRI FARMÁCIA LDA,FERYCAL-12,Tiamina + Riboflavina + Piridoxina + Cianocabalamina + Ácido Fólico + D-Pantenol + Nicotinamida + Fe,25mg + 1mg + 1mg + 5mg + 50mg + 2mg + 10mg + 10mg + 3mg + 0.20mg + 0.25mg + 20mg,Xarope,Frasco de 200ml,Mercury laborato,304,27-10-2007
+OO/H/20067/425,AFRI FARMÁCIA LDA,BUTAMOL,"Salbutamol, Sulfato",2mg/5ml,Xarope,FRASCO DE 60/100/200ML,Mercury laborato,567,08-03-2008
+OO/H/20067/434,MAPUTO HEALTH CARE Lda,CO-AMOXICLAV FOR INJECTION BP 600mg,Amoxicilina + Ácido Clavulânico,500mg + 100mg,Pó para Solução Injectável,5 frascos,KARNATAKA AN,323,27-10-2007
+OO/H/20067/442,WELL WORTH LDA,TOSLIX XAROPE,"Bromexina,cloridrato + Maleatode Clorfeniramina + Bromidrato de Dextrometorfano + Sulfoguiacola de",P 4mg + 2mg + 5mg + 50mg + 1.5mg/5ml,Xarope,Frasco de 100ml,TORQUE PHAR,313,27-10-2007
+OO/H/20067/441,WELL WORTH LDA,NEOTOS XAROPE,"Guaiafenasina + Dextrometorfano, bromidrato + Amónio, cloreto + Clorfeniramina, maleato",50mg + 5mg + 60mg + 2.5mg,Xarope,Frasco de 100ml,TORQUE PHAR,258,24-08-2007
+OO/H/20067/439,WELL WORTH LDA,NEOCID SUSPENSÃO,Hidróxido de alumínio + Hidróxido de magnésio + simeticone,400mg+400mg+50mg,Suspensão Oral,Frasco 160ml,TORQUE PHAR,670,21-10-2008
+OO/H/20067/438,WELL WORTH LDA,CANDID LOTION,Clotrimazol,1%,Loção,Frasco de 20ml,GLENMARK PH,496,03-04-2008
+OO/H/20067/443,MAPUTO HEALTH CARE Lda,CEFTRIAXONA 1G,"CEFTRIAXONA,sódica",1000mg/10ml,Pó para Injectável,50 Frascos,KARNATAKA AN,412,26-02-2008
+OO/H/20068/448,AFRI FARMÁCIA LDA,DICLOPAR,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,10 blister de 10 comprimidos,Shelys Pharmac,302,27-10-2007
+OO/H/20068/447,AFRI FARMÁCIA LDA,COLDRIL CAPSULES,"Paracetamol + pseudoefedrina, cloridrato + clorfeniramina, maleato",500mg + 30mg + 2mg,Cápsulas,12 EMBALAGENS DE 20 CÁPS(12x20),Shelys Pharmac,598,08-03-2008
+OO/H/20068/446,AFRI FARMÁCIA LDA,COLDRIL,"Paracetamol + pseudoefedrina, cloridrato + clorfeniramina, maleato",120/5ml + 10mg/5ml +1mg/5ml,Xarope,Frascos de 100ml,Shelys Pharmac,745,18-02-2009
+OO/H/20068/458,MAPUTO HEALTH CARE Lda,CEFOTAXIME 500,CEFOTAXIMA,500mg,Pó para Injectável,50 FRASCOS,KARNATAKA AN,342,01-12-2007
+OO/H/20068/460,MAPUTO HEALTH CARE Lda,CEFUROXIMA FOR INJECTION 750MG,"CEFUROXIMA, sódica",750mg,Pó para Injectável,FRASCO,KARNATAKA AN,413,26-02-2008
+OO/H/20068/467,MEDIMPORT LDA,REUMON GEL,Etofenamato,50mg/g,Gel,"Bisnaga de 40g 60g, 100g e 150g",Bial - Portela &,278,30-09-2007
+OO/H/20068/471,FARMACÊUTICA AUSTRAL,MEOCIL,"NEOCINA, sulfato + PREDNISOLONA, acetato + SULFACETAMIDA, sódica",5mg/g + 5mg/g + 100mg/g,Pomada Oftálmica,BISNAGA DE 3.5g,LABORATÓRIO,422,26-02-2008
+OO/H/20068/473,WELL WORTH LDA,LOMAC-20,Omeprazol,20mg,Comprimidos,Blisters 10x10,Cipla Goa - INDI,273,30-09-2007
+OO/H/20068/465,MEDIMPORT LDA,EPSICAPROM,Ácido Aminocapróico,3g,Pó para Solução Oral,Caixa de 15 e 20 saquetas,Bial - Portela &,1789,29-03-2010
+OO/H/20068/470,FARMACÊUTICA AUSTRAL,ELIPA®,"Cetorolac, trometamina",5mg/ml,Colírio solução,"Frascoconta-gotas de 7,5 e 10ml",LABORATÓRIO,355,01-12-2007
+OO/H/20068/464,MEDIMPORT LDA,CLAVAMOX DT,Amoxicilina + Ácido Clavulânico,875mg + 125mg,Comprimidos,"EMBALAGEM 6,7,12,16 OU 24 COMP",Smithkline beec,308,27-10-2007
+OO/H/20068/469,FARMACÊUTICA AUSTRAL,CARBINIB,Acetazolamida,250mg,Comprimidos,Embalagem de 20 e 60 Comprimidos,LABORATÓRIO,365,01-12-2007
+OO/H/20068/472,WELL WORTH LDA,CANDID B CREME,Clotrimazol + Diproprionato de Beclometasona,1% + 0.025%,Creme tópico,Bisnaga de 15g,GLENMARK PH,346,01-12-2007
+OO/H/20068/468,FARMACÊUTICA AUSTRAL,ATROPOCIL,"Atropina, sulfato",10mg/ml,Colírio,Frasco de 100ml,LABORATÓRIO,353,01-12-2007
+OO/H/20068/480,MAPUTO HEALTH CARE Lda,LAXODIL-5,Bisacodil,5mg,Comprimidos Revestidos,BLISTER 10 X1O COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20068/475,"GENERICS & SPECIALITIES, Lda",BRUGEN 400,Ibuprofeno,400mg,Drageias,10 CARTEIRAS DE 10 DRAGEIAS,FOURRTS Labo,284,30-09-2007
+OO/H/20068/474,"GENERICS & SPECIALITIES, Lda",BRUGEN 200,Ibuprofeno,200mg,Drageias,10 CARTEIRAS DE 10 DRAGEIAS,FOURRTS Labo,283,30-09-2007
+OO/H/20068/483,MEDIMPORT LDA,REUMON I.M.,Etofenamato,1000mg/2ml,Solução Injectável,1 OU 5 AMPOLAS DE 2 ML,Bial - Portela &,279,30-09-2007
+OO/H/20068/482,MEDIMPORT LDA,REUMON creme,Etofenamato,100mg/g,Creme,BISNAGA 40g OU 100g,Bial - Portela &,292,30-09-2007
+OO/H/20068/481,MEDIMPORT LDA,Clavamox 500,Amoxicilina + Ácido Clavulânico,500mg + 125mg,Comprimidos,"EMBALAGEM 10,12,16 OU 30 COMP",LABORATÓRIO,470,03-04-2008
+OO/H/20068/487,AFRI FARMÁCIA LDA,TRIBEX FORTE,Tiamina (Vit. B1) + Piridoxina (Vit. B6) + Cianocobalamina (Vit. B12),100mg + 100mg + 1000mcg,Solução injectavel,EMBALAGEM 5 AMPOLAS DE 3ML,Mercury laborato,401,13-01-2008
+OO/H/20068/486,AFRI FARMÁCIA LDA,RELAX,Bisacodil,5mg,Comprimidos,EMBALAGEM 100 COMP(2x5x10),Mercury laborato,280,30-09-2007
+OO/H/20068/488,MAPUTO HEALTH CARE Lda,CAPRIL 25,Captopril,25mg,Comprimidos,BLISTERS de 10 x 10 COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20068/495,"SHANI, LIMITADA",SKDERM Cream,"Betametasona,dipropionato + Clotrimazol + Gentamicina",0.64mg + 10mg + 1mg,creme,Bisnaga 30 g,S KANT HEALT,517,16-06-2008
+OO/H/20068/494,"SHANI, LIMITADA",PARA-RÁPIDO,Paracetamol,500mg,Comprimidos,Blisters 10x10 e Embalagem de 50 x 20,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20068/493,"SHANI, LIMITADA",Clotrimazol 1% cream,Clotrimazol,1%,Creme,Bisnaga de 30g,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20068/492,"SHANI, LIMITADA",AMOXYSHA-500,"Amoxicilina, Trihidrato",500mg,Cápsulas,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20069/506,MEDIMPORT LDA,REUMON Loção,Etofenamato,100mg/ml,Loção,"Frasco de 50ml, 100ml e 200ml",Bial - Portela &,291,30-09-2007
+OO/H/20069/503,FARMA HOLDINGS SA,LAMIVUDINA + ZIDOVUDINA,Lamivudina + Zidovudina,150mg + 300mg,Comprimidos,Frasco de 60 comprimidos,Strides Shasun,1046,20-04-2009
+OO/H/20069/502,"MEDÁFRICA, Lda",K-MOL,Paracetamol,500mg,Comprimidos,Embalagem 10X10,KHANDELWAL,704,11-12-2008
+OO/H/20069/500,MAPUTO HEALTH CARE Lda,IBUFLAM 400,Ibuprofeno,400mg,Comprimidos Revestidos,Embalagem de 100 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20069/505,MEDIMPORT LDA,CLAVAMOX 250,Amoxicilina + Ácido Clavulânico,250mg/5ml + 62.5mg/5ml,Pó para Suspensão Oral,"FRASCO DE 60ML, 75ML, 100 ML OU 150 ML",LABORATÓRIO,301,27-10-2007
+OO/H/20069/501,FARMA HOLDINGS SA,AZITHRIN-250,Azitromicina,250mg,Cápsulas,Blister de 10 e 12 cápsulas; Frasco de 100 e de 1000 cápsulas; 30 Cápsulas,Strides Shasun,1124,27-05-2009
+OO/H/20069/507,MAPUTO HEALTH CARE Lda,LORATIN 10,Loratadina,10mg,Comprimidos,aMPOLAS 2x5x2ml,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/51,"SHANI, LIMITADA",TETRACYCLINE HYDROCHLORIDE OINTMENT 3%,Hirocloreto de Tetraciclina,3%w/w,Pomada,Bisnaga 15g,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/51,"MEDIS FARMACÊUTICA, LDA",STOPAYN XAROPE,"Paracetamol + Codeína, fosfato + Prometazina, hidrocloreto",120mg + 5mg + 6.5mg,Xarope,Frasco de 100ml,Adcock Ingram,330,27-10-2007
+OO/H/200610/51,"SHANI, LIMITADA",IBUSHA 400,Ibuprofeno,400mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/51,"SHANI, LIMITADA",IBUSHA 200,Ibuprofeno,200mg,Comprimidos Revestidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/51,"SHANI, LIMITADA",COTRISHA,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/51,AFRI FARMÁCIA LDA,SHETRIM,Trimetoprim + Sulfametoxazol,200mg/5ml + 40mg/5ml,Suspensão Oral,Frasco 100 ML,Shelys Pharmac,2047,25-09-2010
+OO/H/200610/51,AFRI FARMÁCIA LDA,KODOXY,Doxiciclina,100mg,Cápsulas,EMBALAGEM 100 CÁPS(10x10),Kopran Ltda - In,402,13-01-2008
+OO/H/200610/51,AFRI FARMÁCIA LDA,ERYKO-250,"Eritromicina, etil succinato",250mg/5ml,Suspensão Oral,FRASCO DE 100 ML,Kopran Ltda - In,1179,04-06-2009
+OO/H/200610/51,"GENERICS & SPECIALITIES, Lda",EFAVIRENZ,Efavirenz,600mg,Comprimidos,EMBALAGEM 30 COMP,AUROBINDO P,575,08-03-2008
+OO/H/200610/52,MAPUTO HEALTH CARE Lda,PROMET-10,Prometazina,10mg,Comprimidos Revestidos,BLISTER 10X10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/52,MAPUTO HEALTH CARE Lda,MICOWIN 500,Griseofulvina,500mg,Comprimidos,10 blister de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/52,MAPUTO HEALTH CARE Lda,LUXOPRIL-20,"Enalapril, maleato",20mg,Comprimidos,10EMBALAGEM 10 BLIS DE COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/52,MAPUTO HEALTH CARE Lda,LUXOPRIL-10,"Enalapril, maleato",10mg,Comprimidos,10EMBALAGEM 10 BLIS DE COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200610/53,FARMA HOLDINGS SA,CO-TRIMOXAZOLE TABLETS BP 480mg,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,10 Blisters de 10 comp e frasco de 1000 Comp,Strides Arcolab,1557,23-12-2009
+OO/H/200610/53,FARMA HOLDINGS SA,Q-300,"Quinina, Sulfato",300mg,Comprimidos Revestidos,"Blister de 10 comprimidos, 10x10",Strides Shasun,655,21-10-2008
+OO/H/200610/53,FARMA HOLDINGS SA,Nevirapina,Nevirapina,200mg,Comprimidos,Embalagem de 60 comp,Strides Shasun,1754,06-12-2010
+OO/H/200610/53,FARMA HOLDINGS SA,ERYTHROMYCIN STEARATE TABLETS BP 500mg),Eritromicina,500mg,Comprimidos,Embalagem contendo blisters PVC10X10,Strides Shasun,1293,08-07-2009
+OO/H/200610/53,"MEDIS FARMACÊUTICA, LDA",ZITHROMAX IV 50mg/ml,Azitromicina,500mg/ml,Suspensão injectável,FRASCO de 10ml,PFIZER LABOR,276,30-09-2008
+OO/H/200610/53,AFRI FARMÁCIA LDA,BECOSHEL,"Tiamina, cloridrato (Vit. B1) + Riboflavina (Vit. B2) + Piridoxina (Vit B6) + Nicotinamida (vit. B3)",5mg + 2mg + 2mg + 20mg,Xarope,FRASCO DE 100 ML,Shelys Pharmac,369,24-08-2007
+OO/H/200611/54,BAYER SCHERING PHARMA MOÇAMBIQUE,ULTRAPROCT,"FLUOCORTOLONA, pivalato + LIDOCAÍNA, cloridrato",1mg + 40mg,Supositório,Embalagem de 10 UNIDADES,Bayer Healthcar,933,25-03-2009
+OO/H/200611/54,BAYER SCHERING PHARMA MOÇAMBIQUE,MIRENA,Levonorgestrel,52mg,Sistema Intra Uterino,Saqueta de 1 Unidade,BAYER SCHERI,221,24-07-2007
+OO/H/200611/54,WELL WORTH LDA,CANDID B LOTION,"Clotrimazol + Beclometasona, diproprionato","1% + 0,025%",Loção,Frasco de 15ml,GLENMARK PH,1414,26-09-2009
+OO/H/200611/55,"SHANI, LIMITADA",SHARAMIN,"Clorfeniramina, maleato",2mg/5ml,Solução Oral,Frascos de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200611/55,"SHANI, LIMITADA",PEN-V-SHA,PENICILINA V POTÁSSICA,500mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200611/55,"SHANI, LIMITADA",KETOKANT,Ketoconazol,2%W/W,Creme,Bisnaga de 30g,S KANT HEALT,1290,08-07-2009
+OO/H/200611/55,"SHANI, LIMITADA",FANSISHA,Sulfadoxina + Pirimetamina,500mg + 25mg,Comprimidos,Blisters 1x3,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200611/54,"SHANI, LIMITADA",CIMETISHA 400,Cimetidina,400mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200611/55,"MEDIS FARMACÊUTICA, LDA",VIAGRA 50,Citrato de Sildenafil,50mg,Comprimidos Revestidos,CAIXAS DE 4 COMP,Fareva Amboise,260,30-09-2008
+OO/H/200611/55,"MEDIS FARMACÊUTICA, LDA",VIAGRA 100,Citrato de Sildenafil,100mg,Comprimidos Revestidos,CAIXA DE 4 COMP,Fareva Amboise,261,30-09-2008
+OO/H/200611/55,"MEDIS FARMACÊUTICA, LDA",CELEBREX,Celecoxib,200mg,Cápsulas,Embalagem contendo 20 Cápsulas,PFIZER - PORT,1175,04-06-2009
+OO/H/200611/56,AFRI FARMÁCIA LDA,UCETAMOL,Paracetamol,500mg,Comprimidos,EMBALAGEM 100 COMP Blisters (10x10),UMEDICA LABO,3137,23-10-2012
+OO/H/200611/56,AFRI FARMÁCIA LDA,STABETA-40,PROPRANOLOL,40mg,Comprimidos,EMBALAGEM DE 100 COMPRIMIDOS,Stallion Laborato,373,24-08-2007
+OO/H/200611/56,"SHANI, LIMITADA",SHIBUDAL,"Ibuprofeno + Paracetamol + Cafeína, Anidra",200mg + 325mg + 40mg,Cápsulas,Blisters 2x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200611/56,"SHANI, LIMITADA",HEMATONIC,Ferro + Cianocobalamina + Piridoxina + ácido fólico + sulfato de Zinco,"200+50+0,5+1,5+2,33 mg",Xarope,Frasco 200ml,S KANT HEALT,319,27-10-2007
+OO/H/200611/55,AFRI FARMÁCIA LDA,DIALIN 5,Glibenclamida,5mg,Comprimidos Revestidos,EMBALAGEM 100 COMP(10x10),Stallion Laborato,513,16-06-2008
+OO/H/200611/56,"SHANI, LIMITADA",AMOXYSHA-250,"Amoxicilina, Trihidrato",250mg/5ml,Pó para Suspensão Oral,Frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200611/56,"SHANI, LIMITADA",AMOXYSHA-125,"Amoxicilina, Trihidrato",125mg/5ml,Pó para Suspensão Oral,Frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200611/57,"MEDIS FARMACÊUTICA, LDA",SANKO®,Paracetamol + Cafeina,500mg + 30mg,Comprimidos,Embalagens de 1 x 4Comp e de 25 x 4,Mylan Laborator,883,06-03-2009
+OO/H/200611/57,"MEDIS FARMACÊUTICA, LDA",MILZOR TABLETS,Paracetamol,500mg,Comprimidos,Carteiras de 10 x 10 Comp e de 1000 comprimidos,Mylan Laborator,405,13-01-2008
+OO/H/200611/57,"MEDIS FARMACÊUTICA, LDA",MILCOLD,Paracetamol + Fenilefrina + Clorfeniramina,125mg + 2.5mg + 1mg/5ml,Xarope,Frascos de 60ml,Mylan Laborator,476,03-04-2008
+OO/H/200611/56,MAPUTO HEALTH CARE Lda,HERPERAX Ointment,Aciclovir,5%,Pomada dérmica,BISNAGA DE 5 G,MICRO LABS LT,542,16-06-2008
+OO/H/200611/57,"MEDIS FARMACÊUTICA, LDA",GASTRALGIN SUSPENSION,Hidróxido de Alumínio + Hidróxido de Magnésio + Simeticone,200+200+25mg,Suspensão Oral,Frascos de 200ml,Mylan Laborator,477,03-04-2009
+OO/H/200611/56,MAPUTO HEALTH CARE Lda,ERYCYN-500,"Eritromicina, Estearato",500mg,Comprimidos Revestidos,EMBALAGEM 100 COMP,MICRO LABS LT,415,26-02-2008
+OO/H/200611/58,WELL WORTH LDA,NOVACLAV 625,Amoxicilina + Ácido Clavulânico,500mg + 125mg,Comprimidos,"Blisters 1x6, 3x6",Cipla Limited - I,2029,27-08-2010
+OO/H/200611/58,WELL WORTH LDA,NEODOPA,METILDOPA,250mg,Comprimidos,Blisters 10x10,Medopharma Ltd,348,01-12-2007
+OO/H/200611/58,BAYER SCHERING PHARMA MOÇAMBIQUE,ADVANTAN EMULSÃO,Aceponato de Metilprednisolona,1mg / ml,Emulsão Cutânea,Bisnagas de 20G ou 50G,Intendis GmbH d,550,03-08-2008
+OO/H/200611/58,"MEDIS FARMACÊUTICA, LDA",SYNTOPRIM,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,CARTEIRA DE 10 x 10 COMP,Medochemie Ltd,831,06-03-2009
+OO/H/200611/58,"MEDIS FARMACÊUTICA, LDA",PIRODAL,"Bromocriptina, mesilato",2.5mg,Comprimidos,"Embalagem de 30, 100 e 500 comprimidos",Medochemie Ltd,632,08-09-2008
+OO/H/20071/594,"GENERICS & SPECIALITIES, Lda",SALGEN S,"Salbutamol, Sulfato",2mg/5ml,Xarope,Frasco de 100ml,FOURRTS Labo,685,21-12-2008
+OO/H/20073/605,WELL WORTH LDA,RANADIN 300,"Ranitidina, Cloridrato",300mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,508,16-06-2008
+OO/H/20073/604,WELL WORTH LDA,RANADIN 150,"Ranitidina, Cloridrato",150mg,Comprimidos Revestidos,Blisters 10x10,Medopharma Ltd,507,16-06-2008
+OO/H/20073/603,WELL WORTH LDA,NEOTRIM,Trimetoprim + Sulfametoxazol,200mg/5ml + 40mg/5ml,Suspensão Oral,Frasco 100ml,Medopharma Ltd,349,01-12-2007
+OO/H/20073/599,"MEDIS FARMACÊUTICA, LDA",ML-COTRI SUSPENSION,Trimetoprim + Sulfametoxazol,200mg/5ml + 40mg/5ml,Suspensão oral,Frascos de 60 ml e de 100ml,Mylan Laborator,740,11-12-2008
+OO/H/20073/598,"MEDIS FARMACÊUTICA, LDA",MILOXY-S SUSPENSION,"Amoxicilina, Trihidrato",250mg/5ml,Suspensão Oral,FRS 60ml e de 100ml,Mylan Laborator,660,21-12-2008
+OO/H/20073/597,"MEDIS FARMACÊUTICA, LDA",MILOXY-500,Amoxicilina,500mg,Cápsulas,10 Bisteres x 10 cápsulas,Mylan Laborator,1403,28-09-2009
+OO/H/20073/602,WELL WORTH LDA,LUMARTEN,Arteméter + Lumefantrina,20mg +120mg,Comprimidos,"Blisters de 6, 8, 12, 16, 18 e 24, 30x 6, 30x12 Comprimidos",Cipla Limited - I,667,21-10-2008
+OO/H/20073/596,"MEDIS FARMACÊUTICA, LDA",Diclo forte 550,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,10 carteiras x10 Comp,Mylan Laborator,524,16-06-2008
+OO/H/20073/595,"MEDIS FARMACÊUTICA, LDA",CLOXACILLIN CAPSULES,Cloxacilina,500mg,Cápsulas,Embalagem de 100 Cápsulas,Mylan Laborator,611,08-09-2008
+OO/H/20073/611,"SHANI, LIMITADA",VITAMAKS - MULTIVITAMINAS COM MINERAIS Xarope,"Vitamina A, palmitato + tiamina (Vit.B1) + Riboflavina (Vit.B2) + Vitamina D3 + Nicotinamida + piridoxina",2000UI + 2mg + 1.5mg + 200UI + 25mg + 1mg + 2.5mg + 30mg + 1mg + 13mg + 13mg + 100,Xarope,Frasco de 100ml e de 120ml,S KANT HEALT,515,16-06-2008
+OO/H/20073/613,"SHANI, LIMITADA",SIMVASTOL 20,Sinvastatina,20mg,Comprimidos Revestidos,Blisters 10x10,THEMIS MEDIC,1171,04-06-2009
+OO/H/20073/612,"SHANI, LIMITADA",SIMVASTOL 10,Sinvastatina,10mg,Comprimidos Revestidos,Blisters 10x10,THEMIS MEDIC,1170,04-06-2009
+OO/H/20073/607,"GENERICS & SPECIALITIES, Lda",HISTAGEN,"Clorfeniramina, maleato",4mg,Comprimidos,"Frasco de 1000 comp., e 10 x10",FOURRTS Labo,686,21-10-2008
+OO/H/20073/610,"SHANI, LIMITADA",DOXACIL,DOXICICLINA,100mg,Cápsulas,Blisters 10x10,Square Pharmac,1246,15-06-2009
+OO/H/20073/609,"SHANI, LIMITADA",DICLOKANT-50,Diclofenac,50mg,Comprimidos Revestidos,Blisters 10x10,S KANT HEALT,695,21-10-2008
+OO/H/20073/606,"GENERICS & SPECIALITIES, Lda",Cotrigen-S,Sulfametoxazol + Trimetoprim,200mg/5ml + 40mg/5ml,Suspensão Oral,Frasco de 100ml,FOURRTS Labo,747,18-02-2009
+OO/H/20073/608,"SHANI, LIMITADA",CLAMOSHA,"Amoxicilina, Trihidrato + Clavulanato de Potássio",500mg + 125mg,Comprimidos Revestidos,"FRASCO DE 30 COMP, 10x10",INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20073/618,MEDIMPORT LDA,THROMBOCID Pomada,PENTOSANO POLISSULFATO DE SÓDIO 100%+AZULENO,1mg/g + 0.04mg/g,Pomada,BISNAGA DE 40GR,BENE ARZNEIM,307,27-10-2007
+OO/H/20073/617,MEDIMPORT LDA,DOL-U-RON FORTE,"Paracetamol + Codeína, fosfato",500mg + 30mg,Cápsulas,Embalagem de 20 Cáps.,BENE ARZNEIM,303,27-10-2007
+OO/H/20073/616,MEDIMPORT LDA,BEN-U-RON,Paracetamol,500mg,Comprimidos,EMBALAGEM DE 20 COMP,BENE ARZNEIM,269,30-09-2007
+OO/H/20073/628,"MEDIS FARMACÊUTICA, LDA",TAKS 50,Diclofenac,50mg,Comprimidos Revestidos,EMBALAGEM DE 30 COMP,Medochemie Ltd,631,08-09-2008
+OO/H/20073/623,MAPUTO HEALTH CARE Lda,STERIDERM-S,"Clobetasol, Proprionato",0%,Creme dérmico,Bisnaga de 15g,MICRO LABS LT,607,08-09-2008
+OO/H/20073/622,MAPUTO HEALTH CARE Lda,Paracetamol 500,Paracetamol,500mg,Comprimidos,100X10,MICRO LABS LT,640,08-09-2008
+OO/H/20073/621,MAPUTO HEALTH CARE Lda,NOVAGRA,Citrato de Sildenafil,50mg,Comprimidos Revestidos,blister de 4 comprimidos,MICRO LABS LT,563,18-02-2009
+OO/H/20073/627,"MEDIS FARMACÊUTICA, LDA",ESPEN 400,Ibuprofeno,400mg,Comprimidos Revestidos,EMBALAGEM 10 x 10,Mylan Laborator,580,03-08-2008
+OO/H/20073/626,"MEDIS FARMACÊUTICA, LDA",ESPEN 200,Ibuprofeno,200mg,Comprimidos Revestidos,EMBALAGEM 10 x 10,Mylan Laborator,579,03-08-2008
+OO/H/20073/620,MAPUTO HEALTH CARE Lda,CLARIWIN-500,CLARITROMICINA,500mg,Comprimidos Revestidos,BLISTERES 1 X 4 COMP,MICRO LABS LT,608,08-09-2008
+OO/H/20073/625,"MEDIS FARMACÊUTICA, LDA",BETRIM 480,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,Embalagem de 100 e 1000 comprimidos,Mylan Laborator,919,16-03-2009
+OO/H/20073/624,"MEDIS FARMACÊUTICA, LDA",BETRIM FORTE,Sulfametoxazol + Trimetoprim,800mg + 160mg,Comprimidos,embalagem de 100 e de 1000 comprimidos,Mylan Laborator,748,18-02-2009
+OO/H/20073/619,MAPUTO HEALTH CARE Lda,ALLERCET,"Cetirizina, dicloridrato",10mg,Comprimidos Revestidos,BLISTERES 10 X 10 COMP,MICRO LABS LT,641,08-09-2008
+OO/H/20074/632,WELL WORTH LDA,IBUFEN® Susp,Ibuprofeno,100mg/5ml,Suspensão Oral,Frasco de 100ml,TORQUE PHAR,441,26-02-2008
+OO/H/20074/631,WELL WORTH LDA,BURNEX CREME,Sulfadiazina de prata + Clorexidina,1% + 0.2%,Creme,Bisnaga de 20g,TORQUE PHAR,350,08-12-2007
+OO/H/20074/629,WELL WORTH LDA,BABYVIT DROPS,"Nicotinamida + Tiamina, hidrocloreto(Vit.B1) + Riboflavina(Vit.B2) + Piridoxina, hidrocloreto (Vit.B6) + Su",5mg + 0.5mg + 0.5mg + 0.5mg + 11mg + 7.5mg + 750UI + 200UI + 3.45mg,Xarope,Frasco de 30ml,TORQUE PHAR,296,30-09-2007
+OO/H/20074/638,"SHANI, LIMITADA",NALISHA,Ácido Nalidíxico,500mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/637,"SHANI, LIMITADA",MICOSHA,"Miconazol, nitrato",1%,Creme,"Bisnaga de 30g, 15g",INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/636,"SHANI, LIMITADA",GRISEOSHA-500,Griseofulvina,500mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/635,"SHANI, LIMITADA",ERYTHROSHA 250,"Eritromicina, etil succinato",250mg/5ml,Pó para Suspensão Oral,Frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/634,"SHANI, LIMITADA",ERYTHROSHA 125,"Eritromicina, etil succinato",125mg/5ml,Pó para Suspensão Oral,Frascos 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/633,"SHANI, LIMITADA",CLOVISHA,Aciclovir,400mg,Comprimido,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/644,AFRI FARMÁCIA LDA,S-CLAR 500,CLARITROMICINA,500mg,Comprimidos Revestidos,10 blister de 10 e 1 blister de 10 comprimidos,Stallion Laborato,1052,20-04-2009
+OO/H/20074/643,AFRI FARMÁCIA LDA,S-CLAR 250,CLARITROMICINA,250mg,Comprimidos Revestidos,10 blister de 10 e 1 blister de 10 comprimidos,Stallion Laborato,1051,20-04-2009
+OO/H/20074/642,AFRI FARMÁCIA LDA,P ZONE EYE DROPS,Prednisolona,1%,Colírio,1 Frasco de 5ml,Mercury laborato,1394,28-09-2009
+OO/H/20074/648,MAPUTO HEALTH CARE Lda,NISBEN Suspension,Mebendazol,100mg/5ml,Suspensão Oral,Frasco de 100ml e de 30ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/641,AFRI FARMÁCIA LDA,MULTONE SYRUP,VIT A + VIT D3 +VIT B1 + RIBOFLAVINA + VIT B6 + NICOTINAMIDA + VIT C + VITB12,"3000 UI+400 UI+1,5 MG+1,2 MG+1 MG+10 MG+50 MG+3,0MCG",Xarope,Frascos 100ml,Mercury laborato,568,08-03-2008
+OO/H/20074/647,MAPUTO HEALTH CARE Lda,MOPAR-250,Paracetamol,250mg/5ml,Suspensão Oral,Frascos 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/646,MAPUTO HEALTH CARE Lda,MOFEN Suspensão,Ibuprofeno,100mg/5ml,Suspensão Oral,Frascos 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20074/640,AFRI FARMÁCIA LDA,MERIGENTA INJECTÁVEL,"Gentamicina, sulfato",80mg/2ml,Solução Injectável,10 Ampolas de 2ml,Mercury laborato,1049,20-04-2009
+OO/H/20074/639,AFRI FARMÁCIA LDA,GASIDONE,"Domperidona, maleato",10mg,Comprimidos,EMBALAGEM 100 COMP(10x10),Stallion Laborato,1050,20-04-2009
+OO/H/20074/652,"MEDIS FARMACÊUTICA, LDA",TRIFENE 400,Ibuprofeno,400mg,Comprimidos Revestidos,"CXS 10, 20, 30 e 60 COMP",LABORATÓRIO,749,18-02-2009
+OO/H/20074/651,"MEDIS FARMACÊUTICA, LDA",CICLOVIRAL CREME,Aciclovir,50mg/g,Creme,Bisnaga de 10g,LABORATÓRIO,377,13-01-2008
+OO/H/20075/657,FARMACÊUTICA AUSTRAL,TEDOL Líquido cutâneo,Ketoconazol,20mg/g,Líquido cutâneo,Frasco de 100ml,LABORATÓRIO,805,04-03-2009
+OO/H/20075/656,FARMACÊUTICA AUSTRAL,MINOX® 5,Minoxidil,50mg/ml,Solução cutânea,Frasco de 100ml,LABORATÓRIO,419,26-02-2008
+OO/H/20075/655,FARMACÊUTICA AUSTRAL,GENTOCIL,"Gentamicina, Sulfato",3mg/g,Pomada Oftálmica,BISNAGA DE 3.5g,LABORATÓRIO,625,11-12-2008
+OO/H/20075/654,FARMACÊUTICA AUSTRAL,DIOMICETE,Clotrimazol (,10mg/ml,Colírio,Frasco de 10ml,LABORATÓRIO,630,08-09-2008
+OO/H/20075/653,FARMACÊUTICA AUSTRAL,CLINAC,Eritromicina,20mg/ml,Solução cutânea,Frasco de 30ml e de 100ml,LABORATÓRIO,481,03-04-2008
+OO/H/20075/662,"ORANE PHARMA, Lda",MOXIN-500,Amoxicilina,500mg,Comprimidos,Blisters 10x10,Global Pharma,1676,25-10-2010
+OO/H/20075/661,"ORANE PHARMA, Lda",COTROX-DS,Trimetoprim + Sulfametoxazol,800mg + 160mg,Comprimidos,Blisters 10x10,Global Pharma,614,08-09-2008
+OO/H/20075/659,"ORANE PHARMA, Lda",AZIK 500,Azitromicina,500mg,Comprimidos,Blisters 3x10,Global Pharma,2094,06-12-2010
+OO/H/20075/658,"ORANE PHARMA, Lda",ANAFLAM,Ibuprofeno,400mg,Comprimidos,Blisters 10x10 e frasco de 1000 comprimidos,Global Pharma,2251,05-04-2011
+OO/H/20075/665,MEDIMPORT LDA,BEN-U-RON Xarope,Paracetamol,40mg/ml,Xarope,Frasco 85 ML (100G),BENE ARZNEIM,398,13-01-2008
+OO/H/20075/673,FARMA HOLDINGS SA,STRIBEN,Albendazol,400mg,Comprimidos Revestidos,BLISTER 1X1 COMP,Strides Shasun,459,03-04-2008
+OO/H/20075/672,FARMA HOLDINGS SA,LORATADINA COMPRIMIDOS USP 10mg,Loratadina,10mg,Comprimidos Revestidos,"Blisters de 10x10, frascos HDPE de 500 e 1000 Comprimidos",Strides Shasun,458,03-04-2008
+OO/H/20075/671,FARMA HOLDINGS SA,IBUPROFENO COMPRIMIDOS BP 400mg,Ibuprofeno,400mg,Comprimidos Revestidos,EMBALAGEM 1 blister X10 comp / de 100/500/1000 COMP,Strides Shasun,657,21-10-2008
+OO/H/20075/670,FARMA HOLDINGS SA,IBUPROFENO COMPRIMIDOS BP 200mg,Ibuprofeno,200mg,Comprimidos Revestidos,EMBALAGEM COM 100/500/1000 COMP,Strides Shasun,656,21-10-2008
+OO/H/20076/678,AFRI FARMÁCIA LDA,STALMIN 500,Metformina,500mg,Comprimidos,Embalagem de 100 Comprimidos,Stallion Laborato,406,26-02-2008
+OO/H/20076/677,AFRI FARMÁCIA LDA,PROMETHAZINE HYDROCHLORIDE TABLETS,"Prometazina, Hidrocloreto",10mg,Comprimidos Revestidos,CARTEIRAS COM 100 COMP(2x5x10),Mercury laborato,404,31-01-2008
+OO/H/20076/676,AFRI FARMÁCIA LDA,ORACIP,"CIPROFLOXACINA,hidrocloreto",0%,Colírio e Gotas auriculares,FRASCO 5ML,Mercury laborato,788,04-03-2009
+OO/H/20076/675,AFRI FARMÁCIA LDA,FUNGINIL-K,Ketoconazol,200mg,Comprimidos,EMBALAGEM 100 COMP(10x10),Stallion Laborato,407,26-02-2008
+OO/H/20076/685,"SHANI, LIMITADA",SHADINE,Iodopovidona,5% m/m,Pomada,Bisnaga de 30 g,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/684,"SHANI, LIMITADA",SHA-DID V6,Clotrimazol,100mg,Comprimidos vaginais,Blisters 1x6,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/698,FARMACÊUTICA AUSTRAL,TEDOL® CREME,Cetoconazol,20mg/g,Creme,Bisnaga de 30g,LABORATÓRIO,599,03-08-2008
+OO/H/20076/697,FARMACÊUTICA AUSTRAL,TEDOL,Ketoconazol,20mg/ml,Shampoo,FRASCO DE 120ml e de 200ml,LABORATÓRIO,801,04-03-2009
+OO/H/20076/696,FARMACÊUTICA AUSTRAL,RODERMIL,Metronidazol,10mg/g,Emulsão Cutânea,BISNAGA DE 30g,LABORATÓRIO,382,13-01-2008
+OO/H/20076/695,FARMACÊUTICA AUSTRAL,PREDNIOCIL,"Prednisolona, Acetato",5mg/g,Pomada Oftálmica,"Bisnagas 3,5 g",Laboratório Edol,635,08-09-2008
+OO/H/20076/694,FARMACÊUTICA AUSTRAL,OLIDERMIL,Oxido de Zinco,500mg/g,Suspensão cutânea,Frasco de 150g,LABORATÓRIO,478,03-04-2008
+OO/H/20076/704,"SHANI, LIMITADA",NYSTASHA,Nistatina,2.3% w/w,Creme,Bisnaga 30g,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/703,"SHANI, LIMITADA",NOVA POWER PLUS,Ciprohetptadina + Axeroftol (Vit. A) +Colecalciferol (Vit. D3) + Tiamina (Vit. B1) + Riboflavina ( Vit. B2) +,4mg + 1500IU +300IU + 2mg + 2mg + 5mcg + 10mg + 5mg + 20mg + 50mg + 100mg,Comprimidos Revestidos,Blisters 3x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/702,"SHANI, LIMITADA",COFISHA,"Difenidramina,hidrocloreto + Amónio,cloretp + Mentol",14.08mg/5ml + 138.0mg/5ml + 57.03mg/5ml + 0.9 mg/5ml,Xarope,Frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/701,"SHANI, LIMITADA",CHLOFENSHA,Cloranfenicol,250mg,Cápsulas,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/700,"SHANI, LIMITADA",ASPISHA-500,Ácido Acetilsalicílico,500mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/699,"SHANI, LIMITADA",APETISHA,"CIPROHEPTADINA,hidrocloreto",2mg/5ml,Xarope,Frascos 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20076/708,MEDIMPORT LDA,BEN-U-RON 500,Paracetamol,500mg,Supositórios,EMBALAGEM DE 10 SUPOSITÓRIOS,BENE ARZNEIM,450,13-01-2008
+OO/H/20076/707,MEDIMPORT LDA,BEN-U-RON 250,Paracetamol,250mg,Supositórios,EMBALAGEM DE 10 SUPOSITÓRIOS,BENE ARZNEIM,449,13-01-2008
+OO/H/20076/706,MEDIMPORT LDA,BEN-U-RON 125,Paracetamol,125mg,Supositórios,EMBALAGEM DE 10 SUPOSITÓRIOS,BENE ARZNEIM,396,13-01-2008
+OO/H/20076/705,MEDIMPORT LDA,BEN-U-RON 1000,Paracetamol,1000mg,Supositórios,EMBALAGEM DE 10 SUPOSITÓRIOS,BENE ARZNEIM,451,13-01-2008
+OO/H/20076/718,"ORANE PHARMA, Lda",FORMETIN-850,"Metformina, hidrocloreto",850mg,Comprimidos,Blisters 10x10,Global Pharma,2155,31-12-2010
+OO/H/20076/717,"ORANE PHARMA, Lda",DOLMAX-SR,Diclofenac sódico,100mg,Comprimidos,Blisters 10x10,Global Pharma,1679,25-10-2010
+OO/H/20076/716,"ORANE PHARMA, Lda",BIOFLOX-500,"FLUCLOXACILINA,sódica",500mg,Cápsulas,Blisters 10x10 Cápsulas,Global Pharma,1678,25-10-2010
+OO/H/20076/715,"ORANE PHARMA, Lda",BIOFLOX-250,"FLUCLOXACILINA,sódica",250mg,Cápsulas,Blisters 10x10,Global Pharma,1677,25-10-2010
+OO/H/20077/725,AFRI FARMÁCIA LDA,ENSTAL 20,"Enalapril, maleato",20mg,Comprimidos,EMBALAGEM 100 COMP(10x10),Stallion Laborato,574,08-03-2008
+OO/H/20077/724,AFRI FARMÁCIA LDA,ENSTAL 10,"Enalapril, maleato",10mg,Comprimidos,10 blister de 10 comprimidos,Stallion Laborato,573,08-03-2008
+OO/H/20077/723,AFRI FARMÁCIA LDA,DEPISTA-25,Imipramina,25mg,Comprimidos,EMBALAGEM 100 COMP (10x10),Stallion Laborato,663,21-10-2008
+OO/H/20077/719,AFRI FARMÁCIA LDA,AMITRILON-25,"AMITRIPTILINA, cloridrato",25mg,Comprimidos Revestidos,EMBALAGEM 100 COMP (10x10),Stallion Laborato,665,21-10-2008
+OO/H/20077/727,"MEDIS FARMACÊUTICA, LDA",DICLOFENAC GEL,Diclofenac,1%,Gel,20g,Mylan Laborator,471,03-04-2008
+OO/H/20077/732,"MEDIS FARMACÊUTICA, LDA",PARAMOLAN 500,Paracetamol,500mg,Comprimidos,CXS 20 COMP,FARMALABOR,531,16-06-2008
+OO/H/20077/738,"SHANI, LIMITADA",ROXISHA,PIROXICAM,20mg,Cápsulas,BLISTER DE 10 CÁPS,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20077/737,"SHANI, LIMITADA",RANISHA,"Ranitidina, Hidrocloreto",300mg,Comprimidos Revestidos,Blisters de 1x4,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20077/736,"SHANI, LIMITADA",NYSTASHA,Nistatina,100.000 U.I,Comprimidos vaginais,Blister 14 comprimidos,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20077/735,"SHANI, LIMITADA",KETOSHA,Ketoconazol,200mg,Comprimidos,Blisters de 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20077/734,"SHANI, LIMITADA",AMILOSHA - H,Amilorido Hidrocloreto + Hidroclortiazida,5mg + 50mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20078/741,PROFARMA,METAMYCIN,Cloranfenicol,1%,Pomada Oftálmica,Bisnaga de 3.5g e 5g,"BDH industries,",1254,15-06-2009
+OO/H/20078/742,PROFARMA,METAMYCIN,Cloranfenicol,1%,Gotas Oftálmicas,Frasco de 5ml e de 10ml,"BDH industries,",1288,08-07-2009
+OO/H/20078/740,PROFARMA,METAMOL,Paracetamol,500mg,Comprimidos,"Blisters 2x10, 50x10 e Frasco de 1000 comprimidos","BDH industries,",460,03-04-2008
+OO/H/20078/739,PROFARMA,METACYCLINE,Hirocloreto de Tetraciclina,1%w/w,Pomada Oftálmica,Bisnaga 5g,"BDH industries,",874,06-03-2009
+OO/H/20078/748,"ORANE PHARMA, Lda",OMPREZ,Omeprazol,20mg,Cápsulas,Blisters 10x10,Global Pharma,2096,06-12-2010
+OO/H/20078/747,"ORANE PHARMA, Lda",LOTENZ-50,Atenolol,50mg,Comprimidos,Blisters 10x10,Global Pharma,1683,25-10-2010
+OO/H/20078/746,"ORANE PHARMA, Lda",LOTENZ-100,Atenolol,100mg,Comprimidos,Blisters 10x10,Global Pharma,1682,25-10-2010
+OO/H/20078/745,"ORANE PHARMA, Lda",FRUSID,Furosemida,40mg,Comprimidos,EMBALAGEM 10 BLISTERS,Global Pharma,2156,31-12-2010
+OO/H/20078/743,"ORANE PHARMA, Lda",ADIPIN-5,"Amlodipina, besilato",5mg,Comprimidos,Blisters 10x10 Cápsulas,Global Pharma,1680,25-10-2010
+OO/H/20078/744,"ORANE PHARMA, Lda",ADIPIN-10,"Amlodipina, besilato",10mg,Comprimidos,Blisters 10x10 Cápsulas,Global Pharma,1681,25-10-2010
+OO/H/20078/754,WELL WORTH LDA,DANOGEN-200,Danazol,200mg,Cápsulas,Blisters 3x10,Cipla Limited - I,671,21-10-2008
+OO/H/20078/753,WELL WORTH LDA,COFLIX XAROPE,"Difenidramina, Cloridrato + Cloreto de amónio + Citrato de sódio + Mentol","14,08 mg/5ml + 138 mg/5ml + 57,03 mg/5ml + 0,9 mg/5ml",Xarope,Frasco de vidro de 100ml,TORQUE PHAR,492,03-04-2008
+OO/H/20078/752,WELL WORTH LDA,CANDID MOUTH PAINT,Clotrimazol,1%,Gotas Orais,Frasco 15ml,GLENMARK PH,421,26-02-2008
+OO/H/20078/751,WELL WORTH LDA,ALERID,"Cetirizina, hidrocloreto",10mg,Comprimidos,Blisters 10x10,Cipla Limited - I,790,04-03-2009
+OO/H/20078/760,AFRI FARMÁCIA LDA,FUNGISTAT CREAM,"Miconazol, nitrato",2%,Creme,TUBO 15 GRS,Elys Chemical In,639,14-10-2008
+OO/H/20078/756,AFRI FARMÁCIA LDA,ELYSTAMINE CREAM,"MEPIRAMINA,maleato",2%,Creme,TUBO 15 GRS,Elys Chemical In,411,26-02-2008
+OO/H/20078/759,AFRI FARMÁCIA LDA,ELYCORT,"Hidrocortisona, acetato",1%,Creme,TUBO 15g,Elys Chemical In,487,04-03-2008
+OO/H/20078/758,AFRI FARMÁCIA LDA,CANDISTAT creme,CLOTRIMAZOL,1%,Creme tópico,TUBO15g,Elys Chemical In,409,26-02-2008
+OO/H/20078/757,AFRI FARMÁCIA LDA,CANDISTAT,CLOTRIMAZOL,100mg/1000mg,Comprimidos vaginais,CXS 6 COMP VAG,Elys Chemical In,1053,20-04-2009
+OO/H/20078/765,MEDIMPORT LDA,VIREAD,Tenofovir disoproxil fumarato,300mg,Comprimidos,Frasco de 30 Comprimidos,ASPEN Pharma,995,13-04-2009
+OO/H/20079/768,FARMACÊUTICA AUSTRAL,PANDERMIL,"Hidrocortisona, acetato",10mg/g,Creme,TUBO 30g,LABORATÓRIO,381,13-01-2008
+OO/H/20079/770,FARMACÊUTICA AUSTRAL,PANDERMIL,"Hidrocortisona, acetato",10mg/g,Pomada,TUBO 30g,LABORATÓRIO,418,26-02-2008
+OO/H/20079/775,"SHANI, LIMITADA",KETOSHA,Ketoconazol,1%,Creme,Bisnaga de 30g,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20079/774,"SHANI, LIMITADA",FRUSHA,Furosemida,40mg,Comprimidos,BLISTER DE 10 COMP,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20079/773,"SHANI, LIMITADA",FOLISHA,SULFATO FERROSO + ÁCIDO FÓLICO,150mg + 0.5mg,Comprimidos Revestidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20079/772,"SHANI, LIMITADA",CLOVISHA,Aciclovir,1%,Creme,"Bisnaga de 5g, 15g",INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20079/771,"SHANI, LIMITADA",BURNKUL,Sulfadiazina de prata + Clorexidina,1% + 0.2%,Creme,Bisnaga de 30g,TORQUE PHAR,1043,20-04-2009
+OO/H/20079/778,WELL WORTH LDA,FORCAN 200,Fluconazol,200mg,Cápsulas,Blisters 10 x 4,Cipla Limited - I,491,03-04-2008
+OO/H/200710/78,AFRI FARMÁCIA LDA,URGENDOL 50,"Tramadol, Cloridrato",50mg/ml,Solução Injectável,AMPOLA 2 ML,WIN MEDICARE,484,04-03-2008
+OO/H/200710/78,AFRI FARMÁCIA LDA,URGENDOL 100,"Tramadol, Cloridrato",100mg/ml,Solução Injectável,AMPOLA 1 ML,WIN MEDICARE,483,04-03-2008
+OO/H/200710/78,AFRI FARMÁCIA LDA,URGENDOL,"Tramadol, Cloridrato",50mg,Cápsulas,BLISTER de 10 Cápsulas,WIN MEDICARE,410,26-02-2008
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,TOSNIL SYRUP,Dextrometorfano + bromexina hidrocloreto + cloreto de amonio+mentol,10mg + 4mg +100mg + 5mg,Xarope,Frasco 100ml,T & T PHARMA,1129,27-05-2009
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,PARADOR 250,Paracetamol,250mg/5ml,Suspensão Oral,Frasco 100ml,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,PARADOR 125,Paracetamol,125mg/5ml,Suspensão Oral,Frasco 100ml,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,NISAMINE SYRUP,"Clorfeniramina, maleato",2mg/5ml,Xarope,frasco 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/78,AFRI FARMÁCIA LDA,MOVILON 25,Indometacina,25mg,Cápsulas,EMBALAGEM 100 CÁPS(10x10),UMEDICA LABO,488,04-03-2008
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,METRONIS SUSPENSION,Metronidazol,200mg/5ml,Pó para Injectável,Frasco de 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/78,AFRI FARMÁCIA LDA,FUNGISTIN,Nistatina,100.000UI,Comprimidos vaginais,EMBALAGEM 15 COMP VAGINAIS,Elys Chemical In,638,08-09-2008
+OO/H/200710/78,AFRI FARMÁCIA LDA,EUCHLOR-250,Cloranfenicol,250mg,Cápsulas,CXS 100 CÁPS(10x10) e frasco de 1000,UMEDICA LABO,666,21-10-2008
+OO/H/200710/78,MAPUTO HEALTH CARE Lda,CYPNIS-L,"Ciproheptadina, Cloridrato",2.2mg/5ml,Xarope,FRASCOS DE 100 ML,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/78,AFRI FARMÁCIA LDA,CHLORPHENIRAMINE,"Clorfeniramina, maleato",4mg,Comprimidos,10 blister de 10 comprimidos,UMEDICA LABO,485,04-03-2008
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,KLORAMINE-4,"Clorfeniramina, maleato",4mg,Comprimidos,10 blister de 10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,GLIBENCARE-5,Glibenclamida,5mg,Comprimidos,10 blister de 10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,CARBAM-200,Carbamazepina,200mg,Comprimidos,10 blister de 10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,BRONCARE-4,"Salbutamol, Sulfato",4mg,Comprimidos,10 blister de 10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/79,MAPUTO HEALTH CARE Lda,AMIDECARE,"Loperamida, Cloridrato",2MG,Comprimidos Revestidos,10 blister de 10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200710/80,WELL WORTH LDA,ACIVIR-200,Aciclovir,200mg,Comprimido,blisters de 5,Cipla Limited - I,1026,20-04-2009
+OO/H/200710/80,WELL WORTH LDA,ACIVIR CREME,Aciclovir,5%,Creme,Bisnaga de 5g,Cipla Limited e C,854,06-03-2009
+OO/H/200710/80,WELL WORTH LDA,ACIVIR - 400 DT,Aciclovir,400mg,Comprimidos dispersíveis,Blisters de 10x5,Cipla Limited - I,1027,20-04-2009
+OO/H/200710/80,AFRI FARMÁCIA LDA,ELYTETRA,Hirocloreto de Tetraciclina,3% (30mg/g),Pomada,Bisnaga de 15g,Elys Chemical In,620,08-09-2008
+OO/H/200710/80,FARMACÊUTICA AUSTRAL,ZP DERMIL Creme,Piritionato de zinco,5mg/g,Creme,Bisnaga de 25g,LABORATÓRIO,529,16-06-2008
+OO/H/200710/80,FARMACÊUTICA AUSTRAL,MINOX® 2,Minoxidil,20mg/ml,Solução cutânea,Frasco de 100ml,LABORATÓRIO,420,26-09-2008
+OO/H/200710/80,FARMACÊUTICA AUSTRAL,CICLOPLEGICEDOL,"CICLOPENTOLATO,cloridrato",10mg/ml,Colírio,Frasco de 5ml,LABORATÓRIO,662,21-10-2008
+OO/H/200711/81,MAPUTO HEALTH CARE Lda,HYPOCARE-5,"Amlodipina, besilato",5mg,Comprimidos,BLISTERES 10 X 10 COMP,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200711/81,MAPUTO HEALTH CARE Lda,HYPOCARE-10,"Amlodipina, besilato",10mg,Comprimidos,10 blister de 10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200711/81,MAPUTO HEALTH CARE Lda,FOLICARE-5,Ácido Fólico,5mg,Comprimidos,10 blister de 10 comprimidos,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200711/81,PROFARMA,METRONIDAZOL 250,Metronidazol,250mg,Comprimidos,"Caixa de 10 x10, 100 X 10 e Frasco de 100, 500 e 1000 comprimidos","BDH industries,",1796,29-03-2010
+OO/H/200711/81,PROFARMA,FORTRIM A,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,Blisters 100x10 e Frascos de 1000 comprimidos,"BDH industries,",876,06-03-2009
+OO/H/200711/82,WELL WORTH LDA,HEALTHEASE ORAL REHYDRATION SALTS (ORS),Cloreto de Sódio + Cloreto de Potássio + Citrato de sódio + Glicose,3.5g + 1.5g + 2.9g + 20g,Pó para Solução Oral,20 saquetas de 30g,FDC Limited,759,18-02-2009
+OO/H/200711/81,WELL WORTH LDA,BENDEX 400,Albendazol,400mg,Comprimido Mastigável,Blisters 20x1,Cipla Limited - I,495,03-04-2008
+OO/H/200711/82,PROFARMA,META B COMPLEX,Nicotinamida + Riboflavina + Tiamina,15mg + 1mg + 1mg,Comprimidos,"Blisters 100x10, 50x10 e Frascos de 500 e 1000 comprimidos","BDH industries,",1017,20-04-2009
+OO/H/200712/83,"SHANI, LIMITADA",SHEBOX,Mebendazol,100mg,Comprimidos,Blisters de 1x6,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200712/83,"SHANI, LIMITADA",LIMESHA,Ácido Ascórbico,100mg,Comprimidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200712/83,"SHANI, LIMITADA",GELUSHA,Hidróxido de alumínio + Hidróxido de magnésio + simeticone,400mg+400mg+50 mg,Suspensão Oral,Frascos de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200712/83,"SHANI, LIMITADA",ERYTHROSHA 500,"Eritromicina, Estearato",500mg,Comprimidos Revestidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200712/83,"SHANI, LIMITADA",AZITHROMYCIN 500,Azitromicina,500mg,Comprimidos Revestidos,Blisters 1x3,BEXIMCO PHA,1044,20-04-2009
+OO/H/200712/83,"SHANI, LIMITADA",HYDROSHA,Hidroclorotiazida,50mg,Comprimidos Revestidos,Blisters 10x10,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200712/84,"MEDIS FARMACÊUTICA, LDA",BETAMOX PLUS 400,Amoxicilina + Ácido Clavulânico,"400mg+57mg (91,84mg + 13,58mg)",Pó para Suspensão Oral,Frascos de 60ml e 100 ml,LABORATÓRIO,715,11-12-2008
+OO/H/200712/84,"MEDIS FARMACÊUTICA, LDA",BETAMOX PLUS,Amoxicilina + Ácido Clavulânico,875mg + 125mg,Comprimidos Revestidos,"Embalagem contendo blisters de 8,12,16 e 20 COMPRIMIDOS",Laboratórios Atr,612,08-09-2008
+OO/H/200712/84,"MEDIS FARMACÊUTICA, LDA",BETAMOX,Amoxicilina + Ácido Clavulânico,500mg + 125mg,Comprimidos Revestidos,"BLISTER de 12,16,32 e 100 unidades",CIPAN COMPAN,610,08-09-2008
+OO/H/200712/84,"MEDIS FARMACÊUTICA, LDA",BETAMOX,Amoxicilina + Ácido Clavulânico,250mg/5ml + 62.5mg/5ml,Pó para Suspensão Oral,"Frascos de 75ml,100ml, 120ml e 150 ml",LABORATÓRIO,577,08-03-2008
+OO/H/200712/84,AFRI FARMÁCIA LDA,NAUM PAIM BALM,Mentol + Cânfora + Metilsalicilato + Óleo de Terpentina + Óleo de Eucalipto + Óleo de cravo-da-índia,4.5% + 5% + 10% + 2% + 5% + 1%,Pomada,Bisnaga de 20G,Elys Chemical In,618,08-09-2008
+OO/H/200712/84,AFRI FARMÁCIA LDA,DIPARA,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,EMBALAGEM 100 COMP Blisters (10x10),Stallion Laborato,3138,23-10-2012
+OO/H/200712/84,"MEDIS FARMACÊUTICA, LDA",CO-ARTESIANE,Arteméter + Lumefantrina,180mg + 1080mg/60ml,Pó para Suspensão Oral,Frascos de 60 e 120 ml,MANUFACTURI,912,16-03-2009
+OO/H/20081/864,"MEDIS FARMACÊUTICA, LDA",LORIDE,"Loperamida, Cloridrato",2mg,Comprimidos,Blister de 12 comprimidos,LABORATÓRIO,659,21-10-2008
+OO/H/20081/863,"MEDIS FARMACÊUTICA, LDA",ECAMAIS,"Lisinopril, dihidratado + Hidroclorotiazida",20mg + 12.5 mg,Comprimidos,"Blister 10,30,60 e 100 comprimidos",LABORATÓRIO,525,16-06-2008
+OO/H/20081/861,"MEDIS FARMACÊUTICA, LDA",BIOQUIL,Ofloxacina,200mg,Comprimidos Revestidos,Blister de 8 e 16 comprimidos,LABORATÓRIO,627,08-09-2008
+OO/H/20081/862,"MEDIS FARMACÊUTICA, LDA",BIOQUIL,Ofloxacina,400mg,Comprimidos Revestidos,"Blister de 2, 8 e 16 comprimidos",LABORATÓRIO,628,08-09-2008
+OO/H/20081/868,MISSIONPHARMA MOÇAMBIQUE,CO-TRIMOXAZOL,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,Embalagem 10X10,Medicamen Biot,2068,25-09-2010
+OO/H/20081/867,MISSIONPHARMA MOÇAMBIQUE,AMOXICILINA SUSPENSÃO ORAL,"Amoxicilina, Trihidrato",250mg/5ml,Pó para Suspensão Oral,Frasco de 100ml,Medicamen Biot,431,26-02-2008
+OO/H/20081/872,"MEDIS FARMACÊUTICA, LDA",LISOMUCIN,"BROMEXINA,cloridrato",8mg/5ml,Xarope,Frasco de 100 e 200 ml,CIPAN COMPAN,528,16-06-2008
+OO/H/20081/874,"MEDIS FARMACÊUTICA, LDA",CEFIXIMA NEOCEF Susp,CEFIXIMA,"100mg / 5ml (22,4mg/ml)",Pó para Suspensão Oral,"Frasco de 60, 100 e 120 ml",LABORATÓRIO,956,28-03-2009
+OO/H/20081/873,"MEDIS FARMACÊUTICA, LDA",CEFIXIMA NEOCEF,CEFIXIMA,400mg,Comprimidos Revestidos,"Blister de 1, 6, 8 e 12 comprimidos",LABORATÓRIO,533,16-06-2008
+OO/H/20081/877,"MEDIS FARMACÊUTICA, LDA",LAURODERME Pasta,ÁCIDO BÓRICO+ÓXIDO DE ZINCO+ÁCIDO SALICÍLICO,3g + 9.5g + 0.5g/100mg,Pasta cutânea,"Embalagem de 30g, 50g e de 100g",D.C.F DERMO C,588,03-08-2008
+OO/H/20081/876,"MEDIS FARMACÊUTICA, LDA",LAURODERME Líquido cutâneo,ÓXIDO DE ZINCO+ÁCIDO SALICÍLICO+ÁCIDO BÓRICO,9.5g + 0.5g + 3g/100mg,Líquido cutâneo,FRASCO 150ml,D.C.F DERMO C,596,03-08-2008
+OO/H/20081/882,"MEDIS FARMACÊUTICA, LDA",TOSSEQUE,"Bromexina, cloridrato",0.8mg/ml,Xarope,Frasco de 200 ml e 60ml,FARMALABOR,597,03-08-2008
+OO/H/20081/881,"MEDIS FARMACÊUTICA, LDA",LAURODERME PÓ,ÓXIDO DE ZINCO+ÁCIDO SALICÍLICO+ÁCIDO BÓRICO+DIÓXIDO DE TITÂNIO+PERÓXIDO DE ZIN,"2,3g + 0,2g + 3g + 2g +1g/100mg",Pó,EMBALAGEM DE 50g E 100g,D.C.F DERMO C,587,03-08-2008
+OO/H/20081/880,"MEDIS FARMACÊUTICA, LDA",LAURODERME Creme,ÓXIDO DE ZINCO+ÁCIDO SALICÍLICO+ÁCIDO BÓRICO,9.5g + 0.5g + 3g/100mg,Creme,EMBALAGEM DE 50g E 100g,D.C.F DERMO C,939,25-03-2009
+OO/H/20081/886,WELL WORTH LDA,FUROMIDA,Furosemida,40mg,Comprimidos,Blisters 10x10,Medopharma Ltd,1245,15-06-2009
+OO/H/20081/879,"MEDIS FARMACÊUTICA, LDA",ECAPRIL,LISINOPRIL,20mg,Comprimidos,"Blister de 10, 20, 30, 60 e 100 comprimidos",LABORATÓRIO,622,03-08-2008
+OO/H/20081/884,WELL WORTH LDA,DOLAPYN,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,Blisters 10x10,Medopharma Ltd,1159,05-06-2009
+OO/H/20081/883,WELL WORTH LDA,ASTHALIN INHALER (CFC free),"Salbutamol, Sulfato",100mcg,Aerossol pressurizado para Nebulização,Frasco com válvula adaptadora e doseador oral (Bomba) de 200 doses,Cipla Limited - I,852,06-03-2009
+OO/H/20081/878,"MEDIS FARMACÊUTICA, LDA",AMBROXOL FLUIDOX,"Ambroxol, cloridrato",30mg/5ml,Xarope,Frasco 200ml,D.C.F DERMO C,584,08-03-2008
+OO/H/20081/890,"MEDIS FARMACÊUTICA, LDA",PROTON,Omeprazol,20mg,cápsulas gastro-resistentes,"Blister de 14, 28 e 56 Cápsulas",LABORATÓRIO,938,25-03-2009
+OO/H/20081/889,"MEDIS FARMACÊUTICA, LDA",AMBROXOL FLUIDOX® COMPRIMIDOS,"Ambroxol, cloridrato",30mg,Comprimidos,EMBALAGEM DE 20 Comprimidos,Farmalabor-Prod,967,28-03-2009
+OO/H/20081/894,WELL WORTH LDA,NEOZOL Suspensão,Metronidazol,200mg/5ml,Suspensão Oral,Frasco 100ml,Medopharma Ltd,1516,22-11-2009
+OO/H/20081/896,"ORANE PHARMA, Lda",HEXAVITE,"Vitamina A, Acetato + Colecalciferol + Tiamina, mononitrato + Riboflavina + Ác. Ascórbico + Nicotinamid",2500UI + 300UI + 1mg + 1mg + 15mg + 7.5mg,Comprimidos,Blisters 10x10,Global Pharma,1125,27-05-2009
+OO/H/20081/895,"ORANE PHARMA, Lda",ALBENZ,Albendazol,400mg,Comprimidos,Blisters 1x10,Global Pharma,1481,18-10-2010
+OO/H/20082/898,PROFARMA,METAPRED,Prednisolona,5mg,Comprimidos,"Blisters 10x10, 100 blister de 10, Frascos de 500 e 1000 comprimidos","BDH industries,",1253,15-06-2009
+OO/H/20082/907,"MEDIS FARMACÊUTICA, LDA",VITERNUM,Di-hexazina,0.12 g/200ml,Pó para Solução Oral,"Saqueta com 2,5 g de pó e frasco com 200 ml de solvente","OM Portuguesa,",642,18-09-2008
+OO/H/20082/908,"MEDIS FARMACÊUTICA, LDA",VITERNUM,Di-hexazina,6mg,Comprimidos,Blister de 20 e 60 comprimidos,"OM Portuguesa,",743,11-12-2008
+OO/H/20082/906,"MEDIS FARMACÊUTICA, LDA",PARAMOLAN 250,Paracetamol,250mg,Supositórios,Blistres de 5 suposutórios,FARMALABOR,594,08-03-2008
+OO/H/20082/905,"MEDIS FARMACÊUTICA, LDA",PARAMOLAN 125,Paracetamol,125mg,Supositórios,Blistres de 5 supositórios,FARMALABOR,593,08-03-2008
+OO/H/20082/904,"MEDIS FARMACÊUTICA, LDA",MINOTREX,Minociclina,100mg,Cápsulas,CXS 16 CÁPS,LABORATÓRIO,629,08-09-2008
+OO/H/20082/903,"MEDIS FARMACÊUTICA, LDA",MEDALGINAN,Dietilamina,50mg/g,Gel,Bisnagas 100 g,LABORATÓRIO,741,11-12-2008
+OO/H/20082/902,"MEDIS FARMACÊUTICA, LDA",CICLOVIRAL 800,Aciclovir,800mg,Comprimido,Embalagem de 25 e de 35 comprimidos,FARMALABOR,646,08-09-2008
+OO/H/20082/901,"MEDIS FARMACÊUTICA, LDA",CICLOVIRAL 400,Aciclovir,400mg,Comprimido,EMBALAGEM DE 25 COMP,FARMALABOR,645,08-09-2008
+OO/H/20082/900,"MEDIS FARMACÊUTICA, LDA",CICLOVIRAL 200,Aciclovir,200mg,Comprimido,EMBALAGEM DE 25 COMP,FARMALABOR,644,08-09-2008
+OO/H/20082/912,WELL WORTH LDA,NEOFOL,Ácido Fólico,5mg,Comprimidos,Blisters 10x10,Medopharma Ltd,1411,26-09-2009
+OO/H/20082/916,MAPUTO HEALTH CARE Lda,URINEG 300,Ácido Nalidíxico,300mg/5ml,Suspensão Oral,frasco 100ml,T & T PHARMA,936,25-03-2009
+OO/H/20082/930,"MEDIS FARMACÊUTICA, LDA",URO-VAXOM,Lisado Bactériano de Escheríchia colí,6mg,Cápsulas,Embalagens de 30 Comp,"OM Portuguesa,",557,03-08-2008
+OO/H/20082/918,MAPUTO HEALTH CARE Lda,GRAVICARE,Citrato de ferro amonico + Ácido fólico + Vit. B1 + Vit. B6 + nicotinamida + Vit. B12,45mg + 0.5mg + 1.0mg + 2.0mg + 10mg + 18mcg/5ml,Xarope,frasco de 300ml,T & T PHARMA,624,08-09-2008
+OO/H/20082/925,"MEDIS FARMACÊUTICA, LDA",BRONCHO-VAXOM Infantil..,"Liofilizado om-85 - [lisado de bacteriano (H. Influenzae, S. pneumoniae; K. pneumoniae e Ozoneae; S.",20mg (3.5mg + 0.042mg + 1.515mg + 20mg),Cápsulas,3 Blisteres de 10 Cápsulas,"OM Pharma, S.A",1100,04-05-2009
+OO/H/20082/924,"MEDIS FARMACÊUTICA, LDA",BRONCHO-VAXOM infantil,"Liofilizado om-85 - lisado de bacteriano (H. Influenzae, S. pneumoniae; K. pneumoniae e Ozoneae; S.",A 20mg (3.5mg + 0.042mg + 1.515mg + 20mg),Granulado,Blisteres de 3 x 10 saquetas,"OM Portuguesa,",537,16-06-2008
+OO/H/20082/923,"MEDIS FARMACÊUTICA, LDA",BRONCHO-VAXOM Adulto,Liofilizado om-85,40mg,Cápsulas,Blisteres de 3 x 10 Comp,"OM Portuguesa,",1101,04-05-2009
+OO/H/20082/920,MEDIMPORT LDA,AMARYL,Glimepiride,2mg,Comprimidos,6 Carteiras x 10 Comp e de 30 comprimidos,Sanofi - Aventis,535,16-06-2008
+OO/H/20082/921,MEDIMPORT LDA,AMARYL,Glimepiride,4mg,Comprimidos,6 Carteiras x 10 Comp e de 30 comprimidos,Sanofi - Aventis,536,16-06-2008
+OO/H/20082/934,"MEDIS FARMACÊUTICA, LDA",PARAMOLAN,Paracetamol,120mg/5ml,Solução Oral,Frascos de 200ml,LABORATÓRIO,592,08-03-2008
+OO/H/20082/936,AFRI FARMÁCIA LDA,LYFE - Sais de Rehidratação Oral,Glicose + cloreto de sódio + citrato de sódio + Cloreto de Potássio,13.5g + 2.6g + 2.9g + 1.5g,Pó para Solução Oral,50 saquetas de pó para preparação de 1000ml Solução e 50 saquetas de pó para preparação,Elys Chemical In,617,08-09-2008
+OO/H/20082/945,FARMACÊUTICA AUSTRAL,TROPICIL TOP®,Tropicamida,10mg/ml,"Colírio, Solução",Frasco conta gotas de 10ml,LABORATÓRIO,636,08-09-2008
+OO/H/20082/944,FARMACÊUTICA AUSTRAL,TIMOGLAU®,"Timolol, maleato",5mg/ml,"Colírio, Solução",Frasco conta gotas de 7.5ml,LABORATÓRIO,600,08-09-2008
+OO/H/20082/942,FARMACÊUTICA AUSTRAL,PSODERMIL®,Ácido Salicílico + Diproprionato de Betametasona,30mg/g + 0.64mg/g,Pomada,Bisnaga de 30 g,LABORATÓRIO,647,08-09-2008
+OO/H/20082/941,FARMACÊUTICA AUSTRAL,PSODERMIL,Ácido Salicílico + Diproprionato de Betametasona,20mg/ml + 0.5mg/ml,Solução cutânea,FRASCOS DE 100 ML,LABORATÓRIO,601,08-09-2008
+OO/H/20082/938,FARMACÊUTICA AUSTRAL,GENTOCIL,"Gentamicina, Sulfato",3mg/ml,Colírio,Frasco conta gotas de 5 ml,LABORATÓRIO,726,11-12-2008
+OO/H/20083/947,MISSIONPHARMA MOÇAMBIQUE,NISTATINA,Nistatina,100.000 UI/ml,Suspensão Oral,Frasco de 30ml,Medicamen Biot,2724,22-03-2012
+OO/H/20083/946,MISSIONPHARMA MOÇAMBIQUE,CLOTRIMAZOL ÓVULO VAGINAL USP,Clotrimazol,100mg,Comprimidos vaginais,Blister de 6 comprimidos e 10 x 5 inserções,Medicamen Biot,1814,24-04-2010
+OO/H/20083/959,FARMACÊUTICA AUSTRAL,ZP DERMIL CHAMPÓ,Piritionato de zinco,20mg/g,Champô,frasco de 120ml e de 200ml,LABORATÓRIO,1405,28-09-2009
+OO/H/20083/957,FARMACÊUTICA AUSTRAL,LASSADERMIL®,Óxido de Zinco + Amido de trigo,250mg/g + 250mg/g,Pomada,Bisnagas de 25g,Laboratório Edol,586,03-08-2008
+OO/H/20083/955,MAPUTO HEALTH CARE Lda,FUROSEMIDA,Furosemida,10mg/ml,Solução Injectável,frasco 2ml,T & T PHARMA,891,16-03-2009
+OO/H/20083/954,MAPUTO HEALTH CARE Lda,DANAMAP 200,Danazol,200mg,Cápsulas,3x10 cap,T & T PHARMA,773,18-02-2009
+OO/H/20083/953,MAPUTO HEALTH CARE Lda,ASTHAGO,"Salbutamol, Sulfato",5mg,Aerossol pressurizado para Nebulização,frasco 15ml,T & T PHARMA,1,18-02-2009
+OO/H/20083/961,MEDIMPORT LDA,TAXOTERE 80/2,Docetaxel,80mg/2ml,Solução Injectável,1Frasco,Sanofi - Aventis,701,11-12-2008
+OO/H/20083/960,MEDIMPORT LDA,TAXOTERE 20/0.5,Docetaxel,20mg/0.5ml,Solução Injectável,1Frasco,Sanofi - Aventis,658,11-12-2008
+OO/H/20083/962,"MEDIS FARMACÊUTICA, LDA",AEROMAX NASAL,Budesonida,100mcg/dose,Suspensão para pulverização nasal,Embalagens de 200 Doses,LABORATÓRIO,1317,08-08-2009
+OO/H/20083/971,MAPUTO HEALTH CARE Lda,INACAIN,Fenazona + Procaina,5%+1%,Gotas auriculares,frasco 10ml,T & T PHARMA,769,18-02-2009
+OO/H/20083/970,MAPUTO HEALTH CARE Lda,DERMISIL,Sulfadiazina de Prata,10mg,Creme tópico,BISNAGA DE 15 GR,T & T PHARMA,1364,08-07-2009
+OO/H/20083/984,MAPUTO HEALTH CARE Lda,MILORIC,Alopurinol,100mg,Comprimidos,10 Blisters x 10 comprimidos,T & T PHARMA,771,18-02-2009
+OO/H/20083/982,MAPUTO HEALTH CARE Lda,LIMPODINE,IODOPOVIDONA,5%w/w,Pomada,CAIXA COM UMA BISNAGA DE 15G,T & T PHARMA,1264,15-06-2009
+OO/H/20083/981,MAPUTO HEALTH CARE Lda,CIPROM,"Ciprofloxacina, Cloridrato","0,3%",Solução Oftálmica,CAIXAS COM FRSCOS 5ML,T & T PHARMA,626,08-09-2008
+OO/H/20083/980,MAPUTO HEALTH CARE Lda,BENZOATO DE BENZILO 25%,Benzoato de Benzilo,25%,Emulsão Cutânea,FRASCOS PLASTICOS DE 100ML,T & T PHARMA,619,08-09-2008
+OO/H/20083/979,MAPUTO HEALTH CARE Lda,BELEMET INJECTION,Metoclopramida,5mg/ml,Solução Injectável,frasco de 2ml,T & T PHARMA,812,04-03-2009
+OO/H/20084/996,"MEDIS FARMACÊUTICA, LDA",TANSULOSINA BALDACCI,"Tansulosina, Cloridrato",0.4mg,Cápsula de libertação prolongada,"Embalagens de 10, 20, 30, 40 e 60 Comp",D.C.F DERMO C,882,06-03-2009
+OO/H/20084/993,"MEDIS FARMACÊUTICA, LDA",HEMOFISSURAL,"Óxido de Zinco + Dioxido de Titânio + tetracaina, cloridrato",8.5g/100g + 3.0g/100g + 1.0g/100g + 1.5g/100g,Pasta cutânea,Bisnagas de 20g,D.C.F DERMO C,910,16-03-2009
+OO/H/20084/992,"MEDIS FARMACÊUTICA, LDA",DOXI-OM,Dobesilato de Cálcio,500mg,Cápsulas,CaRTEIRA DE 2 e 6 x 10 COMP,"OM Portuguesa,",661,21-10-2008
+OO/H/20084/100,MAPUTO HEALTH CARE Lda,TIMOT,Timolol,0.0005,Solução Oftálmica,frasco 10ml,T & T PHARMA,869,06-03-2009
+OO/H/20084/100,MAPUTO HEALTH CARE Lda,MECOSPRIN,Ácido Acetilsalicílico,500mg,Comprimidos,EMBALAGEM 10X10,T & T PHARMA,868,06-03-2009
+OO/H/20084/999,MAPUTO HEALTH CARE Lda,FENOX - 250,Penicilina V,250mg/5ml,Suspensão Oral,FRASCO 100ml,T & T PHARMA,707,18-02-2009
+OO/H/20084/998,MAPUTO HEALTH CARE Lda,CLOXACILINA -500,Cloxacilina Sódica,500mg,Cápsulas,10 blister de 10 comprimidos,T & T PHARMA,866,06-03-2009
+OO/H/20084/100,"GENERICS & SPECIALITIES, Lda",CEDOR,Paracetamol,500mg,Comprimidos,Embalagens 10X10 e 50x10,BAL PHARMA L,842,06-03-2009
+OO/H/20084/101,MAPUTO HEALTH CARE Lda,MOPAR - 125,Paracetamol,125mg/5ml,Suspensão Oral,Frasco 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20084/101,MAPUTO HEALTH CARE Lda,MOFER-F,sulfato ferroso + ácido folico,200mg+0.25mg,Comprimidos Revestidos,10X10,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20084/100,MAPUTO HEALTH CARE Lda,MHC- CLAVAMOC 625,Amoxicilina + Ácido Clavulânico,500mg + 125mg,Comprimidos Revestidos,1x6,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20084/100,MAPUTO HEALTH CARE Lda,MAXIGEL SUSPENSION,Hidróxido de alumínio + Hidróxido de magnésio + simeticone,300mg + 200mg + 25mg,Suspensão Oral,FRASCOS DE 100 ML,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20084/100,MAPUTO HEALTH CARE Lda,ALBEX-400,Albendazol,400mg,Comprimido Mastigável,1 blister de 1 comprimidos,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20084/101,MAPUTO HEALTH CARE Lda,MOSAL SYRUP,"Salbutamol, Sulfato",2mg/5ml,Xarope,frasco 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20084/102,PROFARMA,METAMOX-500,Amoxicilina,500mg,Cápsulas,"Blisters 10x10 e 50x10, Frascos de 500 e 1000 comprimidos","BDH industries,",872,06-03-2009
+OO/H/20084/102,PROFARMA,METADIL,"Clorfeniramina, maleato",4mg,Comprimidos,Blisters 10x10 e 100x10 e Frascos de 500 e 1000 comprimidos,"BDH industries,",1107,27-05-2009
+OO/H/20084/102,PROFARMA,INDOSULE,Indometacina,25mg,Cápsulas,Blisters 10x10,"BDH industries,",875,06-03-2009
+OO/H/20084/102,"GENERICS & SPECIALITIES, Lda",G-ZOLE,Albendazol,400mg,Comprimidos,embalagem de 1 comprimido,Medopharma Ltd,783,04-03-2009
+OO/H/20084/101,"GENERICS & SPECIALITIES, Lda",GENSPRIN,Ácido Acetilsalicílico,500mg,Comprimidos,Embalagens 10X10,BAL PHARMA L,931,25-03-2009
+OO/H/20084/101,"GENERICS & SPECIALITIES, Lda",GENLYTE,Dextrose + Cloreto de Sódio + Cloreto de Potássio + Citrato de Sódio (Sais de rehidratação oral),"13,500mg + 2,600mg + 1,500mg + 2,900mg",Pó para Solução Oral,Saqueta de 21g,West- Coast Pha,1130,27-04-2009
+OO/H/20084/101,"GENERICS & SPECIALITIES, Lda",ANOMEX,"Hidrocortisona, Acetato + Lidocaína + Alantoína + óxido de zinco","0,25%w/w+3%w/w+5%w/w+5%w/w",Supositório,Blister de 5 supositórios,Bliss GVS Phar,849,06-03-2009
+OO/H/20084/103,"GENERICS & SPECIALITIES, Lda",IBUGEN,Paracetamol+Ibuprofeno+Cafeina,325mg+200mg+40mg,Comprimidos,Embalagens 10X10 e de 1 x 10,FOURRTS Labo,846,06-03-2009
+OO/H/20084/103,"GENERICS & SPECIALITIES, Lda",GENTOSSE,Hidrobrometo de dextrometorfano + Bromexina + Cloreto de amónio,10mg + 8mg + 100mg,Xarope,Frasco de 100ml,FOURRTS Labo,841,06-03-2009
+OO/H/20084/104,MISSIONPHARMA MOÇAMBIQUE,SULFATO FERROSO,Sulfato ferroso,200mg,Comprimidos,Frasco de 1000 comprimidos,Bionova Pharma,1158,18-10-2010
+OO/H/20085/105,WELL WORTH LDA,NEOSTEN,Clotrimazol,100mg,Comprimidos vaginais,Blister 6 + aplicador,TORQUE PHAR,1029,20-04-2009
+OO/H/20085/104,WELL WORTH LDA,NEOSTEN,Clotrimazol,0.01,Creme,Bisnaga de 20g,TORQUE PHAR,1865,28-05-2010
+OO/H/20085/104,WELL WORTH LDA,NEOGESIC RAPID FORTE,Salicilato de Metilo BP + Mentol USP + Óleo de Eucalipto + Óleo de Terpentina,15%w/w + 6%w/w + 2%w/w + 1.5%w/w,Pomada,Bisnaga de 25g,TORQUE PHAR,1202,04-06-2009
+OO/H/20085/104,WELL WORTH LDA,BENDEX,Albendazol,200mg/5ml,Suspensão Oral,Frasco de 10ml,Cipla Limited - I,1143,27-05-2009
+OO/H/20085/104,WELL WORTH LDA,BECLATE 100 HF INHALER,"Betametasona, diproprionato",100mcg/dose (200 doses),Aerossol pressurizado para Nebulização,Frasco com válvula adaptadora e doseador oral (Bomba) de 200 doses,Cipla Limited - I,1203,04-06-2009
+OO/H/20085/105,MISSIONPHARMA MOÇAMBIQUE,SULFATO ÁCIDO DE KANAMICINA,"Kanamicina, Sulfato",2g,Pó para Injectável,Embalagem com 25 ampolas,Shandong Reyo,2076,25-09-2010
+OO/H/20085/105,AFRI FARMÁCIA LDA,UMITOL-200,Carbamazepina,200mg,Comprimidos,EMBALAGEM 100 COMP (10x10),UMEDICA LABO,1457,22-11-2009
+OO/H/20085/105,AFRI FARMÁCIA LDA,SPIROLON-25,Espironolactona,25mg,comprimidos revestidos,embalagem de 100 Comprimidos e de 5 x10´s,Remedica Labor,932,25-03-2009
+OO/H/20085/105,AFRI FARMÁCIA LDA,ALOPRON 100,Alopurinol,100mg,Comprimidos,EMBALAGEM DE 100 COMP(10x10),Remedica Labor,889,16-03-2009
+OO/H/20085/107,MAPUTO HEALTH CARE Lda,NISMOX DRY SYRUP 250,"Amoxicilina, Trihidrato",250mg/5ml,Pó para Suspensão Oral,frasco 100 e 60ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20085/107,MAPUTO HEALTH CARE Lda,NISCLOR 125,Clorafenicol palmitato,125mg/ml,Suspensão Oral,frasco 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20085/107,MAPUTO HEALTH CARE Lda,BIODEC SYRUP,Vit.A+vitD3+vitB1+vitB2+D-pentenol+Niacinamida+vitB6+vitB12+vitE+monohidrato L-lisina,2500UI+200UI+2.5mg+2.5mg+2.5mg+25mg+1mg+3mcg+10mg+10mg,Xarope,frasco 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20085/107,MAPUTO HEALTH CARE Lda,AZINIS,Azitromicina,500mg,Cápsulas,10 blister de 6 cápsulas e 2 blisters de 3 capsulas,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20085/108,AFRI FARMÁCIA LDA,UMETAC-300,Ranitidina,300mg,Comprimidos Revestidos,EMBALAGEM 100 COMP Blisters (10x10),UMEDICA LABO,1256,15-06-2009
+OO/H/20085/108,AFRI FARMÁCIA LDA,SALBUTAMOL,"Salbutamol, Sulfato",2mg,Comprimidos,EMBALAGEM 100 COMP(2x5x10),Mercury laborato,1769,30-12-2010
+OO/H/20085/108,AFRI FARMÁCIA LDA,MEBENDAZOL,Mebendazol,100mg,Comprimidos,EMBALAGEM 100 COMP Blisters (10x10),UMEDICA LABO,1396,28-09-2009
+OO/H/20085/108,AFRI FARMÁCIA LDA,CLAVOMID 625,Amoxicilina + Ácido Clavulânico,500mg + 125mg,Comprimidos,1 Blister de 20 comp e 2 x 10´s,Remedica Labor,721,11-12-2008
+OO/H/20085/108,AFRI FARMÁCIA LDA,CLAVOMID 375,Amoxicilina + Ácido Clavulânico,375mg,Comprimidos,1 Blister de 20 comp e 2 x 10´s,Remedica Labor,720,11-12-2008
+OO/H/20085/108,AFRI FARMÁCIA LDA,CIMET-400,Cimetidina,400mg,Comprimidos,EMBALAGEM 100 COMP Blisters (10x10),UMEDICA LABO,703,11-12-2008
+OO/H/20085/108,AFRI FARMÁCIA LDA,CIMET-200,Cimetidina,200mg,Comprimidos,EMBALAGEM 100 COMP Blisters (10x10),UMEDICA LABO,702,11-12-2008
+OO/H/20085/110,BAYER SCHERING PHARMA MOÇAMBIQUE,ULTRAPROCT,"FLUOCORTOLONA,pivalato+LIDOCAÍNA,cloridrato",1mg/g+ 20mg/g,Creme,Bisnagas de 30G ou 50G,Bayer Healthcar,1126,27-05-2009
+OO/H/20085/110,BAYER SCHERING PHARMA MOÇAMBIQUE,TESTOVIRON DEPOT,"Testosterona, enantato",250mg/ml,Solução Injectável,EMBALGEM DE 1AMPOLA,BAYER SCHERI,1183,04-06-2009
+OO/H/20085/109,AFRI FARMÁCIA LDA,SALBUTAMOL,"Salbutamol, Sulfato",4mg,Comprimidos,EMBALAGEM 100 COMP(2x5x10),Mercury laborato,2098,30-12-2010
+OO/H/20085/109,BAYER SCHERING PHARMA MOÇAMBIQUE,MIGRASPIRINA,Ácido Acetilsalicílico,500mg,Comprimido Efervescente,Embalagem 12 e 24 Comprimidos,BAYER SCHERI,901,16-03-2009
+OO/H/20085/109,BAYER SCHERING PHARMA MOÇAMBIQUE,MICROGINON,Etinilestradiol + Levonorgestrel,0.03mg + 0.15mg,Comprimidos Revestidos,EMBALAGEM COM BLISTERS DE 21 OU 63 UNIDADES,BAYER PHARM,784,04-03-2009
+OO/H/20085/109,BAYER SCHERING PHARMA MOÇAMBIQUE,ASPIRINA-500MG,Ácido Acetilsalicílico,500mg,Comprimidos,EMBALAGEM 20 COMP,BAYER Bitterfeld,785,04-03-2009
+OO/H/20085/109,BAYER SCHERING PHARMA MOÇAMBIQUE,ASPIRINA C,Ácido Acetilsalicílico + Ácido Ascórbico,400mg+240mg,Comprimido Efervescente,EMBALAGEM 10 COMP ENFERVESCENTES,BAYER Bitterfeld,786,04-03-2009
+OO/H/20085/109,BAYER SCHERING PHARMA MOÇAMBIQUE,ANDROCUR,"Ciproterona, acetato",100mg,Comprimidos,EMBALAGEM COM (3X10) COMP,Delpharm Lille S,1184,04-06-2009
+OO/H/20085/109,BAYER SCHERING PHARMA MOÇAMBIQUE,ADVANTAN POMADA,Aceponato de Metilprednisolona,1mg/g,Pomada,Bisnaga de 30 G,Bayer Healthcar,1296,08-08-2009
+OO/H/20085/109,BAYER SCHERING PHARMA MOÇAMBIQUE,ADVANTAN CREME,Aceponato de Metilprednisolona,1mg/g,Creme,Bisnaga de 30 G,Bayer Healthcar,1295,08-08-2009
+OO/H/20085/111,"GENERICS & SPECIALITIES, Lda",RINGER LACTATE SOLUTION FOR INJECTION,Lactato de Sódio Composto Bp,0.240g + 0.115g + 0.600g,Solução Injectável,Frasco de 500ml,BAL PHARMA L,847,06-03-2009
+OO/H/20085/111,"GENERICS & SPECIALITIES, Lda",HYGEN,Hidroclorotiazida,50mg,Comprimidos,"Embalagem 10X10, 500",BAL PHARMA L,1022,20-04-2009
+OO/H/20085/111,"GENERICS & SPECIALITIES, Lda",AMILOGEN,"Amilorido, Hidrocloreto",5mg,Comprimidos,Embalagem 10X10 de 500 e 1000 cáps,BAL PHARMA L,973,28-03-2009
+OO/H/20085/112,AFRI FARMÁCIA LDA,UMERAN-75,Diclofenac sódico,75mg/3ml,Injectável,100 Ampolas (10x10),UMEDICA LABO,1638,19-03-2010
+OO/H/20085/112,AFRI FARMÁCIA LDA,CYCLOVAX-400,Aciclovir,400mg,Comprimidos,EMBALAGEM DE 100 COMP(10x10) e de 1 x 10,Remedica Labor,887,06-03-2009
+OO/H/20085/112,AFRI FARMÁCIA LDA,CYCLOVAX-200,Aciclovir,200mg,Comprimido,EMBALAGEM DE 100 COMP(10x10) e de 3 x 10,Remedica Labor,877,06-03-2009
+OO/H/20085/113,"MEDIS FARMACÊUTICA, LDA",VENOSMIL GEL,Hidrosmina,20mg/g,Gel,Embalagens de 40g ou 100g,Laboratório Vitór,833,06-03-2009
+OO/H/20085/113,"MEDIS FARMACÊUTICA, LDA",VENOSMIL,Hidrosmina,200mg,Cápsulas,Blisteres de 20 e 60 Cápsulas,Laboratório Vitór,838,06-03-2009
+OO/H/20085/112,"MEDIS FARMACÊUTICA, LDA",FENIL-V,Diclofenac sódico,75mg/2ml,Injectável,3 e 60 Ampolas,Laboratório Vitór,731,11-12-2008
+OO/H/20086/113,"GENERICS & SPECIALITIES, Lda",MODUGEN,Amilorido Hidrocloreto + Hidroclortiazida,5mg+50mg,Comprimidos,Embalagem 10X10 de 500 e 1000 cáps,BAL PHARMA L,1241,15-06-2009
+OO/H/20086/113,"GENERICS & SPECIALITIES, Lda",EFAVIRENZ 600,Efavirenz,600mg,Comprimidos Revestidos,Frasco de 30 comprimidos,Matrix Laborator,1023,20-04-2009
+OO/H/20086/114,MAPUTO HEALTH CARE Lda,NISGES-25,Indometacina,25mg,Cápsulas,10 blister de 10 cap,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20086/114,MAPUTO HEALTH CARE Lda,MOZVIT,VitA+VitB1+VitB2+VitB6+Ácido Fólico+VitB12+VitD3+VitE,"1600+1+1+0,5+1mg+2mcg+100u.i+5u.i",Comprimidos Revestidos,10blister de 10 comp,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20086/113,MAPUTO HEALTH CARE Lda,GYNACARE-100,Clotrimazol,100mg,Comprimidos vaginais,blister de 6 comp,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20086/114,"MEDIS FARMACÊUTICA, LDA",PANKREOFLAT,Pancreatina + Dimeticone,172mg+80mg,Comprimidos,Blisteres de 60 Comp,Laboratório Vitór,827,06-03-2009
+OO/H/20086/114,"GENERICS & SPECIALITIES, Lda",GENDOX,Doxiciclina,100mg,Cápsulas,Embalagem 10X10,FOURRTS Labo,687,21-10-2008
+OO/H/20086/114,MAPUTO HEALTH CARE Lda,ARTEFAN 40/240,Arteméter + Lumefantrina,40mg + 240mg,Comprimidos,Blisters 2 x 6 comprimidos,AJANTA PHARM,1078,30-04-2009
+OO/H/20086/114,MAPUTO HEALTH CARE Lda,ARTEFAN 20/120,Arteméter + Lumefantrina,20mg + 120mg,Comprimidos,"Blisters 3x8 comprimidos, 30x6, 30x12",AJANTA PHARM,1077,30-04-2009
+OO/H/20086/115,PROFARMA,QUININA SULFATO COMP,"Quinina, Sulfato",300mg,Comprimidos revestidos,Blisters 10x10,"BDH industries,",744,18-02-2009
+OO/H/20087/115,MEDIMPORT LDA,ARTESUNATE AMODIAQUINE WINTROP,Artesunato + Amodiaquina,50mg + 135mg,Comprimidos,"1x3, 25x3 e 25x6",MAPHA Laborat,1157,27-05-2009
+OO/H/20087/115,MEDIMPORT LDA,ARTESUNATE AMODIAQUINE WINTROP,Artesunato + Amodiaquina,100mg + 270mg,Comprimidos,"1x3, 6, 25x3 e 25x6",MAPHA Laborat,1156,27-05-2009
+OO/H/20087/115,MEDIMPORT LDA,ARTESUNATE AMODIAQUINE WINTROP,Artesunato + Amodiaquina,25mg + 67.5mg,Comprimidos,1x3 e 25x3,MAPHA Laborat,1150,27-05-2009
+OO/H/20087/116,MAPUTO HEALTH CARE Lda,NYSTIN,Nistatina,"100,000ui/5ml",Suspensão Oral,frasco 30ml,T & T PHARMA,1265,15-06-2009
+OO/H/20087/115,MAPUTO HEALTH CARE Lda,FENOX - 500,Penicilina V,500mg,Comprimidos,10 blister de 10comp,T & T PHARMA,779,18-02-2009
+OO/H/20087/115,MAPUTO HEALTH CARE Lda,FENOX - 125,Penicilina V Potássica,125mg/5ml,Suspensão Oral,frasco 100ml,T & T PHARMA,778,18-02-2009
+OO/H/20087/116,"MEDIMOC, SA",OMEPRAZOL,Omeprazol,20mg,Cápsulas,embalagem de 14 Cápsulas,Laboratórios Teu,820,04-03-2009
+OO/H/20087/116,"MEDIMOC, SA",NISTATINA,Nistatina,100.000UI/ml,Suspensão Oral,Frasco de 50ml,Laboratórios Teu,821,04-03-2009
+OO/H/20087/116,"MEDIMOC, SA",COLÍRIO TEUTO,"Nafazolina, Cloridrato + Sulfato de Zinco","0,15mg/ml+0,3mg/ml",Solução Oftálmica,Frasco de 20ml,Laboratórios Teu,817,04-03-2009
+OO/H/20087/116,"MEDIMOC, SA",CAPTOPRIL,Captopril,25mg,Comprimidos,Embalagem 30 comp,Laboratórios Teu,1034,20-04-2009
+OO/H/20087/116,"MEDIMOC, SA",ATENOLOL 50,Atenolol,50mg,Comprimidos,Embalagens 1X28/ 1X30,Laboratórios Teu,765,18-02-2009
+OO/H/20087/117,MAPUTO HEALTH CARE Lda,NYSTIN V,Nistatina,100.000 U.I,Comprimidos vaginais,blister de 14 comp,T & T PHARMA,808,04-03-2009
+OO/H/20087/117,MAPUTO HEALTH CARE Lda,LUXODOPA-250,Metildopa,250mg,Comprimidos Revestidos,10blister de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20087/117,MAPUTO HEALTH CARE Lda,GENTAMICINA GOTAS OFTÁLMICAS B.P,"Gentamicina, Sulfato",30mg/10ml,Solução Oftálmica,frasco 10ml,T & T PHARMA,774,18-02-2009
+OO/H/20087/117,MAPUTO HEALTH CARE Lda,CLORANFENICOL GOTAS OFTÁLMICA,Cloranfenicol,"0,5% W/V/ml",Solução Oftálmica,frasco 10ml,T & T PHARMA,775,18-02-2009
+OO/H/20087/118,AFRI FARMÁCIA LDA,LOKIT,Omeprazol,20mg,Cápsulas,EMBALAGEM 100 CÁPS(10x10),Kopran Ltda - In,789,04-03-2009
+OO/H/20087/117,AFRI FARMÁCIA LDA,CIAVITA,Tiamina (Vit. B1) + Riboflavina (Vit. B2) + Nicotinamida,"1,2mg + 1,2mg + 17,25mg",Comprimidos,EMBALAGEM 100 COMP,Mercury laborato,1258,15-06-2009
+OO/H/20087/118,MAPUTO HEALTH CARE Lda,CARDICARE RETARD 30ER,Nifedipina,30mg,Comprimidos,Blisters 10x10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20087/118,MAPUTO HEALTH CARE Lda,CARDICARE RETARD 20ER,Nifedipina,20mg,Comprimidos,Blisters 10x10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20087/118,"GENERICS & SPECIALITIES, Lda",GENDOL S,Paracetamol,125mg/5ml,Suspensão Oral,"Embalagem contendo frasco ambar, PET de 100ml",Galpha Laborato,782,04-03-2009
+OO/H/20087/119,"MEDIMOC, SA",SULFAMETOXAZOL+TRIMETOPRIM,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,Embalagen 10X10,Laboratórios Teu,819,04-03-2009
+OO/H/20087/119,"MEDIMOC, SA",SULFAMETOXAZOL+TRIMETOPRIM,Trimetoprim + sulfametoxazol,40mg/ml + 8mg/ml,Suspensão Oral,Frasco de 100ml,Laboratórios Teu,857,06-03-2009
+OO/H/20087/119,"GENERICS & SPECIALITIES, Lda",SPASGEN,"Butilescopolamina,Brometo BP 10mg",10mg,Comprimido revestido,"embalagens de 500 e de 1000 comprimidos, 10x2 comprimidos, 10x10 comprimidos",BAL PHARMA L,840,06-04-2009
+OO/H/20087/119,"MEDIS FARMACÊUTICA, LDA",GLUCOSAMINA GLUSINA,"Glucosamina, Sulfato de Sódio",1500mg,Pó para Solução Oral,"embalagem de 7, 20 e de 60 saquetas",Generis Farmac,921,16-03-2009
+OO/H/20087/119,"MEDIMOC, SA",FERRONIL,Sulfato Ferroso,40mg,Comprimidos Revestidos,50 comprimidos,Laboratórios Teu,814,04-03-2009
+OO/H/20087/118,"GENERICS & SPECIALITIES, Lda",CLAVUGEN-625,Amoxicilina + Clavulanato de Potássio,500mg + 125mg,Comprimidos,2x10 blisters,Galpha Laborato,1227,15-06-2009
+OO/H/20087/120,MEDIMPORT LDA,NO SPA,Drotaverina,40mg,Comprimidos,Embalagem de 20 e de 100 comprimidos,Chinoin Pharma,1269,08-07-2009
+OO/H/20087/119,"MEDIS FARMACÊUTICA, LDA",HIDANTINA,Fenitoína,100mg,Comprimidos Revestidos,Embalagem de 20 e 60 comprimido,"FAES Farma, S.",905,16-03-2009
+OO/H/20087/120,"MEDIS FARMACÊUTICA, LDA",FENIL-V Gelcreme,Diclofenac,10mg/g,Gel,Bisnaga de 100g,Laboratório Vitór,918,16-03-2009
+OO/H/20087/120,"MEDIS FARMACÊUTICA, LDA",FENIL V Dispersivel,Diclofenac Sódico,46.5mg,Comprimido Dispersível,Embalagem de 10 e 60 comprimidos,Laboratório Vitór,1067,20-04-2009
+OO/H/20087/119,MEDIMPORT LDA,APROVEL,Irbesartan,150mg,Comprimidos,Embalagem de 28 comprimido,Sanofi Winthrop,1057,20-04-2009
+OO/H/20087/120,MEDIMPORT LDA,APROVEL,Irbesartan,300mg,Comprimidos,Embalagem de 28 comprimido,Sanofi Winthrop,1058,20-04-2009
+OO/H/20087/121,MAPUTO HEALTH CARE Lda,URINEG 500,Ácido Nalidíxico,500mg,Comprimidos,10 blister de 10comp,T & T PHARMA,807,04-03-2009
+OO/H/20087/121,MAPUTO HEALTH CARE Lda,T & T NASAL DROPS,Cloreto de Sódio,1%,Solução Nasal,frasco 20ml,T & T PHARMA,864,06-03-2009
+OO/H/20087/120,MAPUTO HEALTH CARE Lda,MUCORON,"Bromexina, Cloridrato",4mg/5ml,Xarope,frasco 100ml,T & T PHARMA,780,18-02-2009
+OO/H/20087/121,MAPUTO HEALTH CARE Lda,CIT-C,Ácido Ascórbico + ascorbato de sódio,200mg+338mg,Comprimido Mastigável,embalagem de 10 x10,T & T PHARMA,1261,15-06-2009
+OO/H/20088/121,MAPUTO HEALTH CARE Lda,T & T GRIPE WATER,Bicarbonato de Sódio + mentol + Óleo de semente de anis + Óleo de funcho + Solução de sorbitol a 70,"% 40mg + 0,500mg + 0,000375ml + 0,00075ml + 0,11ml",Solução Oral,Frasco de 130ml,T & T PHARMA,809,04-03-2009
+OO/H/20088/123,PROFARMA,TETRACICLINA CÁPSULAS,Tetraciclina,500mg,Cápsulas,Blisters 10x10 e 50x10 e Frascos de 500 e 1000 cápsulas,"BDH industries,",1223,15-06-2009
+OO/H/20088/122,PROFARMA,NAPRIL-10,"Enalapril, maleato",10mg,Comprimidos,"Blisters 10x10, 50x10 e 100x10 e Frascos de 1000 comprimidos","BDH industries,",997,13-04-2009
+OO/H/20088/122,PROFARMA,NALOP-20,"Enalapril, maleato",20mg,Comprimidos,"Blisters 10x10, 50x10 e 10x10 e Frascos de 1000 comprimidos","BDH industries,",1001,13-04-2009
+OO/H/20088/122,"MEDIS FARMACÊUTICA, LDA",BROMALEX,Bromazepam,"1,5mg",Comprimidos,Embalagem de 20 e 40 comprimidos,Laboratório Vitór,951,28-03-2009
+OO/H/20088/122,"MEDIS FARMACÊUTICA, LDA",BROMALEX,Bromazepam,3mg,Comprimidos,Embalagem de 20 e 40 comprimidos,Laboratório Vitór,952,28-03-2009
+OO/H/20088/122,"MEDIS FARMACÊUTICA, LDA",BROMALEX,Bromazepam,6mg,Comprimidos,Embalagem de 20 e 40 comprimidos,Laboratório Vitór,953,28-03-2009
+OO/H/20088/123,AFRI FARMÁCIA LDA,ERGAGIN,"Metilergometrina, maleato",0.2mg/ml,Solução Injectável,10 ampolas de 1ml,Mercury laborato,1401,26-09-2009
+OO/H/20088/123,"MEDIMOC, SA",NAPROXENO,Naproxeno,500mg,Comprimidos,embalagem de 20 comprimidos,Laboratórios Teu,1032,20-04-2009
+OO/H/20088/123,"MEDIMOC, SA",LISINOPRIL,Lisinopril dihidratado,10mg,Comprimidos,30 Comprimidos,Laboratórios Teu,762,18-02-2009
+OO/H/20088/123,"MEDIMOC, SA",DIMEZIN EMULSÃO,Simeticone,75mg/ml,Emulsão Oral,50 frascos de 10ml,Laboratórios Teu,818,04-03-2009
+OO/H/20088/123,"MEDIMOC, SA",CLORIDRATO DE VANCOMICINA,Vancomicina HCL,500mg,Pó liofilizado para solução injectável,1 Frasco de e 50 frascos de,Laboratórios Teu,856,06-03-2009
+OO/H/20088/123,"MEDIMOC, SA",CLORIDRATO DE METOCLOPRAMIDA,"Metoclopramida, Cloridrato",5mg/ml,Injectável,120 ampolas de 2ml,Laboratórios Teu,822,04-03-2009
+OO/H/20088/124,"GENERICS & SPECIALITIES, Lda",GENSONE,Prednisolona,5mg,Comprimidos,embalagem de 10X10,FOURRTS Labo,850,06-03-2009
+OO/H/20088/125,"MEDIMOC, SA",CLORIDRATO DE PROPRANOLOL,"Propranolol, Cloridrato",40mg,Comprimidos,30 e 100 Comprimidos,Laboratórios Teu,981,13-04-2009
+OO/H/20088/124,"MEDIMOC, SA",CLORIDRATO DE AMBROXOL PEDIÁTRICO,"Ambroxol, cloridrato",3mg/ml,Xarope,Frasco de 120ml,Laboratórios Teu,858,06-03-2009
+OO/H/20088/124,"MEDIMOC, SA",CLORIDRATO DE AMBROXOL ADULTO,"Ambroxol, cloridrato",6mg/ml,Xarope,Frasco de 120ml,Laboratórios Teu,888,06-03-2009
+OO/H/20088/124,"GENERICS & SPECIALITIES, Lda",CIPROGEN,Ciprofloxacina,500mg,Comprimidos Revestidos,Blisters de 10x10,Bal pharma Ltd -,1332,19-08-2009
+OO/H/20088/124,"GENERICS & SPECIALITIES, Lda",CLAVUGEN-156.25MG DRY SYRUP,Amoxicilina + Clavulato de Potássio,125mg/5ml + 31.25mg/5ml,Pó para Suspensão Oral,,Galpha Laborato,1333,19-08-2009
+OO/H/20088/125,"MEDIS FARMACÊUTICA, LDA",VENTILAN Inhaler,"Salbutamol, Sulfato",100mcg/dose,Suspensão Pressurizada para inalação,Frasco com 200 doses,Glaxo Operation,955,28-03-2009
+OO/H/20088/125,"MEDIS FARMACÊUTICA, LDA",DERMOVATE Pomada,Propionato de Clobetasol,0.5mg/g,Pomada,Bisnaga de 30g,Glaxo Operation,1354,19-08-2009
+OO/H/20088/125,"MEDIS FARMACÊUTICA, LDA",BETNOVATE® Creme,"Betametasona, valerato",1mg/g,Creme,Bisnaga de 30g,Glaxo Operation,946,28-03-2009
+OO/H/20088/126,PROFARMA,PROPRANOLOL COMPRIMIDOS BP 40mg,Propranolol,40mg,Comprimidos,10 blister de 10comp,"BDH industries,",1472,18-10-2010
+OO/H/20088/126,AFRI FARMÁCIA LDA,MUCO ASTHALIN,Salbutamol + Bromexina + Mentol,2mg/5ml + 4mg/5ml + 1mg / 5ml,Xarope,Frasco de 100ml,Shelys Pharmac,514,16-06-2008
+OO/H/20088/126,PROFARMA,FRUREX,Furosemida,40mg,Comprimidos,"Caixa de 10 blisteres de 10 comp, Frasco de 100, 500, e 1000 comprimidos","BDH industries,",1180,03-06-2009
+OO/H/20088/126,PROFARMA,ERYC- S 500,Eritromicina,500mg,Comprimidos Revestidos,"Blisters de 10x10, Frascos de HDPE de 100 Comp e de 1000 Comp","BDH industries,",1252,15-06-2009
+OO/H/20089/126,MAPUTO HEALTH CARE Lda,TRUPRIM SUSPENSION,Trimetoprim + Sulfametoxazol,205mg + 41mg,Suspensão Oral,frasco de 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20089/126,MAPUTO HEALTH CARE Lda,COLDGRIP,Paracetamol+Cafeína anidra+ Cloridrato de Fenilefrina+Maleato de Clorfeniramina,500mg + 30mg + 10mg + 2mg,Comprimidos,embalagem de 10 x10 e Embalagem com 25 blisters de 4 comprimidos,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20089/126,PROFARMA,METACYCLINE,"Tetraciclina, Hidrocloreto",30mg/g,pomada,Bisnaga de 15g,"BDH industries,",1224,15-06-2009
+OO/H/20089/127,"MEDIS FARMACÊUTICA, LDA",BENYLIN With Codeine,"Difenidramina, Hidrocloreto + Fosfato de Codeína + Cloreto de Amónio",12.50mg + 10mg + 125mg/ 5ml,Xarope,100ml e 200ml,Johnson & John,1009,13-04-2009
+OO/H/20089/127,"MEDIS FARMACÊUTICA, LDA",BENYLIN Wet Cough,Guaíafenasína,200mg/10ml,Solução Oral,"frasco de 50ml, 100ml, 200ml e saquetas de 10ml",Johnson & John,945,28-03-2009
+OO/H/20089/127,"MEDIS FARMACÊUTICA, LDA",BENYLIN Original,"Difenidramina, Hidrocloreto + Cloreto de Amónio",12.50mg/5ml + 125mg/5ml,Xarope,100ml e 200ml,Johnson & John,1056,20-04-2009
+OO/H/20089/127,"MEDIS FARMACÊUTICA, LDA",BENYLIN Four Flu Liquid,"Difenidramina, Hidrocloreto + Paracetamol + Pseudoefedrína, Hidrocloreto",25mg+ 1000mg + 45mg/ 20ml,Solução Oral,100ml e 200ml,Johnson & John,944,28-03-2009
+OO/H/20089/127,"MEDIS FARMACÊUTICA, LDA",BENYLIN Children´s Wet Cough,Guaíafenasína,100mg,Solução Oral,100ml,Johnson & John,1010,13-04-2009
+OO/H/20089/127,"MEDIS FARMACÊUTICA, LDA",BENYLIN Children´s,"Difenidramina, Hidrocloreto + Cloreto de Amónio",12.50mg + 125mg,Xarope,200ml,Johnson & John,1563,23-12-2009
+OO/H/20089/127,MAPUTO HEALTH CARE Lda,RHEUMACARE,Diclofenac dietilamina,"11,6mg/g",Gel,Bisnaga de 20g,T & T PHARMA,1388,26-09-2009
+OO/H/20089/128,MAPUTO HEALTH CARE Lda,MHC WHITFIELD,Ácido Benzóico + Ácido Salicílico,60mg/g + 30mg/g,Pomada tópica,Bisnaga com 20g,T & T PHARMA,1505,22-11-2009
+OO/H/20089/128,MAPUTO HEALTH CARE Lda,MHC CANDIFER SOLUTION,Clotrimazol,10mg/ml,Solução tópica,Frasco de 15ml,T & T PHARMA,1385,26-09-2009
+OO/H/20089/128,MAPUTO HEALTH CARE Lda,MHC CANDIFER,Clotrimazol,10mg/g,Creme tópico,Bisnaga de 20g e 30g,T & T PHARMA,1386,26-09-2009
+OO/H/20089/128,MAPUTO HEALTH CARE Lda,ITCHCARE,Diproprionato de Betametasona + ácido folico,0.640mg/g + 30mg/g,Pomada,Bisnaga de 15g,T & T PHARMA,1384,26-09-2009
+OO/H/20089/127,MAPUTO HEALTH CARE Lda,HERPACARE,Aciclovir,50mg/g,Creme,Bisnagas de 5g,T & T PHARMA,1387,26-09-2009
+OO/H/200810/12,"GENERICS & SPECIALITIES, Lda",KONTRAC -200,Misoprostol,200mcg,Comprimidos,1 blister de 2 comprimidos e 10x10,FOURRTS Labo,1335,19-08-2009
+OO/H/200810/12,MAPUTO HEALTH CARE Lda,PARAGRAIN,Tartarato de Ergotamina + cafeína,1mg+ 100mg,Comprimidos,embalagem de 1 x10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/12,MAPUTO HEALTH CARE Lda,LUXOGYL -250,Metronidazol,250mg,Comprimidos,embalagem de 10 x10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/12,MAPUTO HEALTH CARE Lda,BRONCOLUX-2.5,"Terbutalina, Sulfato",2.5 mg,Comprimidos,embalagem de 10 x10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,"GENERICS & SPECIALITIES, Lda",FOURTS B CÁPSULES,"Tiamina ,Nitrato + Riboflamina + Piridoxina, Hidrocloreto +Nicotinamida+ácido ascórbico+Monohidrato d",12.5mg + 11.5mg + 3.45mg + 54mg + 84.75mg + 55mg + 1.025mg + 0.22mg + 0.24mg + 0.02,Cápsulas,embalagem de 3X10,FOURRTS Labo,1133,27-04-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,URICARE,Amilorido Hcl+ hidroclorotiazida,5mg+50mg,Comprimidos,10 x10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,STERILE PENICILLIN G BENZATHINE USP 1.8G (2.400.00,0 Penicilina G Benzatínica,2.400.000UI,Pó para Injectável,"1 x 50 frascos, 18 caixas embaladas numa caixa maior",KARNATAKA AN,1220,15-06-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,MUVON FORTE,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,embalagem de 10 x10,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,KANAMYCIN ACID SULPHATE FOR INJECTION BP 2.0g,"Kanamicina, Sulfato",2g,Injectável,1 x 50 frascos,KARNATAKA AN,1122,04-05-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,DICLOFENAC SÓDICO INJECTÁVEL /25MG/ML,Diclofenac Sódico,25mg/3ml,Injectável,10 x 3ml,KARNATAKA AN,1594,27-02-2010
+OO/H/200810/13,AFRI FARMÁCIA LDA,OVA - MIT,Clomifene,50mg,Comprimidos,1blister de 10 comprimidos,Remedica Labor,962,28-03-2009
+OO/H/200810/13,AFRI FARMÁCIA LDA,NIFELAT R,Nifedipina,20mg,Comprimidos,10 x10 comp,Remedica Labor,1054,20-04-2009
+OO/H/200810/13,AFRI FARMÁCIA LDA,MILOREX,"Amilorido, hidrocloreto anidro + Hidroclortiazida",5mg + 50mg,Comprimidos,3 x 10,Remedica Labor,1330,19-08-2009
+OO/H/200810/13,AFRI FARMÁCIA LDA,METHYLDOPA-250,Metildopa,250mg,Comprimidos,10 x 10,Remedica Labor,1257,15-06-2009
+OO/H/200810/13,AFRI FARMÁCIA LDA,KETROZOL-200,Ketoconazol,200mg,Comprimidos,10 x10 comp,Remedica Labor,1260,15-06-2009
+OO/H/200810/13,"GENERICS & SPECIALITIES, Lda",KETOCONAZOLE TABLETS USP 200MG,Ketoconazol,200mg,Comprimidos,10 blister de 10 comprimidos,Gracure Pharma,925,16-03-2009
+OO/H/200810/13,AFRI FARMÁCIA LDA,CYCLOVAX CREAM,Aciclovir,0%,Creme,Bisnaga de 10g,Remedica Labor,1294,08-08-2009
+OO/H/200810/13,"GENERICS & SPECIALITIES, Lda",CLOGEN,Clotrimazol,100mg,Comprimidos vaginais,,Gracure Pharma,1243,15-06-2009
+OO/H/200810/13,"MEDIS FARMACÊUTICA, LDA",AUGMENTIN®,Amoxicilina + Ácido Clavulânico,500mg + 125mg,Comprimidos Revestidos,Embalagem de 14 comprimidos,Glaxo Wellcome,948,28-03-2009
+OO/H/200810/13,"SHANI, LIMITADA",PROPASHA,"Propanolol, Hidrocloreto",40mg,Comprimidos,10 blister de 10 comprimidos,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,"SHANI, LIMITADA",PROBESHA,Multivitaminas,"500mg+10g+15mg+0,5mg+5 mcg+2,5mg+1,0mg+25,0mg+3,0mg",Xarope,frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,"SHANI, LIMITADA",GLYSHA,Glibenclamida,5mg,Comprimidos,11 blister de 10 comprimidos,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,"SHANI, LIMITADA",BUSCOSHA,Hioscina Butilbrometo BP,10mg,Comprimidos Revestidos,10 blister de 10 comprimidos,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,"SHANI, LIMITADA",BECOSHA,Complexo B,5mg + 2.5mg + 1.5mg + 2.5mcg + 25mg + 2.5mg,Xarope,frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200810/13,WELL WORTH LDA,VITAMIX MULTIVITAMINAS,Axeroftol (Vit. A) + Tiamina (Vit. B1) + Riboflavina (vit. B2) + Piridoxina (Vit. B6) + Cianocobalamina (Vit.,1000IU + 1mg + 1mg + 0.25mg + 1mcg + 5mg + 5mg,Comprimidos Revestidos,10 blister de 10comp,Medopharma Ltd,2128,30-12-2010
+OO/H/200810/13,"GENERICS & SPECIALITIES, Lda",HISTAGEN-S,"Clorfeniramina, maleato",2mg,Xarope,Frasco de 100ml,Gracure Pharma,1134,27-04-2009
+OO/H/200810/13,AFRI FARMÁCIA LDA,GLYFORMIN 500,"Metformina, hidrocloreto",500mg,Comprimidos,"blisters de 10x10,",Remedica Labor,964,28-03-2009
+OO/H/200810/13,"GENERICS & SPECIALITIES, Lda",FLUCOGEN,Fluconazol,150mg,Cápsulas,1 blister de 1 cápsula,Gracure Pharma,1238,15-06-2009
+OO/H/200810/13,AFRI FARMÁCIA LDA,DAY- BY -DAY,Vitamina A + Tiamina (Vitamiba B1 + Riboflavina (vitamina B2) + Piridoxina (vitamina B6) + Cianocobal,a 2000UI + 1mg +1mg + 1.34mg + 1mcg + 200UI + 3mcg + 1mg + 50mcg + 1mg + 75mg +1mg,Comprimidos,3 blister de 10 comp,Stallion Laborato,1079,04-05-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,SWFI-LIQ,Água para Preparação Injectável,Não aplicável,Solução Injectável,1 x 5ml; 1 x 10ml,Nirma Limited - I,1377,08-07-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,NIRCIP,Ciprofloxacina,200mg/100ml,Solução Injectável,frasco de 100ml,Nirma Limited - I,1219,15-06-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,LACTATO DE RINGER,Lactato de Sódio + Cloreto de Sódio + Cloreto de Potássio+ Cloreto de Cálcio dihidratado,1.60g + 3.0g + 0.2g + 0.135g,Solução Injectável,1 x 500ml; 1 x 1000ml,Nirma Limited - I,1069,20-04-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,"CLORETO DE SÓDIO A 0,9 W/V E GLUCOSE A 5%W/V",Cloreto de Sódio e Glucose anidra,4.5 g + 25g,Solução Injectável,1 x 500ml; 1 x 1000ml,Nirma Limited - I,1073,20-04-2009
+OO/H/200810/13,MAPUTO HEALTH CARE Lda,CLORETO DE SÓDIO,Cloreto de Sódio,0%,Solução injectável,1 x 500ml; 1 x 1000ml,Nirma Limited - I,1375,08-07-2009
+OO/H/200810/13,"MEDIMOC, SA",MEPIADRE,"Mepivacaína, Cloridrato + Epinefrina",20mg + 10μg,Solução Injectável,"5 Blisters com 10 ampolas de 1,8ml",DFL Indústria e,1805,01-04-2010
+OO/H/200810/13,"MEDIMOC, SA",ALPHACAÍNE 100,"Lidocaína, Cloridrato + Epinefrina",20mg/ml + 0.01mg/ml,Solução Injectável,"5 Blisters com 10 ampolas de 1,8ml",DFL Indústria e,1757,06-12-2010
+OO/H/200811/13,MAPUTO HEALTH CARE Lda,GENTAMICINA SOLUÇÃO INJECTÁVEL,"Gentamicina, sulfato",40mg/ml,Solução Injectável,Ampolas de 2ml,KARNATAKA AN,1595,27-02-2010
+OO/H/200811/13,AFRI FARMÁCIA LDA,LAMIVUDINA + ZIDOVUDINA + NEVIRAPINA,Lamivudina + Zidovudina + Nevirapina,150mg + 300mg + 200mg,Comprimidos,Frasco de 60,Hetero Drugs Li,2002,06-12-2010
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",TRIAZOL,Fluconazol,150mg,Cápsulas,"embalagem de 1, 2 e 4 cápsulas",Biolab Sanus Fa,1096,04-05-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",TANTIN,Etinilestradiol + Gestodeno,0.015mg + 0.060mg,Comprimidos Revestidos,"embalagem de 1 x28, 3 x 28, 50 x 28",Biolab Sanus Fa,1155,27-05-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",SYNTOXIME,Cefotaxima Sódica,1000mg,Pó para Injectável,"embalagem de 10, 50 e 100 frascos",Medochemie Ltd,966,28-03-2009
+OO/H/200811/13,MEDIMPORT LDA,DAONIL,Glibenclamida,5mg,Comprimidos,embalagem de 60 COMP,Aventis Pharma,937,25-03-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",COARTEM,Arteméter + Lumefantrina,20mg + 120mg,Comprimidos,"36x6, 4x6",Novartis Pharma,1065,20-04-2009
+OO/H/200811/13,"SHANI, LIMITADA",CIPROSHA,Ciprofloxacina,500mg,Comprimidos,,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200811/13,"GENERICS & SPECIALITIES, Lda",FRUSEGEN,Furosemida,40mg,Comprimidos,embalagem de 10X10,FOURRTS Labo,1237,15-06-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",DEXTROMETORFANO TUSSILENE®,"Dextrometorfano, Bromidrato",2mg/ml,Solução Oral,150ml e 200ml,Sofarimex - Indu,1013,13-04-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",DERMOFIX ÓVULOS,"Sertaconazol, Nitrato",300mg,Óvulos,1 óvulo,Sofarimex - Indu,914,16-03-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",DERMOFIX Creme vaginal,"Sertaconazol, Nitrato",20mg/g,Creme vaginal,bisnaga de 40g,Sofarimex - Indu,907,16-03-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",DERMOFIX Comprimidos vaginais,"Sertaconazol, Nitrato",500mg,Comprimidos vaginais,1 comprimido,Sofarimex - Indu,906,16-03-2009
+OO/H/200811/13,"MEDIS FARMACÊUTICA, LDA",DERMOFIX Champô,"Sertaconazol, Nitrato",20mg/g,Champô,100g,Ferrer Internacio,913,16-03-2009
+OO/H/200811/13,"GENERICS & SPECIALITIES, Lda",METROGEN S,Metronidazol,200mg/5ml,Suspensão Oral,embalagem de 10X10,FOURRTS Labo,1239,15-06-2009
+OO/H/200811/13,"GENERICS & SPECIALITIES, Lda",CONLAX-5,Bisacodil,5mg,Supositório,Bliste de 5 supositórios,Bliss GVS Phar,1161,04-06-2009
+OO/H/200811/13,"GENERICS & SPECIALITIES, Lda",CONLAX-10,Bisacodil,10mg,Supositório,,Bliss GVS Phar,1162,04-06-2009
+OO/H/200811/13,MAPUTO HEALTH CARE Lda,B-TRIM,Trimetoprim + Sulfametoxazol,80mg+400mg,Comprimidos,embalagem de 10 x10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",SECNIDAZOL,Secnidazol,30mg/ml,Solução Oral,frasco de 30ml,EMS S/A- Brazil,1105,04-05-2009
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",FUROATO DE MOMETASONA,Furoato de Mometasona,1mg/g,Creme dérmico,Bisnaga de 20g,EMS S/A- Brazil,1507,22-11-2009
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",CLOTRIMAZOL,Clotrimazol,10mg/g,Creme vaginal,bisnaga de 35g e 6 aplicadores,EMS S/A- Brazil,1093,04-05-2009
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",CLOTRIMAZOL,Clotrimazol,20mg/g,Creme vaginal,bisnaga de 20g e 3 aplicadores,EMS S/A- Brazil,1094,04-05-2009
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",PREDNISONA,Prednisona,20mg,Comprimidos,1x 10 comprimidos,EMS S/A- Brazil,2097,18-10-2010
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",NITRATO DE MICONAZOL,"Miconazol, Nitrato",20mg,Creme vaginal,frasco de 80g e 14 aplicadores,EMS S/A- Brazil,1104,04-05-2009
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",GLIBENCLAMIDA,Glibenclamida,5mg,Comprimidos,embalagem de 30 comprimidos,EMS S/A- Brazil,1148,27-05-2009
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",CLORIDRATO DE TRAMADOL,"Tramadol, Cloridrato",50mg,Cápsulas,embalagem de 10 cápsulas,EMS S/A- Brazil,1102,04-05-2009
+OO/H/200812/13,MAPUTO HEALTH CARE Lda,VIOLETA DE GENCIANA,Violeta de genciana,10mg/ml,Solução tópica,Frasco de 100ml,T & T PHARMA,1221,15-06-2009
+OO/H/200812/13,"MEDIS FARMACÊUTICA, LDA",FUROATO DE MOMETASONA,Furoato de Mometasona,1mg/g,Pomada dérmica,20g,EMS S/A- Brazil,1145,27-05-2009
+OO/H/200812/13,MAPUTO HEALTH CARE Lda,DEPRAMINE-25,"Imipramina, Hidrocloreto",25mg,Comprimidos,embalagem de 10 x10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200812/13,MAPUTO HEALTH CARE Lda,CINNAR-25,Cinarizina,25mg,Comprimidos,embalagem de 10 x10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200812/14,"SHANI, LIMITADA",IBUSHA Suspensão,Ibuprofeno,100mg/5ml,Suspensão Oral,frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200812/14,"GENERICS & SPECIALITIES, Lda",PARACIDO,Hidróxido de Alumínio + Hidróxido de Magnésio + Emulsão de Simeticone,250mg+250mg+50mg/5ml,Suspensão Oral,frasco de 200ml,FOURRTS Labo,1163,03-06-2009
+OO/H/200812/14,"SHANI, LIMITADA",METROSHA,Metronidazol,125mg/5ml,Suspensão Oral,Frasco de 100ml,INTERMED - IN,Fabricante interd,Fabricante interdito temporariamente
+OO/H/200812/14,"GENERICS & SPECIALITIES, Lda",LUMBRIX,Mebendazol,100mg,Comprimidos,20 blister de 6 comprimidos,FOURRTS Labo,1228,15-06-2009
+OO/H/200812/14,"GENERICS & SPECIALITIES, Lda",GEN-Q,"Quinina, Sulfato",300mg,Comprimidos Revestidos,1000 comprimidos,Gracure Pharma,924,16-03-2009
+OO/H/200812/14,"GENERICS & SPECIALITIES, Lda",GENPRAZOL,Omeprazol,20mg,Cápsulas,,Gracure Pharma,1164,03-06-2009
+OO/H/200812/14,MAPUTO HEALTH CARE Lda,XELON,Gluconato de Clorexidina + Cetrimida,1.5% + 3.0%,Solução tópica,Frasco de 100ml,T & T PHARMA,1121,04-05-2009
+OO/H/200812/14,MAPUTO HEALTH CARE Lda,SOLUÇÃO DE PERÓXIDO DE HIDROGÉNIO,Peróxido de Hidrogénio,3%,Solução tópica,Frasco de 100ml,T & T PHARMA,1112,30-04-2009
+OO/H/200812/14,MAPUTO HEALTH CARE Lda,FERMILAX,Parafina Líquida,1%,Emulsão Oral,frasco de 100ml,T & T PHARMA,1075,20-04-2009
+OO/H/200812/14,"MEDIMOC, SA",CLOCEF,"Cefepima, cloridrato",1g,Pó para Injectável,1 Frasco + ampola de 3ml de diluente,Laboratórios Teu,1182,04-06-2009
+OO/H/200812/14,AFRI FARMÁCIA LDA,LAMIVUDINA + ZIDOVUDINA,Lamivudina + Zidovudina,150mg + 300mg,Comprimidos,"1x10, e de 60",Hetero Drugs Li,1426,28-09-2009
+OO/H/200812/14,AFRI FARMÁCIA LDA,UMIFLUVIN,Griseofulvina,500mg,Comprimidos,embalagem de 10 x 10,UMEDICA LABO,1331,19-08-2009
+OO/H/200812/14,AFRI FARMÁCIA LDA,CIPROFLOXACIN TABLETS USP 500mg,Ciprofloxacina,500mg,Comprimidos Revestidos,1 blister de 10 comp e de 10 x 10 comprimidos,UMEDICA LABO,1048,20-04-2009
+OO/H/200812/14,WELL WORTH LDA,BECOVITA,Tiamina (Vit. B1) + Riboflavina (Vit. B2) + Nicotinamida,1mg + 1mg + 10mg,Comprimidos Revestidos,10 blister de 10 comprimidos,Medopharma Ltd,1410,26-09-2009
+OO/H/200812/14,AFRI FARMÁCIA LDA,UCILLIN-500,Ampicilina Anidra,500mg,Injectável,Embalagem de 10 e 50 ampolas,UMEDICA LABO,1259,15-06-2009
+OO/H/200812/14,"MEDIMOC, SA",TENOFTAL,"Timolol, maleato",5mg/ml,Solução Oftálmica,Frasco de 5ml,Laboratórios Teu,970,28-03-2009
+OO/H/200812/14,"MEDIMOC, SA",PLAGEX,"Metoclopramida, Cloridrato",4mg/ml,Suspensão Oral,Frasco de 10ml,Laboratórios Teu,1232,16-03-2009
+OO/H/200812/14,"GENERICS & SPECIALITIES, Lda",PARALOGO,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,embalagem de 10X10,Bal Pharma limit,1298,08-08-2009
+OO/H/200812/14,"GENERICS & SPECIALITIES, Lda",METROGEN,Metronidazol,250mg,Comprimidos,10X10,Bal Pharma Lda,1229,15-06-2009
+OO/H/200812/14,"MEDIMOC, SA",FOSFATO DISSODICO DE DEXAMETASONA,"Dexametasona, fosfato dissodico",4mg/ml,Injectável,frasco de 2.5ml,Laboratórios Teu,903,16-03-2009
+OO/H/200812/14,AFRI FARMÁCIA LDA,DANAZOL,Danazol,200mg,Comprimidos,3 blister de 10 comp,Bharat Parenter,963,28-03-2009
+OO/H/200812/14,"GENERICS & SPECIALITIES, Lda",CLOGEN-S,Clotrimazol,1% w/v,Solução tópica,Frasco de 15ml,Gracure Pharma,926,16-03-2009
+OO/H/200812/14,BAYER SCHERING PHARMA MOÇAMBIQUE,ADALAT AP,Nifedipina,20mg,Comprimidos,Caixa de 20 comprimidos,Bayer Schering,902,16-03-2009
+OO/H/20091/201,"GENERICS & SPECIALITIES, Lda",AZITAB - 500,"Azitromicina, Dihidrato",500mg,Comprimidos Revestidos,Embalagem de 1x3,BAL PHARMA L,1646,19-03-2010
+OO/H/20091/143,WELL WORTH LDA,NOVACLAV - 375,Trihidrato de Amoxicilina + Ácido Clavulânico,250mg + 125mg,Comprimidos,Blister de 6 comp,Cipla Limited - I,943,28-03-2009
+OO/H/20091/143,"GENERICS & SPECIALITIES, Lda",ZEET EXPECTORANT,"Difenidramina, hidrocloreto + Bromexina, hidrocloreto + Guaifenesina + Cloreto de Amónio + Levomento",8mg + 4mg + 50mg + 100mg + 1mg,Xarope,Frascos de 100ml,Alembic Limited,1283,08-07-2009
+OO/H/20091/144,WELL WORTH LDA,NYSTATIN ORAL SUSPENSION,Nistatina,100.000UI,Suspensão Oral,Frasco de 30ml,Cipla Limited - I,1139,27-05-2009
+OO/H/20091/144,WELL WORTH LDA,NEOPOVIDONA SOLUÇÃO DÉRMICA,Iodopovidona,5g/100ml,Solução,Frascos de 100ml,TORQUE PHAR,1201,03-06-2009
+OO/H/20091/145,MAPUTO HEALTH CARE Lda,TINTURA DE IODO USP,Iodo + Iodeto de Sódio + Álcool,2.0%w/v+2.4%w/v+50%w/v,Solução tópica,Frascos de 100ml,T & T PHARMA,893,16-03-2009
+OO/H/20091/144,MAPUTO HEALTH CARE Lda,SURGICAL SPIRIT BP,Salicilato de Metilo + Ftalato Dietílico + Óleo de Rícino+ Espírito Metilado Industrial,5ml+20ml+25ml,Solução tópica,Frascos de 100ml,T & T PHARMA,959,28-03-2009
+OO/H/20091/144,AFRI FARMÁCIA LDA,MEBENDAZOL,Mebendazol,100mg/5ml,Suspensão Oral,Frasco de 30ml,Bharat Parenter,1400,26-09-2009
+OO/H/20091/144,MAPUTO HEALTH CARE Lda,K - WORM - 100,Mebendazol,100mg,Comprimidos,Caixa de 20 blisteres de 6 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20091/145,MAPUTO HEALTH CARE Lda,HYZIDE - 25,Hidroclorotiazida,25mg,Comprimidos,Embalagem de 10 blister de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20091/144,AFRI FARMÁCIA LDA,AMILORIDE,"Amilorido, Hidrocloreto",5mg,Comprimidos,Embalagens de 100 comp (10x10),Bharat Parenter,1178,04-06-2009
+OO/H/20091/144,AFRI FARMÁCIA LDA,ALBENDAZOL,Albendazol,200mg/5ml,Suspensão Oral,Frasco de 20ml,Bharat Parenter,1395,28-09-2009
+OO/H/20091/145,AFRI FARMÁCIA LDA,TROZ - 250,Metronidazol,250mg,Comprimidos,Embalagens de 100 comp (10x10),Mercury laborato,987,13-04-2008
+OO/H/20091/146,MAPUTO HEALTH CARE Lda,STEROCARE 5,Prednisolona,5mg,Comprimidos,Embalagem de 10 blister de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20091/145,MAPUTO HEALTH CARE Lda,PREGNICARE,Sulfato ferroso seco,200mg,Comprimidos,Embalagem de 10 blister de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20091/145,MAPUTO HEALTH CARE Lda,FLUCOLUX 200,Fluconazol,200mg,Cápsulas,Embalagem de 1 blister de 1 caps,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20091/145,MAPUTO HEALTH CARE Lda,FLUCOLUX 150,Fluconazol,150mg,Cápsulas,Embalagem de 1 blister de 1 caps,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20091/147,"GENERICS & SPECIALITIES, Lda",SALGEN 4,"Salbutamol, Sulfato",4mg,Comprimidos,"Embalagem de 10, 100 blister de 10 comp e frascos de 100/1000 comp",FOURRTS Labo,977,13-04-2009
+OO/H/20091/147,"GENERICS & SPECIALITIES, Lda",GLYCERIN SUPPOSITORIES,Glicerina,1g,Supositório,Embalagem de 5 supositorios,Bliss GVS Phar,976,13-04-2009
+OO/H/20091/147,"GENERICS & SPECIALITIES, Lda",GLYCERIN SUPPOSITORIES,Glicerina,2g,Supositório,Embalagem de 5 supositorios,Bliss GVS Phar,1285,08-07-2009
+OO/H/20091/147,"GENERICS & SPECIALITIES, Lda",GENVITA TABLES,Vit.B1+Vit.B2+Vit.b6+Vit.B12+Nicotinamida+Ácido Fólico,1mg+1mg+1mg+1mcg+15mg+0.5mg,Comprimidos revestidos,Embalagens de 3x10 e 10x10,Gracure Pharma,975,13-04-2009
+OO/H/20091/146,"GENERICS & SPECIALITIES, Lda",GENPRIL - 20,"Enalapril, maleato",20mg,Comprimidos,Embalagens de 100 comp (10x10),Gracure Pharma,923,16-03-2009
+OO/H/20091/148,MAPUTO HEALTH CARE Lda,TETRACARE,"Tetraciclina, Hidrocloreto",1%w/w,Pomada Oftálmica,Bisnaga de 5g,T & T PHARMA,1341,19-08-2009
+OO/H/20091/147,MAPUTO HEALTH CARE Lda,TECLOMET,Dipropionato de Betametasona,0.64mg,Creme,"Bisnaga de 15g, 30g",T & T PHARMA,1106,27-05-2009
+OO/H/20091/147,MAPUTO HEALTH CARE Lda,TECLOBET,Propionato de Clobetasol,0.5mg,Pomada,Bisnaga de 30g,T & T PHARMA,1627,13-03-2010
+OO/H/20091/148,MAPUTO HEALTH CARE Lda,ISOVENT 200,Misoprostol,200mcg,Comprimidos,Embalagem de 1 blister de 10 comp e 3 blister de 10 comprimidos,Square Pharmac,1118,04-05-2009
+OO/H/20091/148,MAPUTO HEALTH CARE Lda,INJECÇÃO DE GENTAMICINA BP,"Gentamicina, Sulfato",80mg/2ml,Solução Injectável,Embalagem com 100 ampolas de 2ml,T & T PHARMA,1263,15-06-2009
+OO/H/20091/147,MAPUTO HEALTH CARE Lda,CANDIFER G,Clotrimazol+Sulfato de Gentamicina,10mg+1mg,Solucao topica,Frasco de15ml,T & T PHARMA,1117,04-05-2009
+OO/H/20091/148,MAPUTO HEALTH CARE Lda,BÁLSAMO,Mentol + Salicilato de Metilo,100mg + 200mg,Pomada,Bisnaga de 20g e de 30g,T & T PHARMA,1070,20-04-2009
+OO/H/20091/149,AFRI FARMÁCIA LDA,VELORIN 50,Atenolol,50mg,Comprimidos,Embalagem de 10 blister de 10 comp,Remedica Labor,985,13-04-2008
+OO/H/20091/149,AFRI FARMÁCIA LDA,VELORIN 100,Atenolol,100mg,Comprimidos,Embalagem de 10 blister de 10 comp,Remedica Labor,986,13-04-2008
+OO/H/20091/149,AFRI FARMÁCIA LDA,QUININE SULPHATE,"Quinina, Sulfato",300mg,Comprimidos,"Embalagem de 1 blister de 10 comp, 10x10",Bharat Parenter,990,13-04-2008
+OO/H/20091/148,AFRI FARMÁCIA LDA,EMFORAL 40,"Propanol, Hidrocloreto",40mg,Comprimidos,Embalagem de 5 blister de 10 comp,Remedica Labor,984,13-04-2008
+OO/H/20091/149,PROFARMA,BETAMETASONA VALERATO,"Betametasona, valerato",0.1%w/w,Creme,Bisnaga de 15g e 30g,"BDH industries,",994,13-04-2009
+OO/H/20091/150,"MEDIS FARMACÊUTICA, LDA",VALERATO DE BETAMETASONA+SULFATO DE GENTAMI,C Valerato de Betametasona + Sulfato de Gentamicina + Tolnaftato + Clioquinol,0.5mg/g + 1mg/g + 10mg/g + 10mg/g,Pomada,Embalagem de 1 bisnaga com 20g,EMS S/A- Brazil,1086,04-05-2009
+OO/H/20091/150,"MEDIS FARMACÊUTICA, LDA",DIPROPIONATO DE BETAMETASONA + SULFATO DE GEN,"Betametasona, Dipropionato + Gentamicina, sultato",0.5mg/g + 1mg/g,Pomada,Embalagem de 1 bisnaga com 30g,EMS S/A- Brazil,1103,04-05-2009
+OO/H/20091/149,"MEDIS FARMACÊUTICA, LDA",DIPROPIONATO DE BETAMETASONA + SULFATO DE GEN,"Betametasona, Dipropionato + Gentamicina, sultato",0.5mg/g + 1mg/g,Creme,Embalagem de 1 bisnaga com 30g,EMS S/A- Brazil,2524,17-10-2011
+OO/H/20091/149,"MEDIFARMA, LDA",BETADINE,Iodopovidona,40mg/ml,Espuma Cutânea,Embalagem com 125ml e 500ml,Meda Manufactu,1007,13-04-2008
+OO/H/20092/150,"MEDIS FARMACÊUTICA, LDA",NIMESILAN,Nimesulida,100mg,Comprimidos,12 Comprimidos,EMS S/A- Brazil,1190,04-06-2009
+OO/H/20092/300,"MEDIS FARMACÊUTICA, LDA",MEGALIS 20,Tadalafil,20mg,Comprimidos revestidos,1 x 4 comprimidos,Macleods Pharm,1274,08-07-2009
+OO/H/20092/300,"MEDIS FARMACÊUTICA, LDA",MEGALIS 10,Tadalafil,10mg,Comprimidos revestidos,1 x 4 comprimidos,Macleods Pharm,1273,08-07-2009
+OO/H/20092/150,"MEDIS FARMACÊUTICA, LDA",MALEATO DE DEXCLORFENIRAMINA COMP,"Dexclorfeniramina, maleato",2mg,Comprimidos,20 Comprimidos,EMS S/A- Brazil,1154,27-05-2009
+OO/H/20092/150,"MEDIS FARMACÊUTICA, LDA",MALEATO DE DEXCLORFENIRAMINA,"Dexclorfeniramina, maleato",2mg/5ml,Solução Oral,Frasco de 120ml,EMS S/A- Brazil,1147,27-05-2009
+OO/H/20092/150,"MEDIS FARMACÊUTICA, LDA",LAXODAL,Picossulfato de Sódio,7.5mg/ml,Solução Oral,Frasco de 30ml,D.C.F DERMO C,1088,04-05-2009
+OO/H/20092/150,"MEDIS FARMACÊUTICA, LDA",FLUOXETINA TUNELUZ,"Fluoxetina, Cloridrato",20mg,Cápsulas,"Embalagens de 10, 20, 30 e 60 caps",Baldacci Portuga,1153,27-05-2009
+OO/H/20092/150,"MEDIS FARMACÊUTICA, LDA",DIPROPIONATO DE BETAMETASONA+ACIDO SALICILICO,Dipropionato de Betametasona + Ácido Salicílico,"0,5mg/g+30mg/g",Pomada,Bisnaga de 30g,EMS S/A- Brazil,1087,04-05-2009
+OO/H/20092/150,"MEDIS FARMACÊUTICA, LDA",AMOXICILINA,Amoxicilina,875mg,Comprimidos,Embalagem de 14 comp,EMS S/A- Brazil,1095,04-05-2009
+OO/H/20092/151,AFRI FARMÁCIA LDA,ZIMAT,"Cetirizina, Hidrocloreto",10mg,Comprimidos,10x10,UMEDICA LABO,,23-12-2009
+OO/H/20092/151,AFRI FARMÁCIA LDA,UMOXAZOLE-480,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,10x10,UMEDICA LABO,988,13-04-2008
+OO/H/20092/151,AFRI FARMÁCIA LDA,UCLOX-500,Cloxacilina,500mg,Cápsulas,10x10,UMEDICA LABO,991,13-04-2008
+OO/H/20092/150,AFRI FARMÁCIA LDA,KANAMYCIN ACID SULPHATE FOR INJECTION 2.0g,"Kanamicina, Sulfato",2g,Injectável,1x25,UMEDICA LABO,1519,19-12-2009
+OO/H/20092/151,"MEDIS FARMACÊUTICA, LDA",CLONAZEPAM,Clonazepam,"2,5mg/ml",Solução Oral,1x20ml,EMS S/A- Brazil,1099,04-05-2009
+OO/H/20092/151,"MEDIFARMA, LDA",MIXTARD 30,Insulina isofana humana biossitética,100UI/ml,Solução Injectável,"1x10ml, penset 5x3ml",Novo Nordisk- D,1006,13-04-2009
+OO/H/20092/151,"MEDIFARMA, LDA",INSULATARD,Insulina isofana humana bissintética,100UI/ml,Solução Injectável,"1x10ml, penset 5x3ml",Novo Nordisk- D,1108,27-05-2009
+OO/H/20092/151,"MEDIFARMA, LDA",ACTRAPID,Insulina Humana Biossintética,100UI/ml,Solução Injectável,"1x10ml, penset 5x3ml",Novo Nordisk- D,1123,27-05-2009
+OO/H/20092/152,MAPUTO HEALTH CARE Lda,VINOMEZ,Omeprazol,20mg,Cápsulas,Embalagem contendo 10 blister de 10 caps,T & T PHARMA,1383,26-09-2009
+OO/H/20092/152,MAPUTO HEALTH CARE Lda,METRODIN,Benzoato de Metronidazol,125mg/5ml,Suspensão Oral,Frasco de 120ml,T & T PHARMA,1506,22-11-2009
+OO/H/20092/152,MAPUTO HEALTH CARE Lda,LIDOCAINA INJECÇÃO BP,"Lidocaína, Hidrocloreto",21.4mg/ml (2%),Injectável,Frasco de 50ml,T & T PHARMA,1343,19-08-2009
+OO/H/20092/152,MAPUTO HEALTH CARE Lda,ENATRIM - 480,Sulfametoxazol + Trimetoprim,400mg + 80mg,Comprimidos,Embalagem contendo 10 blister de 10 comp,T & T PHARMA,1168,04-06-2009
+OO/H/20092/151,MAPUTO HEALTH CARE Lda,AZILID 500,Azitromicina,500mg,Comprimidos,Embalagem com 1 blister de 3 comp,MICRO LABS LT,1378,08-07-2009
+OO/H/20092/152,MAPUTO HEALTH CARE Lda,ASTHAGO XAROPE,"Salbutamol, Sulfato",2mg/5ml,Xarope,Frasco de 100ml,T & T PHARMA,1342,19-08-2009
+OO/H/20092/152,WELL WORTH LDA,NEOBENDEX,Mebendazol,100mg/5ml,Suspensão Oral,Frasco de 30ml,TORQUE PHAR,1994,23-07-2010
+OO/H/20092/152,WELL WORTH LDA,COMYCETIN GOTAS OFTÁLMICAS,"Cloranfenicol + Lignocaína, cloridrato",200mg/2ml + 100mg/2ml,Colírio,Frasco de 10ml,Nabiqasim Indus,1953,22-07-2010
+OO/H/20093/153,"MEDIS FARMACÊUTICA, LDA",DAFRACLAV® 625,Amoxicilina + Ácido Clavulânico,500mg + 125mg,Comprimidos,Embalagem de 15 comp,Bilim Pharmaceu,1186,03-06-2009
+OO/H/20093/153,"MEDIS FARMACÊUTICA, LDA",DAFRACLAV® 1000,Amoxicilina + Ácido Clavulânico,875mg + 125mg,Comprimidos,Embalagem de 10 comp,Bilim Pharmaceu,1187,03-06-2009
+OO/H/20093/153,"MEDIS FARMACÊUTICA, LDA",DAFRACLAV BD Forte,Amoxicilina + Ácido Clavulânico,400mg + 57mg,Pó para Suspensão Oral,Embalagem de 70ml,Bilim Pharmaceu,1189,05-06-2009
+OO/H/20093/152,"MEDIS FARMACÊUTICA, LDA",DAFRACLAV BD,Amoxicilina + Ácido Clavulânico,200mg/5ml + 28mg/5ml,Pó para Suspensão Oral,Embalagem de 70ml,Bilim Pharmaceu,1188,05-06-2009
+OO/H/20093/153,MAPUTO HEALTH CARE Lda,DIVON GEL,Dietilamina Diclofenac + Óleo de Linhança + Salicilato de Metilo + Mentol,1.16%+3%+10.5%+5%,Gel,Frasco de 30g,MICRO LABS LT,2058,25-09-2010
+OO/H/20093/154,"MEDIS FARMACÊUTICA, LDA",MONOPRONT 20,"Isossorbido, Monohidrato",20mg,Comprimidos,Embalagem de 20 e 60 comp,Sun Pharmaceu,1977,23-07-2010
+OO/H/20093/153,"GENERICS & SPECIALITIES, Lda",DICLOFEN Plus,Paracetamol + Diclofenac,500mg + 50mg,Comprimidos,Embalagem contendo 10 carteirasx10 comp,FOURRTS Labo,1165,03-06-2009
+OO/H/20093/154,"SHANI, LIMITADA",CIFRAN,"Ciprofloxacina, Hidrocloreto",500mg,Comprimidos,Embalagens com 10 comp,Ranbaxy Labora,1211,15-06-2009
+OO/H/20093/154,"MEDIS FARMACÊUTICA, LDA",SINVASTATINA BALDACCI,Sinvastatina,20mg,Comprimidos revestidos,"Embalagens de 20, 30 e 60 comp",D.C.F DERMO C,1195,05-06-2009
+OO/H/20093/154,"MEDIS FARMACÊUTICA, LDA",INFRALAX,Paracetamol + Cafeina + Carisoprodol + Diclofenac,300mg+30mg+125mg+50mg,Comprimidos,Embalagem contendo 30 comp 1 blister de 10 comp cada,EMS S/A- Brazil,1235,15-06-2009
+OO/H/20093/155,"MEDIS FARMACÊUTICA, LDA",DENTISPRAY,Benzocaina,50mg/ml,Solução gengival,Frasco de 5ml,Laboratórios Viñ,1197,05-06-2009
+OO/H/20093/155,"GENERICS & SPECIALITIES, Lda",REDIN PN LIQUID,Citrato de amonio ferico+Proteina hidrolisada+Pentahidrato de lactato de calcio + Cianocobalamina+Aci,230mg+50mg+100mg+2.5mg+0.5mg+35mg+25mg+0.25mg+25mg,Solução Oral,Frasco de 200ml,FOURRTS Labo,1539,23-12-2009
+OO/H/20093/155,"GENERICS & SPECIALITIES, Lda",FUSIFEN CREAM,Ácido FusÍdico,2% w/w,Creme,Bisnaga de 15g,FOURRTS Labo,1292,08-07-2009
+OO/H/20093/155,"GENERICS & SPECIALITIES, Lda",AMBCET SYRUP,Ambroxol + Cetirizina,30mg/5ml + 5mg/5ml,Xarope,Frasco de 60ml,FOURRTS Labo,1337,19-08-2009
+OO/H/20093/156,WELL WORTH LDA,SILAGRA 100,Citrato de Sildenafil,100mg,Comprimidos,Embalagem com 1 blister de 4 comp,Cipla Limited - I,1586,23-12-2009
+OO/H/20093/156,WELL WORTH LDA,NEOTON XAROPE,"Clorfeniramina, maleato",2mg/5ml,Xarope,Frasco de 100ml,TORQUE PHAR,1408,28-09-2009
+OO/H/20093/156,WELL WORTH LDA,AMDIPINE,"Amlodipina, besilato",5mg,Comprimidos,"Embalagens de 30 Comp, 10x10",Nabiqasim Indus,1412,26-09-2009
+OO/H/20093/156,WELL WORTH LDA,AMDIPINE,"Amlodipina, besilato",10mg,Comprimidos,"Embalagens de 30 Comp, 10x10",Nabiqasim Indus,1413,26-09-2009
+OO/H/20093/156,MAPUTO HEALTH CARE Lda,PREDNISOLONE ACETATE OPHTHALMIC SUSPENSION,"Prednisolona, Acetato",10mg/ml,Suspensão oftálmica,Frasco de 5ml,T & T PHARMA,1365,08-07-2009
+OO/H/20093/156,MAPUTO HEALTH CARE Lda,IBU,Ibuprofeno,100mg/5ml,Suspensão Oral,Frasco de 100ml,T & T PHARMA,1596,27-02-2010
+OO/H/20093/156,MAPUTO HEALTH CARE Lda,BRONZ,"Ambroxol, hidrocloreto + Terbutalina, sulfato + Guaiafenasina + Mentol",15mg/5ml+1.25mg/5ml+50mg/5ml+2.5mg/5ml,Solução Oral,Frasco de 100ml,T & T PHARMA,1345,19-08-2009
+OO/H/20093/157,"MEDIS FARMACÊUTICA, LDA",MONOPRONT RETARD,"Isossorbido, Monohidrato",50mg,Comprimidos de libertação prolongada,Embalagens de 30 comp,IBERFAR - Indu,1214,15-06-2009
+OO/H/20093/157,"SHANI, LIMITADA",BETAFED,"Pseudoefedrina, Hidrocloreto + Triprolidina, Hidrocloreto","1,25mg+30mg",Xarope,Frasco de 100ml,BE TABS PHAR,1248,15-06-2009
+OO/H/20094/157,MAPUTO HEALTH CARE Lda,GASTROPAN,Hioscina Butilbromida,10mg,Comprimidos,10 blisters contendo 10 comp cada,T & T PHARMA,1262,15-06-2009
+OO/H/20094/157,MAPUTO HEALTH CARE Lda,CUATRODERM,Valerato de Betametasona+Sulfato de Gentamicina+Tolnaftato+Clioquinol,0.5mg+1mg+10mg+10mg,Creme,Bisnaga de 15g,T & T PHARMA,1366,08-07-2009
+OO/H/20094/157,MAPUTO HEALTH CARE Lda,ALICORT,"Hidrocortisona, Acetato",10mg,Pomada,Bisnaga de 15g e de 30g,T & T PHARMA,1267,15-06-2009
+OO/H/20094/157,"GENERICS & SPECIALITIES, Lda",ZEDEX COUGH SYRUP,Bromexina + Dextrometorfano + Cloreto de Amónio + Mentol,8mg+10mg+100mg+5mg,Xarope,Frasco de100ml,WOCK HARDT,1226,15-06-2009
+OO/H/20094/157,"GENERICS & SPECIALITIES, Lda",BRO-ZEDEX COUGH SYRUP,Terbutalina Sulfato + Bromexina HCL+ Guaifenesina + Mentol,2.5mg+8mg+100mg+5mg,Xarope,Frasco de100ml,WOCK HARDT,1240,15-06-2009
+OO/H/20094/158,MAPUTO HEALTH CARE Lda,PHYTORAL,Ketoconazol,200mg,Comprimidos,Blisters de 10x10 Comprimidos,MICRO LABS LT,1347,19-08-2009
+OO/H/20094/158,MAPUTO HEALTH CARE Lda,MORTIN,Trimetoprim + Sulfametoxazol,80mg + 400mg,Comprimidos,Blisters de 10x10 e Frascos de 1000 comprimidos,MICRO LABS LT,1346,19-08-2009
+OO/H/20094/158,PROFARMA,CHEMISPRIN,Ácido Acetilsalicílico,500mg,Comprimidos,"Embalagens de 2x10, 10x10, 50x10, 100x10 e Frasco de 1000 comprimidos","BDH industries,",1222,15-06-2009
+OO/H/20094/158,"MEDIS FARMACÊUTICA, LDA",AZITROMICINA BALDACCI,Azitromicina,500mg,Comprimidos,Embalagens de 2 e 3 comprimidos,Kern Pharma S.,1213,15-06-2009
+OO/H/20094/158,"MEDIS FARMACÊUTICA, LDA",RISPERIDONA BALDACCI,Risperidona,1mg,Comprimidos revestidos,Embalagens contendo 20 e 60 comprimidos,Laboratórios Les,1215,15-06-2009
+OO/H/20094/159,"MEDIS FARMACÊUTICA, LDA",RISPERIDONA BALDACCI,Risperidona,2mg,Comprimidos revestidos,Embalagens contendo 20 e 60 comprimidos,Laboratórios Viñ,1216,15-06-2009
+OO/H/20094/159,MAPUTO HEALTH CARE Lda,SOMOX 250,"Amoxicilina,Trihidrato",250mg/5ml,Suspensão Oral,Frasco de 100ml,T & T PHARMA,1368,08-07-2009
+OO/H/20094/159,MAPUTO HEALTH CARE Lda,SOMOX 125,"Amoxicilina,Trihidrato",125mg/5ml,Suspensão Oral,Frasco de 100ml,T & T PHARMA,1367,08-07-2009
+OO/H/20094/159,MAPUTO HEALTH CARE Lda,K-DOX 100,"Doxiciclina, Hiclato",100mg,Cápsulas,Embalagens contendo 10x10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20094/159,MAPUTO HEALTH CARE Lda,CALAMINA LOÇÃO,Calamina,80mg/2ml,Loção tópica,Frasco de 100ml,T & T PHARMA,1369,08-07-2009
+OO/H/20094/159,BAYER SCHERING PHARMA MOÇAMBIQUE,ULTRAVIST 370,Iopromide,769mg/ml,Injectável,"Frascos de 10ml, 50ml, 100ml, 200ml e 1000ml",Bayer Schering,1834,25-05-2010
+OO/H/20094/159,BAYER SCHERING PHARMA MOÇAMBIQUE,ULTRAVIST 300,Iopromide,623mg/ml,Injectável,"Frascos de 20ml, 50ml, 100ml, 200ml, 500ml e 1000ml",BAYER SCHERI,1527,23-12-2009
+OO/H/20094/159,BAYER SCHERING PHARMA MOÇAMBIQUE,ULTRAVIST 240,Iopromide,499mg/ml,Injectável,Frascos de 10ml e 50ml,BAYER SCHERI,1777,29-03-2010
+OO/H/20094/159,BAYER SCHERING PHARMA MOÇAMBIQUE,CLIMARA,Estradiol,"3,9mg",Sistema Transdermico,Saquetas de 4 e 12 Unidades,3M Drug Deliver,1778,29-03-2010
+OO/H/20094/160,BAYER SCHERING PHARMA MOÇAMBIQUE,MINIGESTE,Etinilestradiol + Gestodeno,0.02mg + 0.075mg,Comprimidos revestidos,blister com 21 e 63 unidades,Bayer Schering,1868,03-06-2010
+OO/H/20094/160,PROFARMA,AMINOFILINA,Aminofilina,100mg,Comprimidos,"Blister de 10x10 , 100x10 e frascos com 5000 e 1000 comp","BDH industries,",1289,08-07-2009
+OO/H/20095/160,WELL WORTH LDA,NEOPOVIDONA OINTMENT,Iodopovidona,5g/100ml,Pomada,Bisnaga de 15 g,TORQUE PHAR,1361,19-08-2009
+OO/H/20095/161,MAPUTO HEALTH CARE Lda,VARIBION,Vit.B1+Vit.B2+Vit.b6+Vit.B12+D - Pantenol+Nicotinamida,100mg+5mg+1000mcg+50mg+100mg,Injectável,100 ampolas de 2ml,T & T PHARMA,1304,08-08-2009
+OO/H/20095/161,MAPUTO HEALTH CARE Lda,PROMETAZINA,"Prometazina, Hidrocloreto",25mg,Comprimidos,Embalagem contendo 10 blister x 10 comp,T & T PHARMA,1373,08-07-2009
+OO/H/20095/161,MAPUTO HEALTH CARE Lda,PREDNISOLONA FOSFATO SÓDICO INJECTÁVEL,Prednisolona,50mg/10ml,Injectável,5 ampolas de 10ml,T & T PHARMA,1303,08-08-2009
+OO/H/20095/161,MAPUTO HEALTH CARE Lda,PIRIDOXINA,"Piridoxina, Hidrocloreto",50mg,Comprimidos,Frasco contendo 100 comp,T & T PHARMA,1374,08-07-2009
+OO/H/20095/161,MAPUTO HEALTH CARE Lda,LORINOL 10,Loratadina,10mg,Comprimidos,Embalagem com 10 blister x 10 comp,MICRO LABS LT,1305,08-08-2009
+OO/H/20095/161,MAPUTO HEALTH CARE Lda,KETOCONAZOL CREAM,Ketoconazol,20mg/g,Creme,Bisnaga de 30g,T & T PHARMA,1371,08-07-2009
+OO/H/20095/161,MAPUTO HEALTH CARE Lda,FAHREN,Paracetamol,125mg/5ml,Suspensão Oral,Frasco de 100ml,T & T PHARMA,1372,08-07-2009
+OO/H/20095/162,"GENERICS & SPECIALITIES, Lda",DICLOFENAC GEL,Diclofenac Dietilamina,1.16%w/w,Gel,Bisnaga de 20g,GALENTIC PHA,1339,19-08-2009
+OO/H/20095/162,"GENERICS & SPECIALITIES, Lda",DERMOSONE S OINTMENT,Dipropionato de Betametasona + Acido Salicílico,"0,5mg/g+30mg/g",Pomada,Bisnaga de 10g e 15g e 30g,GALENTIC PHA,1286,08-07-2009
+OO/H/20095/162,"MEDIS FARMACÊUTICA, LDA",COARTEM DISPERSIBLE,Arteméter + Lumefantrina,20mg + 120mg,Comprimidos dispersíveis,Embalagem contendo blisters de 6 e 12 comp 1x6 e de 2x6,Novartis Pharma,1281,08-07-2009
+OO/H/20095/162,"GENERICS & SPECIALITIES, Lda",CANDIGEN BG CREAM,"Betametasona, dipropionato + Gentamicina, sulfato + Clotrimazol","0,05%w/w + 0,1%w/w + 1%w/w",Creme tópico,Bisnaga de 10g e 30g,GALENTIC PHA,1416,26-09-2009
+OO/H/20095/163,"MEDIFARMA, LDA",BETADINE,Iodopovidona,100mg/ml,Solução vaginal,Frasco de 200ml,Meda Manufactu,1312,08-08-2009
+OO/H/20095/163,"MEDIFARMA, LDA",BETADINE,Iodopovidona,100mg/ml,Solução cutânea,Frasco de 125ml e 500ml,Meda Manufactu,1351,19-08-2009
+OO/H/20095/163,"MEDIFARMA, LDA",BETADINE,Iodopovidona,100mg/ml,Solução para gargarejar,Frasco de 125ml,Meda Manufactu,1428,28-09-2009
+OO/H/20095/163,"MEDIFARMA, LDA",BETADINE,Iodopovidona,100mg/g,Pomada,Bisnagas de 30g e 100g,SIDEFARMA-PO,1311,08-08-2009
+OO/H/20095/163,BAYER SCHERING PHARMA MOÇAMBIQUE,XARELTO,Rivaroxabano,10mg,Comprimidos,"Embalagens contendo blisters de 10, 30 e 100 comp",Bayer Schering,1528,23-12-2009
+OO/H/20095/164,"GENERICS & SPECIALITIES, Lda",CALADIN LOTION,Calamina,150mg,Loção tópica,Frasco de 60ml,GALENTIC PHA,1300,08-08-2009
+OO/H/20095/164,"GENERICS & SPECIALITIES, Lda",BENZOSCAB APPLICATION,Benzoato de Benzilo,250mg,Emulsão Cutânea,Frasco de 100ml,GALENTIC PHA,1299,08-08-2009
+OO/H/20095/164,WELL WORTH LDA,NUZAC 20,"Fluoxetina, Hidrocloreto",20mg,Cápsulas,Embalagem contendo 10 blister de 10 comp,Cipla Limited - I,1329,08-08-2009
+OO/H/20095/164,WELL WORTH LDA,HEALTHEASE CREAM,Dipropionato de Beclometasona + Hidrocloreto de Lignocaina + Clorocresol + Hidrocloreto de Fenilefrin,a 0.025%+2.50%+0.1%+0.1%,Creme,Bisnaga de 30g,TORQUE PHAR,1409,26-09-2009
+OO/H/20095/164,WELL WORTH LDA,COMYCETIN GOTAS OFTÁLMICAS,Cloranfenicol,1%,Gotas Oftálmicas,Frasco de 10ml,Nabiqasim Indus,1328,08-08-2009
+OO/H/20096/165,"GENERICS & SPECIALITIES, Lda",VIRUCID 400,Aciclovir,400mg,Comprimido,Embalagem contendo 3 blister de 10 comp,Delorbis Pharma,1422,26-09-2009
+OO/H/20096/165,"GENERICS & SPECIALITIES, Lda",VIRUCID 200,Aciclovir,200mg,Comprimido,Embalagem contendo 3 blister de 10 comp,Delorbis Pharma,1421,26-09-2009
+OO/H/20096/165,BRAZILGENÉRICOS SA,PREDNISONA,Prednisona,5mg,Comprimidos,Embalagens contendo 20 comp,EMS S/A- Brazil,1435,26-09-2009
+OO/H/20096/166,"GENERICS & SPECIALITIES, Lda",OROMUCORAL GEL,"Miconazol, nitrato",2%,Gel,Bisnaga de 40g,GALENTIC PHA,1540,23-12-2009
+OO/H/20096/165,BRAZILGENÉRICOS SA,FLUCOCIN,Fluconazol,150mg,Cápsulas,Embalagens contendo 2 comp,EMS S/A- Brazil,2048,25-09-2010
+OO/H/20096/165,BRAZILGENÉRICOS SA,AZITROMICINA,Azitromicina,500mg,Comprimidos,Embalagens contendo 3 comp,EMS S/A- Brazil,1436,26-09-2009
+OO/H/20096/165,BRAZILGENÉRICOS SA,AMOXICILINA,Amoxicilina,500mg,Cápsulas,Embalagens contendo 21 caps,EMS S/A- Brazil,1455,16-10-2009
+OO/H/20096/165,BRAZILGENÉRICOS SA,ALGIFLEX,Ibuprofeno,200mg,Comprimidos,Embalagens contendo 20 comp,EMS S/A- Brazil,1434,28-09-2009
+OO/H/20096/166,"GENERICS & SPECIALITIES, Lda",VALPIN CR 200,Valproato de Sódio + Ácido Valpróico,96mg + 96mg,Comprimidos,Embalagens contendo 10 blisters de 10 comp,Lincoln Pharmac,1417,26-09-2009
+OO/H/20096/166,"GENERICS & SPECIALITIES, Lda",STERILISED WATER FOR INJECTIONS 10ML BP,Água para injecção,10ml,Líquido Inj,Frasco de 10ml,Amanta Healthc,1542,23-12-2009
+OO/H/20096/166,"GENERICS & SPECIALITIES, Lda",SANTRO 100,Citrato de Sildenafil,100mg,Comprimidos,Embalagens contendo blister de 4 comp,Lincoln Pharmac,1419,26-09-2009
+OO/H/20096/166,"GENERICS & SPECIALITIES, Lda",NYGEN V,Nistatina,100.000 UI,Comprimidos vaginais,Embalagens contendo blister de1 4 comp,Lincoln Pharmac,1418,26-09-2009
+OO/H/20096/166,"GENERICS & SPECIALITIES, Lda",DOMIGEN,"Domperidona, maleato",10mg,Comprimidos,Embalagens contendo 10 blisters de 10 comprimidos,Lincoln Pharmac,1420,26-09-2009
+OO/H/20096/166,"GENERICS & SPECIALITIES, Lda",CLOTRILIN,Clotrimazol,100mg,Comprimidos vaginais,Embalagens contendo blister de 6 comp,Lincoln Pharmac,1541,23-12-2009
+OO/H/20097/167,"SHANI, LIMITADA",CANDACIDE ORAL SUSPENSIO,Nistatina,100.000 UI,Suspensão Oral,"Frasco de 30ml, 20ml",BE TABS PHAR,1441,16-10-2009
+OO/H/20097/167,WELL WORTH LDA,SINAREST - PD,"Oxymetazolina, Hidrocloreto",0.25mg,Solução,Frasco de 10ml,Centaur Pharma,1449,16-10-2009
+OO/H/20097/168,WELL WORTH LDA,WOODWARD’S GRIPE WATER,Bicarbonato de Sódio + Óleo de dill,0.05mg + 0.005ml,Xarope,Frasco de 150ml,W. Woordward P,1447,16-10-2009
+OO/H/20097/167,WELL WORTH LDA,ATREST,Alprazolam,0.5 mg,Comprimidos,"Embalagem contendo 10 blisters de 10 comp, 3x10",Centaur Pharma,1448,16-10-2009
+OO/H/20097/168,WELL WORTH LDA,AMLOPRES 10,"Amlodipina, besilato",10mg,Comprimidos,Embalagem contendo 10 blisters de 10 comp,Cipla Limited - I,1520,19-12-2009
+OO/H/20097/168,"SHANI, LIMITADA",SILVERKANT,Sulfadiazina de Prata,1%w/w,Creme,Bisnagas de 15g e 30g,S KANT HEALT,1577,23-12-2009
+OO/H/20097/169,"GENERICS & SPECIALITIES, Lda",METROGEL,Metronidazol,1%w/w,Gel,Bisnaga de 30g,Lincoln Pharmac,1587,27-02-2010
+OO/H/20097/169,"GENERICS & SPECIALITIES, Lda",CLOGEN ORAL,Clotrimazol,1% w/v,Gotas orais,Frasco de 15ml,Lincoln Pharmac,1643,19-03-2010
+OO/H/20097/169,"GENERICS & SPECIALITIES, Lda",CLOBIGEN,Propionato de Clobetasol,0.05% w/w,Creme,Bisnaga de 15g,Lincoln Pharmac,1543,23-12-2009
+OO/H/20097/170,MAPUTO HEALTH CARE Lda,NISCLOR 250,"Cloranfenicol, Palmitato",250mg/5ml,Suspensão Oral,Frasco de 100ml,Kniss Laboratori,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20097/169,MAPUTO HEALTH CARE Lda,K-PHENICOL 250,Cloranfenicol,250mg,Cápsulas,Embalagem contendo 10 blisters de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20097/169,MAPUTO HEALTH CARE Lda,BEESIX 50,"Piridoxina, Hidrocloreto",50mg,Comprimidos,Embalagem contendo 10 blisters de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20097/169,MAPUTO HEALTH CARE Lda,AZMANIL 100,Aminofilina,100mg,Comprimidos,Embalagem contendo 10 blisters de 10 comp,KAUSIKH THER,Fabricante interd,Fabricante interdito temporariamente
+OO/H/20097/171,"SHANI, LIMITADA",VOLINI GEL,Diclofenac Sódico,0.01,Gel,Bisnagas de 30g e de 50g,Ranbaxy Labora,1509,22-11-2009
+OO/H/20097/170,MAPUTO HEALTH CARE Lda,NOVAGRA FORTE,Citrato de Sildenafil,100mg,Comprimidos,Embalagem contendo 1 blister de 4 comp,MICRO LABS LT,1445,16-10-2009
+OO/H/20097/172,"MEDIS FARMACÊUTICA, LDA",MYPRODOL ® SUSPENSION,Ibuprofeno + Paracetamol + Fosfato de Codeína,200mg/10ml + 250mg/10ml + 10mg/10ml,Suspensão Oral,Frasco de 100ml,ADCOCK Ingram,1510,22-11-2009
+OO/H/20097/172,"MEDIS FARMACÊUTICA, LDA",MYPRODOL ® CAPSULES,"Ibuprofeno + Paracetamol + Codeína, fosfato",200mg + 250mg + 10mg,Cápsulas,"Embalagens de 20, 30 e 100 Cáps",ADCOCK Ingram,1570,23-12-2009
+OO/H/20097/171,MEDIMPORT LDA,DEPAKINE CHRONO 500,Valproato de Sódio + Ácido Valpróico,333mg + 145mg,Comprimidos,Embalagem com 60 comp,Sanofi-Synthela,1979,23-07-2010
+OO/H/20097/171,MEDIMPORT LDA,DEPAKINE CHRONO 300,Valproato de Sódio + Ácido Valpróico,200mg + 87mg,Comprimidos,Embalagem com 60 comp,Sanofi-Synthela,1978,23-07-2010
+OO/H/20097/171,"SHANI, LIMITADA",CONTIFLO OD,"Tansulosina, Hidrocloreto",0.4mg,Cápsulas,Embalagem com 1 blister de 10 caps,Ranbaxy Labora,1650,19-03-2010
+OO/H/20097/170,MEDIMPORT LDA,ASPEGIC 100,Acetilsalicilato de Lisina,180mg,Pó para Solução Oral,Embalagem com 20 Saquetas,Sofarimex - Indu,1564,23-12-2009
+OO/H/20097/170,MEDIMPORT LDA,ASPEGIC 500,Acetilsalicilato de Lisina,500mg,Pó para Solução Oral,Embalagem com 20 Saquetas,Sofarimex - Indu,1566,23-12-2009
+OO/H/20097/170,MEDIMPORT LDA,ASPEGIC 250,Acetilsalicilato de Lisina,450mg,Pó para Solução Oral,Embalagem com 20 Saquetas,Sofarimex - Indu,1565,23-12-2009
+OO/H/20097/170,MEDIMPORT LDA,ASPEGIC 1000,Acetilsalicilato de Lisina,1800mg,Pó para Solução Oral,Embalagem com 20 Saquetas,Sofarimex - Indu,1567,23-12-2009
+OO/H/20097/170,"MEDIS FARMACÊUTICA, LDA",ABAC-LZ TABLETS,"Abacavir, sulfato + Lamivudina + Zidovudina",300mg + 150mg + 300mg,Comprimidos,Embalagem com frasco de 60 comp,Ranbaxy Labora,1508,22-11-2009
+OO/H/20097/171,"MEDIS FARMACÊUTICA, LDA",ABAC TABLETS,"Abacavir, sulfato",300mg,Comprimidos,Embalagem com frasco de 60 comp,Ranbaxy Labora,1568,23-12-2009
+OO/H/20097/173,AFRI FARMÁCIA LDA,TIMOLOL,Timolol,0.25%m/v,Solução Oftálmica,Frasco de 5ml,Mercury laborato,1625,13-03-2010
+OO/H/20097/172,AFRI FARMÁCIA LDA,NALIDIXIC ACID TABLETS,Ácido Nalidíxico,500mg,Comprimidos,frasco de 100 comprimidos,Bharat Parenter,1639,19-03-2010
+OO/H/20098/173,"GENERICS & SPECIALITIES, Lda",L-GENTA,"Gentamicina, Sulfato",0.1%w/w,Creme,Bisnagas de 15g,Lincoln Pharmac,1545,23-12-2009
+OO/H/20098/173,"GENERICS & SPECIALITIES, Lda",GLUCOSE INTRAVENOUS INFUSION BP,Glicose,0.05 (5%),Injectável,Frasco de 500ml,Amanta Healthc,1544,23-12-2009
+OO/H/20098/174,BRAZILGENÉRICOS SA,SIMETICONE,Simeticone,40mg,Comprimidos,Embalagens contendo 20 comp,EMS S/A- Brazil,1780,29-03-2010
+OO/H/20098/174,BRAZILGENÉRICOS SA,SIMETICONE,Simeticone,75mg/ml,Emulsão Cutânea,Frasco de 15ml,EMS S/A- Brazil,1696,11-11-2010
+OO/H/20098/174,BRAZILGENÉRICOS SA,OMEPRAZOL,Omeprazol,20mg,Cápsulas,Embalagens contendo 28 caps,EMS S/A- Brazil,2034,08-09-2010
+OO/H/20098/173,BRAZILGENÉRICOS SA,CLORIDRATO DE DOXICILINA,"Doxiciclina, Cloridrato",100mg,Comprimidos,Embalagens contendo 15 comp,EMS S/A- Brazil,1802,01-04-2010
+OO/H/20098/174,BRAZILGENÉRICOS SA,BENECTRIN,Sulfametoxazol+Trimetoprim,200mg/5ml +40mg/5ml,Suspensão Oral,Frasco de 100ml,EMS S/A- Brazil,1641,19-03-2010
+OO/H/20098/174,BRAZILGENÉRICOS SA,AZITROMICINA,Azitromicina,200mg/5ml,Suspensão Oral,"Frasco de 15ml e 22,5ml",EMS S/A- Brazil,1869,03-06-2010
+OO/H/20098/173,BRAZILGENÉRICOS SA,AMOXICILINA 250mg/ml Pó para Suspensão Oral,Amoxicilina,250mg/5ml,Pó para Suspensão Oral,Frasco de 150ml,EMS S/A- Brazil,1640,19-03-2010
+OO/H/20132/404,"LUSOFARMA, Lda",PAROXETINA GENEDEC,"Paroxetina, cloridrato",20mg,Comprimidos revestidos,Blister de 60 comprimidos,Generis Farmac,3535,10-05-2013
+OO/H/20165/530,FARMA HOLDINGS SA,MOZAPAN 40,Pantoprazol,40mg,comprimidos revestidos,10 blister de 10 comprimidos,Swiss Garnier Li,4829,17-01-2017
+OO/H/20189/634,ACE HEALTH CARE LDA,FLUCLOCIN 500,Flucloxacilina,500mg,Cápsula,blister de 10 cápsulas,Biomatrix Heath,J5875,12-11-2019
+OO/H/20227/766,HEDERA LDA,CLORIDRATO DE TRAMADOL,"Tramadol, cloridrato",50mg/ml,Solução injectável,Embalagem contendo 50 ampolas com 1ml 2ml,Uniao Quimica F,N7102,18-09-2023
+OO/H/20097/168,"AFRI FARMÁCIA, LDA",THIORIDAZINE,"Tioridazina, Hidrocloreto",100mg,Comprimidos,Frasco de 1000,Remedica Labor,1450,16-10-2009
+OO/H/20122/355,"GENERICS & SPECIALITIES, Lda",SEPTLON,"Clorhexidina, gluconato + Cetrimida","15% m/v + 7,5%m/v",Solução antiseptica,frasco de 500ml e de 1000ml,West- Coast Pha,3385,26-02-2013
+OO/H/20238/833,MISSIONPHARMA MOÇAMBIQUE,CLORIDRATO DE DOXORRUBICINA PARA INJECÇÃO BP,"5 Doxorrubicina, cloridrato",50mg,Injectável,1 frasco,Naprod Life Scie,L7544,28-08-2024

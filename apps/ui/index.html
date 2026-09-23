@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -44,6 +44,7 @@ h1{font-size:30px;line-height:1.1;margin:6px 0 2px;letter-spacing:-.6px}
 /* ---------- blocks ---------- */
 .card{background:var(--card);border-radius:var(--r);padding:var(--pad);margin-bottom:12px;
       box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card.tap:active{transform:scale(.995);background:#FAF9F7}
 .hero{background:var(--hero);color:#fff;border-radius:var(--r);padding:20px var(--pad);
       margin-bottom:14px}
 .hero .k{font-size:13px;opacity:.9;font-weight:600}
@@ -89,6 +90,23 @@ textarea{min-height:120px;resize:vertical}
             font-weight:800;font-size:17px;line-height:1}
 .qty span{min-width:26px;text-align:center;font-weight:700}
 
+/* ---------- store ---------- */
+.shelves{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.shelf{background:#fff;border-radius:14px;padding:12px;text-align:start;
+       box-shadow:0 1px 2px rgba(0,0,0,.04);min-height:74px;
+       display:flex;flex-direction:column;justify-content:space-between}
+.shelf .n{font-weight:700;font-size:13px;line-height:1.25}
+.shelf .c{color:var(--muted);font-size:12px;margin-top:6px}
+.shelf:active{background:#FAF9F7}
+.price{font-weight:800;font-size:17px;letter-spacing:-.3px;white-space:nowrap}
+.from{color:var(--muted);font-size:11px;font-weight:600;display:block}
+.cartbar{position:sticky;bottom:0;margin:4px calc(var(--pad) * -1) 0;
+         padding:10px var(--pad) 12px;background:rgba(239,237,232,.94);
+         backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:5}
+.vendorline{display:flex;justify-content:space-between;align-items:center;gap:10px;
+            padding:10px 0;border-top:1px solid var(--line)}
+.best{background:rgba(23,163,74,.08);border-radius:10px;padding:10px;margin:0 -10px}
+
 /* chat */
 .msgs{display:flex;flex-direction:column;gap:8px;padding-bottom:8px}
 .msg{max-width:82%;padding:10px 13px;border-radius:16px;font-size:14px;word-break:break-word}
@@ -103,6 +121,11 @@ textarea{min-height:120px;resize:vertical}
 .chip.on{border-color:var(--green);background:rgba(23,163,74,.08);color:#0C6B31}
 code{background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px;font-size:12px;
      font-family:ui-monospace,Menlo,monospace}
+
+/* Latin text inside an Arabic line — a medicine name, a price, an id —
+   keeps its own direction instead of being reordered around the
+   punctuation around it. */
+.bidi{unicode-bidi:isolate;direction:ltr;display:inline-block;text-align:start}
 </style>
 </head>
 <body>
@@ -121,7 +144,7 @@ code{background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px;font-size:12px
    is no sample data in this file: if the server is unreachable the screen
    says so, in place, instead of rendering a number that came from nowhere.
 
-   Three rules this file keeps:
+   Five rules this file keeps:
 
    1. Money is never parsed into a JS number. The API sends 2dp strings
       (A2.4) and they are displayed as strings. A float here would quietly
@@ -134,6 +157,17 @@ code{background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px;font-size:12px
       screen instead of killing the handler — an earlier build of this app
       died on one null reference and every later tap silently did nothing,
       which looked exactly like "the app is just an image".
+   4. The interface speaks English, Portuguese or Arabic. **A medicine name
+      is never translated.** `Amoxicilina + Ácido Clavulânico` is what is
+      printed on the box, on the invoice and in the national register; an
+      Arabic or English rendering of it would be a different string from the
+      one the pharmacist has to match against a physical package, and the
+      matcher searches the Portuguese text regardless of the chosen
+      interface language.
+   5. A price shown next to a product is the cheapest *fresh* offer and it
+      names the vendor. A storefront that shows a price without saying whose
+      it is teaches the pharmacist to distrust it the first time two vendors
+      disagree.
    =================================================================== */
 
 /* ---------------- storage (never required) ---------------- */
@@ -155,9 +189,179 @@ const DEFAULT_API = (location.protocol === "http:" || location.protocol === "htt
   : "http://127.0.0.1:8099";
 function apiBase(){ return (store.get("api") || DEFAULT_API).replace(/\/+$/,""); }
 
+/* ---------------- language ----------------
+   English is the default because that is what was asked for; Portuguese is
+   one tap away and is what a Maputo pharmacist will pick. Arabic flips the
+   whole document direction. Nothing here touches product data. */
+const LANGS = [["en","English"], ["pt","Português"], ["ar","العربية"]];
+
+const T = {
+  en: {
+    brand:"PH Store", login_title:"PH Store", login_sub:"Sign in to your pharmacy",
+    phone:"Mobile", password:"Password", sign_in:"Sign in",
+    server:"Server", server_note:"The API address. Change it only if your team asked you to.",
+    save_server:"Save server", test:"Test connection", server_ok:"Server OK",
+    server_saved:"Server saved.",
+    tab_store:"Store", tab_list:"List", tab_orders:"Orders", tab_chat:"Chat", tab_panel:"Account",
+    store:"Store", store_sub:"Browse, search and order",
+    search_ph:"Paracetamol, Amoxicilina…", search:"Search", searching:"Searching…",
+    nothing:"Nothing found.", clear:"Clear",
+    shelves:"Categories", catalogue_size:"products in the catalogue",
+    with_offers:"available to order now",
+    from:"from", offers:"offer(s)", no_offer:"no offer yet", regulated:"regulated price",
+    add:"Add", in_cart:"In cart", cart:"Cart", items:"item(s)",
+    place_order:"Place order", empty_cart:"Your cart is empty.",
+    back:"Back", vendors:"Vendors", best:"Best price", stock:"available",
+    expires_in:"expiry horizon", days:"days",
+    single_vendor:"Only one vendor has this right now.",
+    list_title:"Send a list", list_sub:"Paste it exactly as you write it on WhatsApp — one product per line.",
+    send_list:"Send list", write_a_line:"Write at least one line.",
+    nothing_moves:"Nothing moves while a line is still undecided.",
+    identified:"Identified", confirm_q:"Which of these?", not_in_index:"Nothing in the index matches this line.",
+    remove_line:"Remove line", confirm_list:"Confirm list", lines_left:"line(s) still undecided",
+    list_confirmed:"List confirmed.",
+    orders:"Orders", orders_sub:"Your orders, newest first", refresh:"Refresh",
+    no_orders:"No orders yet.", lines:"Lines", goods:"Goods", no_orders_made:"No orders generated.",
+    order_made:"Order placed:", order_count:"order(s)",
+    chat:"Chat", chat_human:"You are talking to a colleague",
+    chat_escalating:"Passing you to a colleague…", chat_bot:"Automatic assistant",
+    no_messages:"No messages yet.", write_here:"Write here…", send:"Send",
+    talk_to_human:"Talk to a person", write_message:"Write a message.",
+    panel:"Account", panel_sub:"About your pharmacy",
+    ask:"Ask", ask_eg:"e.g. “when will I run out of stock?”", ask_ph:"Your question…",
+    ask_btn:"Ask", answered_by:"Answered by:", write_question:"Write a question.",
+    summary:"Summary", owed:"Owed to vendors", open_requests:"Open requests",
+    open_orders:"Orders in progress", disputes:"Disputes", returns:"Returns",
+    computed_from:"Computed from:", session:"Session", sign_out:"Sign out",
+    language:"Language", loading:"loading…", no_data:"No data", draw_error:"Could not draw the screen:",
+    no_connection:"No connection to the server.",
+    st:{DRAFT:"Draft", NORMALIZING:"Reading the list", AWAITING_CONFIRMATION:"Awaiting confirmation",
+        AWAITING_ADMIN_APPROVAL:"Awaiting approval", CONFIRMED:"Confirmed",
+        IN_FULFILMENT:"In progress", CLOSED:"Closed", CANCELLED:"Cancelled",
+        PENDING_ACCEPTANCE:"Awaiting vendor", ACCEPTED:"Accepted", DISPATCHED:"On the way",
+        DELIVERED_PENDING_RECEIPT:"Delivered — to check", RECEIPT_ACCEPTED:"Checked",
+        DISPUTED:"Disputed", REJECTED:"Rejected", RETURN_IN_PROGRESS:"Return in progress"}
+  },
+  pt: {
+    brand:"PH Store", login_title:"PH Store", login_sub:"Entrar na sua farmácia",
+    phone:"Telemóvel", password:"Palavra-passe", sign_in:"Entrar",
+    server:"Servidor", server_note:"O endereço da API. Mude apenas se a sua equipa lho pediu.",
+    save_server:"Guardar servidor", test:"Testar ligação", server_ok:"Servidor OK",
+    server_saved:"Servidor guardado.",
+    tab_store:"Loja", tab_list:"Lista", tab_orders:"Pedidos", tab_chat:"Conversa", tab_panel:"Conta",
+    store:"Loja", store_sub:"Procure, veja e encomende",
+    search_ph:"Paracetamol, Amoxicilina…", search:"Procurar", searching:"A procurar…",
+    nothing:"Nada encontrado.", clear:"Limpar",
+    shelves:"Categorias", catalogue_size:"produtos no catálogo",
+    with_offers:"disponíveis para encomendar",
+    from:"desde", offers:"oferta(s)", no_offer:"sem oferta ainda", regulated:"preço regulado",
+    add:"Adicionar", in_cart:"No carrinho", cart:"Carrinho", items:"item(ns)",
+    place_order:"Fazer pedido", empty_cart:"O carrinho está vazio.",
+    back:"Voltar", vendors:"Fornecedores", best:"Melhor preço", stock:"disponível",
+    expires_in:"validade mínima", days:"dias",
+    single_vendor:"Só um fornecedor tem este produto de momento.",
+    list_title:"Enviar uma lista", list_sub:"Cole a lista como a escreve no WhatsApp — um produto por linha.",
+    send_list:"Enviar lista", write_a_line:"Escreva pelo menos uma linha.",
+    nothing_moves:"Nada avança enquanto uma linha estiver por decidir.",
+    identified:"Identificado", confirm_q:"Qual destes?", not_in_index:"Nada no índice corresponde a esta linha.",
+    remove_line:"Remover linha", confirm_list:"Confirmar lista", lines_left:"linha(s) por decidir",
+    list_confirmed:"Lista confirmada.",
+    orders:"Pedidos", orders_sub:"Os seus pedidos, do mais recente", refresh:"Actualizar",
+    no_orders:"Ainda sem pedidos.", lines:"Linhas", goods:"Mercadoria",
+    no_orders_made:"Sem encomendas geradas.",
+    order_made:"Pedido criado:", order_count:"encomenda(s)",
+    chat:"Conversa", chat_human:"Está a falar com um colega",
+    chat_escalating:"A passar para um colega…", chat_bot:"Assistente automático",
+    no_messages:"Sem mensagens ainda.", write_here:"Escreva aqui…", send:"Enviar",
+    talk_to_human:"Falar com uma pessoa", write_message:"Escreva uma mensagem.",
+    panel:"Conta", panel_sub:"Sobre a sua farmácia",
+    ask:"Pergunte", ask_eg:"Ex.: «quando vou ficar sem stock?»", ask_ph:"A sua pergunta…",
+    ask_btn:"Perguntar", answered_by:"Respondido por:", write_question:"Escreva uma pergunta.",
+    summary:"Resumo", owed:"Em dívida aos fornecedores", open_requests:"Pedidos abertos",
+    open_orders:"Encomendas em curso", disputes:"Disputas", returns:"Devoluções",
+    computed_from:"Calculado de:", session:"Sessão", sign_out:"Sair",
+    language:"Idioma", loading:"a carregar…", no_data:"Sem dados",
+    draw_error:"Erro ao desenhar o ecrã:", no_connection:"Sem ligação ao servidor.",
+    st:{DRAFT:"Rascunho", NORMALIZING:"A ler a lista", AWAITING_CONFIRMATION:"A confirmar",
+        AWAITING_ADMIN_APPROVAL:"A aguardar aprovação", CONFIRMED:"Confirmado",
+        IN_FULFILMENT:"Em execução", CLOSED:"Fechado", CANCELLED:"Cancelado",
+        PENDING_ACCEPTANCE:"A aguardar fornecedor", ACCEPTED:"Aceite", DISPATCHED:"A caminho",
+        DELIVERED_PENDING_RECEIPT:"Entregue — a conferir", RECEIPT_ACCEPTED:"Conferido",
+        DISPUTED:"Em disputa", REJECTED:"Recusado", RETURN_IN_PROGRESS:"Devolução em curso"}
+  },
+  ar: {
+    brand:"PH Store", login_title:"PH Store", login_sub:"ادخل إلى صيدليتك",
+    phone:"رقم الموبايل", password:"كلمة المرور", sign_in:"دخول",
+    server:"الخادم", server_note:"عنوان الـAPI. متغيّرهوش إلا لو فريقك طلب منك.",
+    save_server:"حفظ الخادم", test:"اختبار الاتصال", server_ok:"الخادم يعمل",
+    server_saved:"الخادم اتحفظ.",
+    tab_store:"المتجر", tab_list:"قائمة", tab_orders:"الطلبات", tab_chat:"المحادثة", tab_panel:"الحساب",
+    store:"المتجر", store_sub:"تصفّح وابحث واطلب",
+    search_ph:"Paracetamol, Amoxicilina…", search:"بحث", searching:"جارٍ البحث…",
+    nothing:"مفيش نتائج.", clear:"مسح",
+    shelves:"الأقسام", catalogue_size:"منتج في الفهرس",
+    with_offers:"متاح للطلب الآن",
+    from:"من", offers:"عرض", no_offer:"لا يوجد عرض بعد", regulated:"سعر مقنّن",
+    add:"إضافة", in_cart:"في السلة", cart:"السلة", items:"صنف",
+    place_order:"إرسال الطلب", empty_cart:"السلة فاضية.",
+    back:"رجوع", vendors:"الموردون", best:"أفضل سعر", stock:"متاح",
+    expires_in:"أقل صلاحية", days:"يوم",
+    single_vendor:"مورّد واحد بس عنده المنتج ده دلوقتي.",
+    list_title:"إرسال قائمة", list_sub:"الصق القائمة زي ما بتكتبها في واتساب — صنف في كل سطر.",
+    send_list:"إرسال القائمة", write_a_line:"اكتب سطر واحد على الأقل.",
+    nothing_moves:"مفيش حاجة بتتحرك طول ما في سطر لسه محتاج قرار.",
+    identified:"اتحدد", confirm_q:"أنهي واحد فيهم؟", not_in_index:"مفيش حاجة في الفهرس بتطابق السطر ده.",
+    remove_line:"حذف السطر", confirm_list:"تأكيد القائمة", lines_left:"سطر محتاج قرار",
+    list_confirmed:"القائمة اتأكدت.",
+    orders:"الطلبات", orders_sub:"طلباتك، الأحدث أولاً", refresh:"تحديث",
+    no_orders:"مفيش طلبات لسه.", lines:"السطور", goods:"البضاعة",
+    no_orders_made:"مفيش طلبيات اتعملت.",
+    order_made:"الطلب اتعمل:", order_count:"طلبية",
+    chat:"المحادثة", chat_human:"بتتكلم مع زميل",
+    chat_escalating:"بنحوّلك لزميل…", chat_bot:"مساعد آلي",
+    no_messages:"مفيش رسائل لسه.", write_here:"اكتب هنا…", send:"إرسال",
+    talk_to_human:"أكلّم شخص", write_message:"اكتب رسالة.",
+    panel:"الحساب", panel_sub:"عن صيدليتك",
+    ask:"اسأل", ask_eg:"مثلاً: «إمتى هيخلص المخزون؟»", ask_ph:"سؤالك…",
+    ask_btn:"اسأل", answered_by:"أجاب عليه:", write_question:"اكتب سؤال.",
+    summary:"ملخّص", owed:"مستحق للموردين", open_requests:"طلبات مفتوحة",
+    open_orders:"طلبيات جارية", disputes:"نزاعات", returns:"مرتجعات",
+    computed_from:"محسوب من:", session:"الجلسة", sign_out:"خروج",
+    language:"اللغة", loading:"جارٍ التحميل…", no_data:"لا توجد بيانات",
+    draw_error:"تعذّر رسم الشاشة:", no_connection:"لا يوجد اتصال بالخادم.",
+    st:{DRAFT:"مسودة", NORMALIZING:"جارٍ قراءة القائمة", AWAITING_CONFIRMATION:"في انتظار التأكيد",
+        AWAITING_ADMIN_APPROVAL:"في انتظار الموافقة", CONFIRMED:"مؤكَّد",
+        IN_FULFILMENT:"جارٍ التنفيذ", CLOSED:"مقفول", CANCELLED:"ملغى",
+        PENDING_ACCEPTANCE:"في انتظار المورّد", ACCEPTED:"مقبول", DISPATCHED:"في الطريق",
+        DELIVERED_PENDING_RECEIPT:"اتسلّم — للمراجعة", RECEIPT_ACCEPTED:"اتراجع",
+        DISPUTED:"في نزاع", REJECTED:"مرفوض", RETURN_IN_PROGRESS:"مرتجع جارٍ"}
+  }
+};
+
+function lang(){ const l = store.get("lang"); return T[l] ? l : "en"; }
+function t(key){
+  const L = T[lang()], E = T.en;
+  return (L && L[key] !== undefined) ? L[key] : (E[key] !== undefined ? E[key] : key);
+}
+function tStatus(code){
+  const L = T[lang()].st || {}, E = T.en.st;
+  return L[code] || E[code] || code;
+}
+function applyLang(){
+  // Arabic keeps the same left-to-right layout as Portuguese and English, by
+  // decision: one arrangement of the screen for every language means a
+  // pharmacist and a colleague on different settings point at the same place
+  // on the same screen, and the tab order, the cart button and every price
+  // column stay where the eye learned them. Only the words change. The
+  // browser still shapes and orders Arabic runs correctly inside their own
+  // paragraph, which is all that is needed here.
+  document.documentElement.lang = lang();
+  document.documentElement.dir = "ltr";
+}
+
 /* ---------------- state ---------------- */
 const S = {
-  tab: "home",
+  tab: "store",
   token: store.get("token") || null,
   me: null,
   busy: false,
@@ -165,12 +369,16 @@ const S = {
   flash: null,
   cart: [],            // [{product, qty}]
   search: "",
-  results: null,
+  results: null,       // search / shelf results
+  resultsTitle: null,  // the shelf being browsed, when browsing
+  shelves: null,
+  product: null,       // the open product page
   requests: null,
   order: null,
   norm: null,          // normalisation view for a pasted list
   thread: null,
   assistant: null,
+  askResult: null,
   lastRequestId: null
 };
 
@@ -191,7 +399,7 @@ async function api(path, opts){
             : (opts.body instanceof FormData ? opts.body : JSON.stringify(opts.body))
     });
   } catch (e) {
-    throw new Error("Sem ligação ao servidor.\n" + apiBase() + "\n\n" + e.message);
+    throw new Error(t("no_connection") + "\n" + apiBase() + "\n\n" + e.message);
   }
 
   if (res.status === 204) return null;
@@ -219,26 +427,33 @@ function MT(v){
   if (v === null || v === undefined) return "—";
   const s = String(v);
   const [i, d] = s.split(".");
-  const grouped = i.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-  return grouped + "," + (d || "00") + " MT";
+  const grouped = i.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return grouped + "," + (d || "00") + " MT";
 }
-function productName(p){
-  return [p.inn, p.strength, p.form].filter(Boolean).join(" · ")
-       + (p.pack_size ? " (" + p.pack_size + ")" : "");
+
+/* Rule 4. A product name is source data, not interface text: it is printed
+   as it stands, and wrapped so that a Latin name inside an Arabic line keeps
+   its own direction instead of being reordered around the punctuation. */
+/* A money string is Latin digits plus a Latin unit. Dropped raw into an
+   Arabic line it gets reordered — `0,00 MT` renders as `MT 0,00` — so it is
+   isolated exactly like a product name. Rule 1 still holds: the value itself
+   is never parsed, only wrapped. */
+function money(v){ return '<span class="bidi">' + esc(MT(v)) + "</span>"; }
+
+function name(p){
+  const label = p.brand_name || p.inn || "—";
+  const detail = [p.strength, p.form].filter(Boolean).join(" · ");
+  return '<span class="bidi">' + esc(label) + "</span>" +
+         (detail ? '<br><span class="s bidi">' + esc(detail) + "</span>" : "");
 }
-const STATUS_PT = {
-  DRAFT:"Rascunho", NORMALIZING:"A ler a lista", AWAITING_CONFIRMATION:"A confirmar",
-  AWAITING_ADMIN_APPROVAL:"A aguardar aprovação", CONFIRMED:"Confirmado",
-  IN_FULFILMENT:"Em execução", CLOSED:"Fechado", CANCELLED:"Cancelado",
-  PENDING_ACCEPTANCE:"A aguardar fornecedor", ACCEPTED:"Aceite", DISPATCHED:"A caminho",
-  DELIVERED_PENDING_RECEIPT:"Entregue — a conferir", RECEIPT_ACCEPTED:"Conferido",
-  DISPUTED:"Em disputa", REJECTED:"Recusado", RETURN_IN_PROGRESS:"Devolução em curso"
-};
+function plainName(p){
+  return [p.brand_name || p.inn, p.strength, p.form].filter(Boolean).join(" · ");
+}
 const statusPill = st => {
   const cls = ({CLOSED:"m", CANCELLED:"m", REJECTED:"r", DISPUTED:"r",
                 CONFIRMED:"g", ACCEPTED:"g", RECEIPT_ACCEPTED:"g",
                 DISPATCHED:"b", IN_FULFILMENT:"b"})[st] || "o";
-  return '<span class="pill ' + cls + '">' + esc(STATUS_PT[st] || st) + "</span>";
+  return '<span class="pill ' + cls + '">' + esc(tStatus(st)) + "</span>";
 };
 
 /* ---------------- forms ----------------
@@ -288,31 +503,30 @@ async function guard(fn){
 }
 
 const ICONS = {
-  home:'<path d="M3 10.5 12 3l9 7.5V21H3z"/>',
-  catalogue:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>',
+  store:'<path d="M3 9h18l-1.5 11.2A2 2 0 0 1 17.5 22h-11a2 2 0 0 1-2-1.8z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
   orders:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
   chat:'<path d="M21 12a8 8 0 1 1-3.2-6.4"/><path d="M21 4v5h-5"/>',
-  panel:'<path d="M4 20V10M10 20V4M16 20v-7M22 20v-4"/>'
+  panel:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'
 };
-const TABS = [
-  ["home","Início"], ["catalogue","Catálogo"], ["orders","Pedidos"],
-  ["chat","Conversa"], ["panel","Painel"]
-];
+const TABS = [["store","tab_store"], ["list","tab_list"], ["orders","tab_orders"],
+              ["chat","tab_chat"], ["panel","tab_panel"]];
 
 function renderTabs(){
   const bar = document.getElementById("tabbar");
   if (!bar) return;
   if (!S.token){ bar.style.display = "none"; return; }
   bar.style.display = "flex";
-  bar.innerHTML = TABS.map(([id,label]) =>
+  bar.innerHTML = TABS.map(([id,key]) =>
     '<button data-tab="' + id + '" class="' + (S.tab === id ? "on" : "") + '">' +
       '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + ICONS[id] + "</svg>" +
-      "<span>" + label + "</span></button>"
+      "<span>" + esc(t(key)) + "</span></button>"
   ).join("");
 }
 
 function render(){
+  applyLang();
   const main = document.getElementById("main");
   if (!main) return;
   try {
@@ -322,7 +536,7 @@ function render(){
       (S.token ? VIEW[S.tab]() : loginView());
   } catch (e) {
     // rule 3: a broken screen still shows why, and the app stays alive
-    main.innerHTML = '<div class="err">Erro ao desenhar o ecrã:\n' + esc(e.message) + "</div>";
+    main.innerHTML = '<div class="err">' + esc(t("draw_error")) + "\n" + esc(e.message) + "</div>";
   }
   restoreForm();
   renderTabs();
@@ -333,56 +547,196 @@ function render(){
   }
 }
 
+function langChips(){
+  return LANGS.map(([code,label]) =>
+    '<button class="chip' + (lang() === code ? " on" : "") + '" data-act="setLang" ' +
+    'data-lang="' + code + '">' + esc(label) + "</button>").join("");
+}
+
 /* ---------------- login ---------------- */
 function loginView(){
   return '' +
-  '<h1>PH Store</h1>' +
-  '<p class="sub">Entrar na sua farmácia</p>' +
+  "<h1>" + esc(t("login_title")) + "</h1>" +
+  '<p class="sub">' + esc(t("login_sub")) + "</p>" +
+  '<div class="card">' + langChips() + "</div>" +
   '<div class="card">' +
-    '<label for="ph">Telemóvel</label>' +
-    '<input id="ph" type="text" inputmode="tel" placeholder="+258 84 000 0011" ' +
+    '<label for="ph">' + esc(t("phone")) + "</label>" +
+    '<input id="ph" type="text" inputmode="tel" placeholder="+258840000011" dir="ltr" ' +
       'value="' + esc(store.get("lastPhone") || "") + '">' +
-    '<label for="pw">Palavra-passe</label>' +
-    '<input id="pw" type="password" placeholder="••••••••">' +
+    '<label for="pw">' + esc(t("password")) + "</label>" +
+    '<input id="pw" type="password" placeholder="••••••••" dir="ltr">' +
     '<div style="height:16px"></div>' +
-    '<button class="btn g" data-act="login"' + (S.busy ? " disabled" : "") + '>' +
-      (S.busy ? '<span class="spin"></span>' : "Entrar") + "</button>" +
+    '<button class="btn g" data-act="login"' + (S.busy ? " disabled" : "") + ">" +
+      (S.busy ? '<span class="spin"></span>' : esc(t("sign_in"))) + "</button>" +
   "</div>" +
   '<div class="card">' +
-    '<label for="api">Servidor</label>' +
-    '<input id="api" type="text" value="' + esc(apiBase()) + '">' +
-    '<p class="s" style="margin:8px 0 0">O endereço da API. Mude apenas se a sua equipa lho pediu.</p>' +
+    '<label for="api">' + esc(t("server")) + "</label>" +
+    '<input id="api" type="text" dir="ltr" value="' + esc(apiBase()) + '">' +
+    '<p class="s" style="margin:8px 0 0">' + esc(t("server_note")) + "</p>" +
     '<div style="height:12px"></div>' +
-    '<button class="btn ghost sm" data-act="saveApi">Guardar servidor</button> ' +
-    '<button class="btn ghost sm" data-act="ping">Testar ligação</button>' +
+    '<button class="btn ghost sm" data-act="saveApi">' + esc(t("save_server")) + "</button> " +
+    '<button class="btn ghost sm" data-act="ping">' + esc(t("test")) + "</button>" +
   "</div>";
 }
 
-/* ---------------- home ---------------- */
-function homeView(){
-  const a = S.assistant;
+/* ---------------- store (the home screen) ---------------- */
+function priceBlock(p){
+  if (p.best_price)
+    return '<span class="price"><span class="from">' + esc(t("from")) + "</span>" +
+           money(p.best_price) + "</span>";
+  if (p.regulated_price)
+    return '<span class="pill b">' + esc(t("regulated")) + "</span>";
+  return '<span class="s">' + esc(t("no_offer")) + "</span>";
+}
+
+function productCard(p){
+  const inCart = S.cart.find(i => i.product.id === p.id);
+  return '<div class="card tap" data-act="openProduct" data-id="' + esc(p.id) + '">' +
+    '<div class="row" style="margin:0;padding:0;border:0;align-items:flex-start">' +
+      "<span>" + name(p) + "</span>" + priceBlock(p) +
+    "</div>" +
+    '<div class="row" style="margin-top:10px">' +
+      '<span class="s">' + (p.fresh_offer_count || 0) + " " + esc(t("offers")) + "</span>" +
+      (inCart ? '<span class="pill g">' + esc(t("in_cart")) + " · " + inCart.qty + "</span>" : "") +
+    "</div>" +
+  "</div>";
+}
+
+function cartBar(){
+  const n = S.cart.reduce((a,i) => a + i.qty, 0);
+  if (!n) return "";
+  return '<div class="cartbar">' +
+    '<button class="btn g" data-act="goCart">' + esc(t("cart")) + " · " + n + " " +
+      esc(t("items")) + "</button></div>";
+}
+
+function storeView(){
+  if (S.product) return productView();
+  if (S.tab === "cart") return cartView();
+  const sh = S.shelves;
+  const results = S.results;
   return '' +
-  "<h1>Olá</h1>" +
-  '<p class="sub">' + esc(S.me ? (S.me.roles || []).join(" · ") : "") + "</p>" +
-  '<div class="hero">' +
-    '<div class="k">Em dívida aos fornecedores</div>' +
-    '<div class="v">' + (a ? esc(MT(a.outstanding_to_vendors)) : "—") + "</div>" +
-    '<div class="k">' + (a ? esc(a.open_orders + " pedido(s) em curso") : "a carregar…") + "</div>" +
-  "</div>" +
-  (a ? '<div class="card">' +
-      '<div class="row"><span class="t">Pedidos abertos</span><span>' + a.open_requests + "</span></div>" +
-      '<div class="row"><span class="t">Encomendas em curso</span><span>' + a.open_orders + "</span></div>" +
-      '<div class="row"><span class="t">Disputas</span><span>' + a.open_disputes + "</span></div>" +
-      '<div class="row"><span class="t">Devoluções</span><span>' + a.open_returns + "</span></div>" +
-      '<p class="s" style="margin:12px 0 0">Calculado de: ' + esc(a.basis.source) + "</p>" +
-    "</div>"
-   : '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "Sem dados") + "</div>") +
+  "<h1>" + esc(t("store")) + "</h1>" +
+  '<p class="sub">' + esc(t("store_sub")) + "</p>" +
   '<div class="card">' +
-    '<span class="t">Enviar uma lista</span>' +
-    '<p class="s">Cole a lista como a escreve no WhatsApp — um produto por linha.</p>' +
-    '<textarea id="paste" placeholder="Amoxicilina 500 mg 21&#10;Paracetamol 500&#10;..."></textarea>' +
+    '<input id="q" type="search" placeholder="' + esc(t("search_ph")) + '" dir="ltr" ' +
+      'value="' + esc(S.search) + '">' +
     '<div style="height:10px"></div>' +
-    '<button class="btn" data-act="paste"' + (S.busy ? " disabled" : "") + ">Enviar lista</button>" +
+    '<button class="btn" data-act="search"' + (S.busy ? " disabled" : "") + ">" +
+      (S.busy ? '<span class="spin"></span>' : esc(t("search"))) + "</button>" +
+  "</div>" +
+
+  (results !== null
+    ? '<div class="row" style="margin:2px 0 10px">' +
+        '<span class="t">' + esc(S.resultsTitle || t("search")) + "</span>" +
+        '<button class="btn ghost sm" data-act="clearResults">' + esc(t("clear")) + "</button>" +
+      "</div>" +
+      (results.length === 0
+        ? '<div class="card empty">' + esc(t("nothing")) + "</div>"
+        : results.map(productCard).join("") +
+          (S.nextOffset !== null && S.nextOffset !== undefined
+            ? '<button class="btn ghost" data-act="more">+</button>' : ""))
+
+    : (sh
+        ? '<div class="hero">' +
+            '<div class="v">' + sh.catalogue_size + "</div>" +
+            '<div class="k">' + esc(t("catalogue_size")) + "</div>" +
+            '<div class="k" style="margin-top:6px">' + sh.products_with_offers + " " +
+              esc(t("with_offers")) + "</div>" +
+          "</div>" +
+          '<p class="sub">' + esc(t("shelves")) + "</p>" +
+          '<div class="shelves">' +
+            sh.items.map(x =>
+              '<button class="shelf" data-act="openShelf" data-name="' + esc(x.shelf) + '">' +
+                '<span class="n bidi">' + esc(x.shelf) + "</span>" +
+                '<span class="c">' + x.product_count + "</span>" +
+              "</button>").join("") +
+          "</div>"
+        : '<div class="card empty">' +
+            (S.busy ? '<span class="spin"></span>' : esc(t("loading"))) + "</div>")) +
+  cartBar();
+}
+
+function productView(){
+  const p = S.product;
+  const offers = p.offers || [];
+  return '' +
+  '<button class="btn ghost sm" data-act="closeProduct">← ' + esc(t("back")) + "</button>" +
+  '<div style="height:12px"></div>' +
+  '<h1 class="bidi">' + esc(p.brand_name || p.inn) + "</h1>" +
+  '<p class="sub bidi">' + esc([p.inn, p.strength, p.form, p.pack_size].filter(Boolean).join(" · ")) + "</p>" +
+
+  '<div class="card">' +
+    '<span class="t">' + esc(t("vendors")) + "</span>" +
+    (offers.length === 0
+      ? '<p class="s" style="margin:10px 0 0">' + esc(t("no_offer")) + "</p>"
+      : offers.map((o,i) =>
+          '<div class="vendorline' + (i === 0 ? " best" : "") + '">' +
+            "<span><span class='t bidi'>" + esc(o.vendor_name || o.vendor_id) + "</span>" +
+            (i === 0 ? ' <span class="pill g">' + esc(t("best")) + "</span>" : "") +
+            '<br><span class="s">' + o.qty_available + " " + esc(t("stock")) +
+            " · " + esc(t("expires_in")) + " " + o.expiry_horizon_days + " " + esc(t("days")) +
+            "</span></span>" +
+            '<span class="price">' + money(o.price) + "</span>" +
+          "</div>").join("")) +
+    (p.single_candidate ? '<p class="s" style="margin:10px 0 0">' +
+        esc(t("single_vendor")) + "</p>" : "") +
+  "</div>" +
+
+  '<div class="card">' + qtyControl(p) + "</div>" +
+  cartBar();
+}
+
+function qtyControl(p){
+  const inCart = S.cart.find(i => i.product.id === p.id);
+  if (!inCart)
+    return '<button class="btn g" data-act="add" data-id="' + esc(p.id) + '">' +
+           esc(t("add")) + "</button>";
+  return '<div class="row" style="margin:0;padding:0;border:0">' +
+    '<span class="t">' + esc(t("in_cart")) + "</span>" +
+    '<span class="qty">' +
+      '<button data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
+      "<span>" + inCart.qty + "</span>" +
+      '<button data-act="inc" data-id="' + esc(p.id) + '">+</button>' +
+    "</span></div>";
+}
+
+function cartView(){
+  return '' +
+  '<button class="btn ghost sm" data-act="goStore">← ' + esc(t("back")) + "</button>" +
+  '<div style="height:12px"></div>' +
+  "<h1>" + esc(t("cart")) + "</h1>" +
+  (S.cart.length === 0
+    ? '<div class="card empty">' + esc(t("empty_cart")) + "</div>"
+    : '<div class="card">' +
+        S.cart.map(i =>
+          '<div class="row">' +
+            "<span>" + name(i.product) +
+            (i.product.best_price
+              ? '<br><span class="s">' + money(i.product.best_price) + "</span>" : "") +
+            "</span>" +
+            '<span class="qty">' +
+              '<button data-act="dec" data-id="' + esc(i.product.id) + '">−</button>' +
+              "<span>" + i.qty + "</span>" +
+              '<button data-act="inc" data-id="' + esc(i.product.id) + '">+</button>' +
+            "</span>" +
+          "</div>").join("") +
+        '<div style="height:14px"></div>' +
+        '<button class="btn g" data-act="checkout"' + (S.busy ? " disabled" : "") + ">" +
+          (S.busy ? '<span class="spin"></span>' : esc(t("place_order"))) + "</button>" +
+      "</div>");
+}
+
+/* ---------------- list (the WhatsApp paste) ---------------- */
+function listView(){
+  return '' +
+  "<h1>" + esc(t("list_title")) + "</h1>" +
+  '<p class="sub">' + esc(t("list_sub")) + "</p>" +
+  '<div class="card">' +
+    '<textarea id="paste" dir="ltr" placeholder="Amoxicilina 500 mg 21&#10;Paracetamol 500&#10;..."></textarea>' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn" data-act="paste"' + (S.busy ? " disabled" : "") + ">" +
+      (S.busy ? '<span class="spin"></span>' : esc(t("send_list"))) + "</button>" +
   "</div>" +
   (S.norm ? normBlock() : "");
 }
@@ -391,79 +745,38 @@ function normBlock(){
   const n = S.norm;
   const lines = n.lines.map(l => {
     if (l.match_status === "AUTO" || l.match_status === "RESOLVED")
-      return '<div class="row"><span><span class="t">' + esc(l.source_span || "") + "</span>" +
-             '<br><span class="s">Identificado</span></span>' +
+      return '<div class="row"><span><span class="t bidi">' + esc(l.source_span || "") + "</span>" +
+             '<br><span class="s">' + esc(t("identified")) + "</span></span>" +
              '<span class="pill g">OK</span></div>';
     const cands = (l.candidates || []).map(c =>
-      '<button class="chip" data-act="resolve" data-line="' + esc(l.id) + '" data-prod="' + esc(c.id) + '">' +
-      esc(productName(c)) + "</button>").join("");
+      '<button class="chip bidi" data-act="resolve" data-line="' + esc(l.id) + '" data-prod="' + esc(c.id) + '">' +
+      esc(plainName(c)) + "</button>").join("");
     return '<div class="row" style="display:block">' +
       '<div class="row" style="margin:0;padding:0;border:0">' +
-        '<span class="t">' + esc(l.source_span || "") + "</span>" +
+        '<span class="t bidi">' + esc(l.source_span || "") + "</span>" +
         '<span class="pill ' + (l.match_status === "ASK" ? "o" : "r") + '">' +
-        (l.match_status === "ASK" ? "Confirmar" : "Não encontrado") + "</span>" +
+        esc(l.match_status === "ASK" ? t("confirm_list") : t("nothing")) + "</span>" +
       "</div>" +
       '<p class="s" style="margin:6px 0">' +
-        (cands ? "Qual destes?" : "Nada no índice corresponde a esta linha.") + "</p>" +
+        esc(cands ? t("confirm_q") : t("not_in_index")) + "</p>" +
       cands +
-      '<button class="chip" data-act="dropline" data-line="' + esc(l.id) + '">Remover linha</button>' +
+      '<button class="chip" data-act="dropline" data-line="' + esc(l.id) + '">' +
+        esc(t("remove_line")) + "</button>" +
     "</div>";
   }).join("");
 
   return '<div class="card" id="normblock">' +
     '<div class="row" style="margin:0;padding:0;border:0">' +
-      '<span class="t">' + esc(n.request.number) + "</span>" + statusPill(n.request.status) +
+      '<span class="t bidi">' + esc(n.request.number) + "</span>" + statusPill(n.request.status) +
     "</div>" +
-    '<p class="s">Nada avança enquanto uma linha estiver por decidir.</p>' +
+    '<p class="s">' + esc(t("nothing_moves")) + "</p>" +
     lines +
     '<div style="height:12px"></div>' +
     (n.can_complete_normalisation
-      ? '<button class="btn g" data-act="normdone">Confirmar lista</button>'
-      : '<button class="btn" disabled>' + n.blocking_line_ids.length + " linha(s) por decidir</button>") +
+      ? '<button class="btn g" data-act="normdone">' + esc(t("confirm_list")) + "</button>"
+      : '<button class="btn" disabled>' + n.blocking_line_ids.length + " " +
+        esc(t("lines_left")) + "</button>") +
   "</div>";
-}
-
-/* ---------------- catalogue ---------------- */
-function catalogueView(){
-  const cartCount = S.cart.reduce((n,i) => n + i.qty, 0);
-  const results = S.results;
-  return '' +
-  "<h1>Catálogo</h1>" +
-  '<p class="sub">' + (cartCount ? cartCount + " item(ns) no carrinho" : "Procure por nome ou substância") + "</p>" +
-  '<div class="card">' +
-    '<input id="q" type="search" placeholder="Paracetamol…" value="' + esc(S.search) + '">' +
-    '<div style="height:10px"></div>' +
-    '<button class="btn" data-act="search"' + (S.busy ? " disabled" : "") + ">" +
-      (S.busy ? '<span class="spin"></span>' : "Procurar") + "</button>" +
-  "</div>" +
-  (results === null ? ""
-   : results.length === 0 ? '<div class="card empty">Nada encontrado.</div>'
-   : results.map(p => {
-      const inCart = S.cart.find(i => i.product.id === p.id);
-      return '<div class="card">' +
-        '<div class="row" style="margin:0;padding:0;border:0">' +
-          '<span><span class="t">' + esc(productName(p)) + "</span><br>" +
-          '<span class="s">' + (p.fresh_offer_count || 0) + " oferta(s)" +
-          (p.regulated_price ? " · preço regulado" : "") + "</span></span>" +
-        "</div>" +
-        '<div style="height:10px"></div>' +
-        (inCart
-          ? '<div class="qty">' +
-              '<button data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
-              "<span>" + inCart.qty + "</span>" +
-              '<button data-act="inc" data-id="' + esc(p.id) + '">+</button>' +
-            "</div>"
-          : '<button class="btn ghost sm" data-act="add" data-id="' + esc(p.id) + '">Adicionar</button>') +
-      "</div>";
-   }).join("")) +
-  (S.cart.length ? '<div class="card">' +
-      '<span class="t">Carrinho</span>' +
-      S.cart.map(i => '<div class="row"><span class="s">' + esc(productName(i.product)) +
-        "</span><span>" + i.qty + "</span></div>").join("") +
-      '<div style="height:12px"></div>' +
-      '<button class="btn g" data-act="checkout"' + (S.busy ? " disabled" : "") + ">" +
-        (S.busy ? '<span class="spin"></span>' : "Fazer pedido") + "</button>" +
-    "</div>" : "");
 }
 
 /* ---------------- orders ---------------- */
@@ -471,16 +784,16 @@ function ordersView(){
   if (S.order) return orderDetail();
   const rs = S.requests;
   return '' +
-  "<h1>Pedidos</h1>" +
-  '<p class="sub">Os seus pedidos, do mais recente</p>' +
-  '<button class="btn ghost sm" data-act="reloadOrders">Actualizar</button>' +
+  "<h1>" + esc(t("orders")) + "</h1>" +
+  '<p class="sub">' + esc(t("orders_sub")) + "</p>" +
+  '<button class="btn ghost sm" data-act="reloadOrders">' + esc(t("refresh")) + "</button>" +
   '<div style="height:12px"></div>' +
   (rs === null ? '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "—") + "</div>"
-   : rs.length === 0 ? '<div class="card empty">Ainda sem pedidos.</div>'
-   : rs.map(r => '<div class="card" data-act="openReq" data-id="' + esc(r.id) + '">' +
+   : rs.length === 0 ? '<div class="card empty">' + esc(t("no_orders")) + "</div>"
+   : rs.map(r => '<div class="card tap" data-act="openReq" data-id="' + esc(r.id) + '">' +
         '<div class="row" style="margin:0;padding:0;border:0">' +
-          '<span><span class="t">' + esc(r.number) + "</span><br>" +
-          '<span class="s">' + esc(r.channel) + " · " + (r.line_count || 0) + " linha(s)</span></span>" +
+          '<span><span class="t bidi">' + esc(r.number) + "</span><br>" +
+          '<span class="s bidi">' + esc(r.channel) + " · " + (r.line_count || 0) + "</span></span>" +
           statusPill(r.status) +
         "</div>" +
       "</div>").join(""));
@@ -490,105 +803,117 @@ function orderDetail(){
   const o = S.order;
   const orders = o.orders || [];
   return '' +
-  '<button class="btn ghost sm" data-act="backOrders">← Voltar</button>' +
+  '<button class="btn ghost sm" data-act="backOrders">← ' + esc(t("back")) + "</button>" +
   '<div style="height:12px"></div>' +
-  "<h1>" + esc(o.number) + "</h1>" +
-  '<p class="sub">' + esc(STATUS_PT[o.status] || o.status) + "</p>" +
+  '<h1 class="bidi">' + esc(o.number) + "</h1>" +
+  '<p class="sub">' + esc(tStatus(o.status)) + "</p>" +
   '<div class="card">' +
-    '<span class="t">Linhas</span>' +
-    (o.lines || []).map(l => '<div class="row"><span class="s">' +
+    '<span class="t">' + esc(t("lines")) + "</span>" +
+    (o.lines || []).map(l => '<div class="row"><span class="s bidi">' +
       esc(l.source_span || l.index_product_id || "—") + "</span><span>" +
       l.qty_requested + "</span></div>").join("") +
   "</div>" +
   (orders.length ? orders.map(x => '<div class="card">' +
       '<div class="row" style="margin:0;padding:0;border:0">' +
-        '<span class="t">' + esc(x.number || x.id) + "</span>" + statusPill(x.status) +
+        '<span class="t bidi">' + esc(x.number || x.id) + "</span>" + statusPill(x.status) +
       "</div>" +
-      '<div class="row"><span class="s">Mercadoria</span><span class="t">' +
-        esc(MT(x.goods_total)) + "</span></div>" +
+      '<div class="row"><span class="s">' + esc(t("goods")) + '</span><span class="t">' +
+        money(x.goods_total) + "</span></div>" +
     "</div>").join("")
-   : '<div class="card empty">Sem encomendas geradas.</div>');
+   : '<div class="card empty">' + esc(t("no_orders_made")) + "</div>");
 }
 
 /* ---------------- chat ---------------- */
 function chatView(){
-  const t = S.thread;
+  const th = S.thread;
   return '' +
-  "<h1>Conversa</h1>" +
+  "<h1>" + esc(t("chat")) + "</h1>" +
   '<p class="sub">' +
-    (t ? (t.active_handler === "HUMAN" ? "Está a falar com um colega"
-        : t.active_handler === "ESCALATING" ? "A passar para um colega…"
-        : "Assistente automático") : "a carregar…") + "</p>" +
-  (t ? '<div class="card">' +
+    esc(th ? (th.active_handler === "HUMAN" ? t("chat_human")
+        : th.active_handler === "ESCALATING" ? t("chat_escalating")
+        : t("chat_bot")) : t("loading")) + "</p>" +
+  (th ? '<div class="card">' +
       '<div class="msgs">' +
-        (t.messages.length ? t.messages.map(m =>
+        (th.messages.length ? th.messages.map(m =>
           '<div class="msg ' + (m.sender_type === "PHARMACY" ? "me" : "them") + '">' +
-            '<span class="w">' + esc(m.sender_type === "PHARMACY" ? "Você" :
-                                     m.sender_type === "AGENT" ? "PH Store" : "Sistema") + "</span>" +
+            '<span class="w">' + esc(m.sender_type === "PHARMACY" ? "•" :
+                                     m.sender_type === "AGENT" ? "PH Store" : "—") + "</span>" +
             esc(m.body) + "</div>").join("")
-         : '<div class="empty">Sem mensagens ainda.</div>') +
+         : '<div class="empty">' + esc(t("no_messages")) + "</div>") +
       "</div>" +
       '<div class="composer">' +
-        '<textarea id="msg" placeholder="Escreva aqui…"></textarea>' +
-        '<button class="btn sm g" data-act="send">Enviar</button>' +
+        '<textarea id="msg" placeholder="' + esc(t("write_here")) + '"></textarea>' +
+        '<button class="btn sm g" data-act="send">' + esc(t("send")) + "</button>" +
       "</div>" +
-      (t.active_handler === "BOT"
+      (th.active_handler === "BOT"
         ? '<div style="height:10px"></div>' +
-          '<button class="btn ghost sm" data-act="escalate">Falar com uma pessoa</button>' : "") +
+          '<button class="btn ghost sm" data-act="escalate">' + esc(t("talk_to_human")) + "</button>" : "") +
     "</div>"
    : '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "—") + "</div>");
 }
 
-/* ---------------- panel ---------------- */
+/* ---------------- account ---------------- */
 function panelView(){
   const a = S.assistant;
   return '' +
-  "<h1>Painel</h1>" +
-  '<p class="sub">Sobre a sua farmácia</p>' +
+  "<h1>" + esc(t("panel")) + "</h1>" +
+  '<p class="sub">' + esc(t("panel_sub")) + "</p>" +
   '<div class="card">' +
-    '<span class="t">Pergunte</span>' +
-    '<p class="s">Ex.: «quando vou ficar sem stock?»</p>' +
-    '<input id="ask" type="text" placeholder="A sua pergunta…">' +
-    '<div style="height:10px"></div>' +
-    '<button class="btn" data-act="ask"' + (S.busy ? " disabled" : "") + ">Perguntar</button>" +
-    (S.askResult ? '<div style="height:12px"></div>' +
-      '<p class="s">Respondido por: <code>' + esc(S.askResult.answered_by || "—") + "</code></p>" +
-      (S.askResult.message_pt ? '<p class="s">' + esc(S.askResult.message_pt) + "</p>" : "") : "") +
+    '<span class="t">' + esc(t("language")) + "</span>" +
+    '<div style="height:10px"></div>' + langChips() +
   "</div>" +
-  (a ? '<div class="card">' +
-      '<span class="t">Resumo</span>' +
-      '<div class="row"><span class="s">Em dívida</span><span class="t">' +
-        esc(MT(a.outstanding_to_vendors)) + "</span></div>" +
-      '<div class="row"><span class="s">Pedidos abertos</span><span>' + a.open_requests + "</span></div>" +
-    "</div>" : "") +
+  (a ? '<div class="hero">' +
+      '<div class="k">' + esc(t("owed")) + "</div>" +
+      '<div class="v">' + money(a.outstanding_to_vendors) + "</div>" +
+    "</div>" +
+    '<div class="card">' +
+      '<span class="t">' + esc(t("summary")) + "</span>" +
+      '<div class="row"><span class="s">' + esc(t("open_requests")) + "</span><span>" + a.open_requests + "</span></div>" +
+      '<div class="row"><span class="s">' + esc(t("open_orders")) + "</span><span>" + a.open_orders + "</span></div>" +
+      '<div class="row"><span class="s">' + esc(t("disputes")) + "</span><span>" + a.open_disputes + "</span></div>" +
+      '<div class="row"><span class="s">' + esc(t("returns")) + "</span><span>" + a.open_returns + "</span></div>" +
+      '<p class="s" style="margin:12px 0 0">' + esc(t("computed_from")) + " " +
+        '<span class="bidi">' + esc(a.basis.source) + "</span></p>" +
+    "</div>"
+   : '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : esc(t("no_data"))) + "</div>") +
   '<div class="card">' +
-    '<span class="t">Sessão</span>' +
-    '<p class="s">' + esc(S.me ? S.me.user_id : "") + "<br>" + esc(apiBase()) + "</p>" +
+    '<span class="t">' + esc(t("ask")) + "</span>" +
+    '<p class="s">' + esc(t("ask_eg")) + "</p>" +
+    '<input id="ask" type="text" placeholder="' + esc(t("ask_ph")) + '">' +
     '<div style="height:10px"></div>' +
-    '<button class="btn ghost" data-act="logout">Sair</button>' +
+    '<button class="btn" data-act="ask"' + (S.busy ? " disabled" : "") + ">" +
+      esc(t("ask_btn")) + "</button>" +
+    (S.askResult ? '<div style="height:12px"></div>' +
+      '<p class="s">' + esc(t("answered_by")) + ' <code>' + esc(S.askResult.answered_by || "—") + "</code></p>" +
+      (S.askResult.message_pt ? '<p class="s bidi">' + esc(S.askResult.message_pt) + "</p>" : "") : "") +
+  "</div>" +
+  '<div class="card">' +
+    '<span class="t">' + esc(t("session")) + "</span>" +
+    '<p class="s bidi">' + esc(S.me ? S.me.user_id : "") + "<br>" + esc(apiBase()) + "</p>" +
+    '<div style="height:10px"></div>' +
+    '<button class="btn ghost" data-act="logout">' + esc(t("sign_out")) + "</button>" +
   "</div>";
 }
 
-const VIEW = { home:homeView, catalogue:catalogueView, orders:ordersView, chat:chatView, panel:panelView };
+const VIEW = { store:storeView, cart:storeView, list:listView, orders:ordersView,
+               chat:chatView, panel:panelView };
 
 /* ---------------- loaders ---------------- */
-async function loadHome(){
-  S.assistant = await api("/v1/assistant/summary");
-}
-async function loadOrders(){
-  const r = await api("/v1/requests?limit=50");
-  S.requests = r.items;
-}
-async function loadThread(){
-  S.thread = await api("/v1/support/threads/me");
-}
+async function loadShelves(){ S.shelves = await api("/v1/catalogue/shelves"); }
+async function loadHome(){ S.assistant = await api("/v1/assistant/summary"); }
+async function loadOrders(){ S.requests = (await api("/v1/requests?limit=50")).items; }
+async function loadThread(){ S.thread = await api("/v1/support/threads/me"); }
 async function afterLogin(){
   S.me = await api("/v1/auth/me");
-  await loadHome();
+  await loadShelves();
 }
 
 /* ---------------- actions ---------------- */
 const ACT = {
+  async setLang(el){
+    store.set("lang", el.dataset.lang);
+    applyLang();
+  },
   async login(){
     const phone = val("ph");
     const pw = val("pw");
@@ -601,27 +926,107 @@ const ACT = {
     store.set("token", S.token);
     store.set("lastPhone", phone.trim());
     await afterLogin();
-    S.tab = "home";
+    S.tab = "store";
   },
   async saveApi(){
     const v = val("api").trim();
     if (v) store.set("api", v);
-    S.flash = "Servidor guardado.";
+    S.flash = t("server_saved");
   },
   async ping(){
     const r = await fetch(apiBase() + "/healthz");
     const j = await r.json();
-    S.flash = "Servidor OK · " + (j.status || "?");
+    S.flash = t("server_ok") + " · " + (j.status || "?");
   },
   async logout(){
     S.token = null; S.me = null; store.del("token");
     S.cart = []; S.results = null; S.requests = null; S.thread = null;
-    S.assistant = null; S.norm = null; S.order = null; S.form = {};
+    S.assistant = null; S.norm = null; S.order = null; S.shelves = null;
+    S.product = null; S.form = {};
   },
 
+  /* ---- store ---- */
+  async search(){
+    S.search = val("q");
+    S.product = null;
+    if (!S.search.trim()){ S.results = null; S.resultsTitle = null; return; }
+    const out = await api("/v1/catalogue/search?q=" + encodeURIComponent(S.search.trim()) +
+                          "&in_stock=true&limit=30");
+    S.results = out.items;
+    S.nextOffset = out.next_offset;
+    S.resultsTitle = S.search.trim();
+  },
+  async openShelf(el){
+    const shelf = el.dataset.name;
+    const out = await api("/v1/catalogue/shelf?name=" + encodeURIComponent(shelf) + "&limit=30");
+    S.results = out.items;
+    S.nextOffset = out.next_offset;
+    S.resultsTitle = shelf;
+    S.shelfName = shelf;
+  },
+  async more(){
+    const off = S.nextOffset;
+    if (off === null || off === undefined) return;
+    const url = S.shelfName && S.resultsTitle === S.shelfName
+      ? "/v1/catalogue/shelf?name=" + encodeURIComponent(S.shelfName) + "&limit=30&offset=" + off
+      : "/v1/catalogue/search?q=" + encodeURIComponent(S.search.trim()) +
+        "&in_stock=true&limit=30&offset=" + off;
+    const out = await api(url);
+    S.results = S.results.concat(out.items);
+    S.nextOffset = out.next_offset;
+  },
+  async clearResults(){
+    S.results = null; S.resultsTitle = null; S.shelfName = null; S.search = "";
+    clearField("q");
+  },
+  async openProduct(el){
+    S.product = await api("/v1/catalogue/products/" + el.dataset.id);
+  },
+  async closeProduct(){ S.product = null; },
+  async goCart(){ S.tab = "cart"; S.product = null; },
+  async goStore(){ S.tab = "store"; },
+
+  async add(el){
+    const p = S.product && S.product.id === el.dataset.id
+      ? S.product : (S.results || []).find(x => x.id === el.dataset.id);
+    if (p && !S.cart.find(i => i.product.id === p.id)) S.cart.push({ product: p, qty: 1 });
+  },
+  async inc(el){
+    const i = S.cart.find(x => x.product.id === el.dataset.id);
+    if (i) i.qty += 1;
+  },
+  async dec(el){
+    const i = S.cart.find(x => x.product.id === el.dataset.id);
+    if (!i) return;
+    i.qty -= 1;
+    if (i.qty <= 0) S.cart = S.cart.filter(x => x !== i);
+  },
+  async checkout(){
+    if (!S.cart.length) throw new Error(t("empty_cart"));
+    const req = await api("/v1/requests", {
+      method:"POST", body:{ mode:"CATALOGUE", allocation_strategy:"FEWEST_VENDORS" }
+    });
+    for (const item of S.cart){
+      await api("/v1/requests/" + req.id + "/lines", {
+        method:"POST", body:{ index_product_id: item.product.id, qty_requested: item.qty }
+      });
+    }
+    // the key is tied to this basket, so a retry replays instead of duplicating
+    const out = await api("/v1/requests/" + req.id + "/checkout", {
+      method:"POST", headers:{ "Idempotency-Key": "co-" + req.id }, body:{}
+    });
+    const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
+    S.flash = t("order_made") + " " + (out.orders || []).length + " " +
+              t("order_count") + " · " + total;
+    S.cart = [];
+    await loadOrders();
+    S.tab = "orders";
+  },
+
+  /* ---- list ---- */
   async paste(){
     const body = val("paste");
-    if (!body.trim()) throw new Error("Escreva pelo menos uma linha.");
+    if (!body.trim()) throw new Error(t("write_a_line"));
     const out = await api("/v1/intake/text", {
       method:"POST", body:{ body: body, channel:"WHATSAPP_TEXT" }
     });
@@ -645,61 +1050,27 @@ const ACT = {
   async normdone(){
     await api("/v1/requests/" + S.lastRequestId + "/normalization-complete", { method:"POST" });
     await api("/v1/requests/" + S.lastRequestId + "/confirm", { method:"POST" });
-    S.flash = "Lista confirmada.";
+    // the intake lane can buy now: confirmed is a valid checkout entry state
+    const out = await api("/v1/requests/" + S.lastRequestId + "/checkout", {
+      method:"POST", headers:{ "Idempotency-Key": "co-" + S.lastRequestId }, body:{}
+    });
+    const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
+    S.flash = t("list_confirmed") + " " + (out.orders || []).length + " " +
+              t("order_count") + " · " + total;
     S.norm = null;
     await loadOrders();
     S.tab = "orders";
   },
 
-  async search(){
-    S.search = val("q");
-    if (!S.search.trim()){ S.results = []; return; }
-    const out = await api("/v1/catalogue/search?q=" + encodeURIComponent(S.search.trim()));
-    S.results = out.items;
-  },
-  async add(el){
-    const p = (S.results || []).find(x => x.id === el.dataset.id);
-    if (p) S.cart.push({ product: p, qty: 1 });
-  },
-  async inc(el){
-    const i = S.cart.find(x => x.product.id === el.dataset.id);
-    if (i) i.qty += 1;
-  },
-  async dec(el){
-    const i = S.cart.find(x => x.product.id === el.dataset.id);
-    if (!i) return;
-    i.qty -= 1;
-    if (i.qty <= 0) S.cart = S.cart.filter(x => x !== i);
-  },
-  async checkout(){
-    if (!S.cart.length) throw new Error("O carrinho está vazio.");
-    const req = await api("/v1/requests", {
-      method:"POST", body:{ mode:"CATALOGUE", allocation_strategy:"FEWEST_VENDORS" }
-    });
-    for (const item of S.cart){
-      await api("/v1/requests/" + req.id + "/lines", {
-        method:"POST", body:{ index_product_id: item.product.id, qty_requested: item.qty }
-      });
-    }
-    // the key is tied to this basket, so a retry replays instead of duplicating
-    const key = "co-" + req.id;
-    const out = await api("/v1/requests/" + req.id + "/checkout", {
-      method:"POST", headers:{ "Idempotency-Key": key }, body:{}
-    });
-    const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
-    S.flash = "Pedido criado: " + (out.orders || []).length + " encomenda(s) · " + total;
-    S.cart = [];
-    await loadOrders();
-    S.tab = "orders";
-  },
-
+  /* ---- orders ---- */
   async reloadOrders(){ await loadOrders(); },
   async openReq(el){ S.order = await api("/v1/requests/" + el.dataset.id); },
   async backOrders(){ S.order = null; },
 
+  /* ---- chat ---- */
   async send(){
     const body = val("msg").trim();
-    if (!body) throw new Error("Escreva uma mensagem.");
+    if (!body) throw new Error(t("write_message"));
     await api("/v1/support/threads/me/messages", { method:"POST", body:{ body: body, channel:"APP" } });
     clearField("msg");
     await loadThread();
@@ -709,9 +1080,10 @@ const ACT = {
     await loadThread();
   },
 
+  /* ---- account ---- */
   async ask(){
     const q = val("ask").trim();
-    if (!q) throw new Error("Escreva uma pergunta.");
+    if (!q) throw new Error(t("write_question"));
     S.askResult = await api("/v1/assistant/ask", { method:"POST", body:{ question: q } });
   }
 };
@@ -721,11 +1093,12 @@ document.addEventListener("click", function(ev){
   const tabBtn = ev.target.closest && ev.target.closest("[data-tab]");
   if (tabBtn){
     S.tab = tabBtn.dataset.tab;
-    S.err = null; S.flash = null; S.order = null;
+    S.err = null; S.flash = null; S.order = null; S.product = null;
     render();
+    if (S.tab === "store"  && S.shelves  === null) guard(loadShelves);
     if (S.tab === "orders" && S.requests === null) guard(loadOrders);
     if (S.tab === "chat"   && S.thread   === null) guard(loadThread);
-    if ((S.tab === "home" || S.tab === "panel") && S.assistant === null) guard(loadHome);
+    if (S.tab === "panel"  && S.assistant=== null) guard(loadHome);
     return;
   }
   const el = ev.target.closest && ev.target.closest("[data-act]");
@@ -738,6 +1111,19 @@ document.addEventListener("click", function(ev){
   guard(() => fn(el));
 });
 
+document.addEventListener("keydown", function(ev){
+  if (ev.key !== "Enter") return;
+  const el = ev.target;
+  if (!el || el.tagName !== "INPUT") return;
+  const act = el.id === "q" ? "search" : el.id === "ask" ? "ask"
+            : (el.id === "ph" || el.id === "pw") ? "login" : null;
+  if (!act) return;
+  ev.preventDefault();
+  snapshotForm();
+  S.flash = null;
+  guard(() => ACT[act](el));
+});
+
 /* ---------------- boot ---------------- */
 function tick(){
   const c = document.getElementById("clock");
@@ -748,6 +1134,7 @@ function tick(){
 }
 tick(); setInterval(tick, 20000);
 
+applyLang();
 render();
 if (S.token) guard(afterLogin);
 </script>
