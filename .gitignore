@@ -5,3 +5,7 @@ __pycache__/
 .pytest_cache/
 var/
 .env
+
+# secrets and local state
+.env
+var/

@@ -1,0 +1,102 @@
+# PH Store — pilot stack.
+#
+# Designed to sit BESIDE the applications already running on this VPS
+# (`academy`, `clinic`) without touching them:
+#
+#   * its own bridge network, so nothing here is reachable from their stacks
+#   * Postgres is NOT published to the host at all — only the api container
+#     can reach it, over the internal network
+#   * the API publishes one port, ${API_PORT}, which defaults to 8099 and can
+#     be moved if that one is taken
+#
+# Migrations run as a one-shot `migrate` service that exits, never on api
+# boot: two replicas booting together would otherwise race each other through
+# alembic.
+
+name: phstore
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: phstore
+      POSTGRES_USER: phstore
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks: [phstore]
+    # no `ports:` on purpose — the database is not on the host at all
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phstore -d phstore"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: ./backend
+    restart: "no"
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    environment:
+      ROVA_ENV: production
+      ROVA_DATABASE_URL: postgresql+psycopg://phstore:${POSTGRES_PASSWORD}@db:5432/phstore
+      ROVA_JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [phstore]
+
+  api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      ROVA_ENV: production
+      ROVA_DATABASE_URL: postgresql+psycopg://phstore:${POSTGRES_PASSWORD}@db:5432/phstore
+      ROVA_JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      ROVA_STORAGE_DIR: /app/var/storage
+      # The Android client's page origin is the literal `null`, which only a
+      # wildcard matches. Safe because this API authenticates with a Bearer
+      # header and never a cookie. Narrow this the day a web front end exists.
+      ROVA_CORS_ORIGINS: ${CORS_ORIGINS:-*}
+    volumes:
+      - storage:/app/var/storage
+    ports:
+      - "${API_PORT:-8099}:8099"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks: [phstore]
+
+  # The SLA timers and order closing only happen when this runs. Without it
+  # nothing in the system ever times out or closes by itself.
+  jobs:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      ROVA_ENV: production
+      ROVA_DATABASE_URL: postgresql+psycopg://phstore:${POSTGRES_PASSWORD}@db:5432/phstore
+      ROVA_JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      ROVA_STORAGE_DIR: /app/var/storage
+    volumes:
+      - storage:/app/var/storage
+    command:
+      - /bin/sh
+      - -c
+      - 'while true; do python -m rova.cli jobs tick || echo "tick failed"; sleep 300; done'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks: [phstore]
+
+volumes:
+  db_data:
+  storage:
+
+networks:
+  phstore:
+    driver: bridge
