@@ -32,9 +32,9 @@ def _create_order_for_vendor(
     """The per-vendor order-creation body, extracted so `allocate_remainder`
     (defect 4 fix, below) can create the same shape of single-vendor order
     for a rerouted remainder line without going through `checkout()` itself
-    — `checkout()` requires `request.status = 'DRAFT'` (R-030 territory),
-    which a request is no longer in by the time a reroute decision happens
-    post-acceptance. `next_seq` is computed fresh here (COUNT of this
+    — `checkout()` only enters from `DRAFT` or `CONFIRMED` (R-030 territory),
+    and a request is past both by the time a reroute decision happens
+    post-acceptance (it is `IN_FULFILMENT`). `next_seq` is computed fresh here (COUNT of this
     request's existing orders + 1, seen inside the same transaction as any
     orders this call itself is about to insert) rather than threaded in by
     the caller, so both call sites — the checkout loop below and a lone
@@ -170,8 +170,8 @@ def allocate_remainder(session: Session, *, request_line_id: str, actor) -> dict
     insert the remainder `request_line` (`origin_line_id` set) but never
     allocate it — zero `allocation` rows, no second `order` — despite that
     function's docstring claiming it "re-enters the ordinary checkout path",
-    which is false: `checkout()` requires `request.status = 'DRAFT'`, and by
-    the time a line is short post-acceptance the request is long past DRAFT.
+    which is false: `checkout()` enters only from `DRAFT` or `CONFIRMED`, and
+    by the time a line is short post-acceptance the request is `IN_FULFILMENT`.
     This is the real re-entry point, called by
     `POST /v1/request-lines/{id}/allocate`: it ranks the remainder quantity
     — excluding the vendor whose shortfall produced it (R-029) — and, if a
@@ -240,8 +240,32 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
     req = session.execute(text("SELECT * FROM request WHERE id=:r"), {"r": request_id}).mappings().first()
     if req is None:
         raise ApiError("NOT_FOUND", "request not found")
-    if req["status"] != "DRAFT":
-        raise ApiError("GUARD_FAILED", "request is not in DRAFT", rule="SM-01")
+    # SM-01 has two lanes into CONFIRMED and both have to be able to buy:
+    #
+    #   catalogue   DRAFT --SUBMIT_CART--> CONFIRMED
+    #               DRAFT --SUBMIT_CART_OVER_THRESHOLD--> AWAITING_ADMIN_APPROVAL
+    #                     --ADMIN_APPROVE--> CONFIRMED
+    #   intake      NORMALIZING --NORMALIZATION_COMPLETE--> AWAITING_CONFIRMATION
+    #                     --CONFIRM--> CONFIRMED
+    #
+    # Accepting DRAFT alone left the second and third of those as dead ends:
+    # a WhatsApp list the pharmacy had already resolved and confirmed, and a
+    # cart the pharmacy admin had already approved, both sat at CONFIRMED
+    # with no route to an order. Found against the live pilot server, not in
+    # a test — every unit test drove the DRAFT lane.
+    #
+    # CONFIRMED is accepted, AWAITING_CONFIRMATION is not: confirming is the
+    # buyer's own act (SM-01 CONFIRM, guarded by the confirmation timer and
+    # restricted to PharmacyBuyer/OpsReviewer), and checkout must not perform
+    # it on their behalf — a PharmacyAdmin could otherwise buy a basket the
+    # buyer never confirmed.
+    entry_status = req["status"]
+    if entry_status not in ("DRAFT", "CONFIRMED"):
+        raise ApiError(
+            "GUARD_FAILED",
+            f"request is in {entry_status}; checkout accepts DRAFT or CONFIRMED",
+            rule="SM-01",
+        )
 
     lines = session.execute(
         text("SELECT * FROM request_line WHERE request_id=:r"), {"r": request_id}
@@ -275,7 +299,10 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
         ))
 
     machine = MACHINES["SM-01"]
-    machine.apply(session, request_id, "SUBMIT_CART", actor)
+    if entry_status == "DRAFT":
+        # R-122's threshold guard lives inside this transition, so the
+        # catalogue lane still cannot skip the admin-approval gate.
+        machine.apply(session, request_id, "SUBMIT_CART", actor)
     machine.apply(session, request_id, "FIRST_ORDER_CREATED", "SYSTEM")
 
     return {"request_id": request_id, "orders": orders_out}
