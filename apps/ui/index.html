@@ -2,521 +2,748 @@
 <html lang="pt" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#EFEDE8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#100F0D" media="(prefers-color-scheme: dark)">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>PH Store</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap">
 <style>
 :root{
-  --page:#EFEDE8; --card:#FFFFFF; --card2:#F7F6F2; --sep:#E7E4DC;
-  --t1:#14130F; --t2:#5E5B52; --t3:#949084;
-  --blue:#0A7AFF; --green:#17A34A; --teal:#0FA5A0; --orange:#F08222;
-  --pink:#E8447A; --purple:#7B5CF0; --red:#E23B37; --amber:#E8A317;
-  --shade:0 1px 2px rgba(20,19,15,.05), 0 8px 22px -10px rgba(20,19,15,.16);
-  --shade-lg:0 2px 6px rgba(20,19,15,.06), 0 22px 44px -18px rgba(20,19,15,.26);
-  --ui:"Figtree",system-ui,-apple-system,sans-serif;
-  --ar:"IBM Plex Sans Arabic","Figtree",system-ui,sans-serif;
+  --ground:#EFEDE8; --card:#FFFFFF; --ink:#16130F; --muted:#6C6559; --line:#E2DED6;
+  --blue:#0A7AFF; --green:#17A34A; --teal:#0FA5A0; --orange:#F08222; --pink:#E8447A;
+  --purple:#7B5CF0; --red:#E23B37;
+  --r:18px; --pad:16px;
+  --hero:linear-gradient(140deg,#25CC80,#0E9070 55%,#0A7C84);
 }
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --page:#100F0D; --card:#1B1A17; --card2:#232219; --sep:#2C2A25;
-    --t1:#F6F4EF; --t2:#ADA99D; --t3:#7E7A6F;
-    --blue:#3D95FF; --green:#3DC46C; --teal:#2FC2BC; --orange:#FF9A45;
-    --pink:#FF6B96; --purple:#9B82FF; --red:#FF5F5A; --amber:#FFBE3D;
-    --shade:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -10px rgba(0,0,0,.7);
-    --shade-lg:0 2px 8px rgba(0,0,0,.55), 0 24px 48px -18px rgba(0,0,0,.8);
-  }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background:var(--ground);color:var(--ink);
+  font-family:Figtree,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.45;
+  display:flex;flex-direction:column;overflow:hidden;
 }
-:root[data-theme="dark"]{
-  --page:#100F0D; --card:#1B1A17; --card2:#232219; --sep:#2C2A25;
-  --t1:#F6F4EF; --t2:#ADA99D; --t3:#7E7A6F;
-  --blue:#3D95FF; --green:#3DC46C; --teal:#2FC2BC; --orange:#FF9A45;
-  --pink:#FF6B96; --purple:#9B82FF; --red:#FF5F5A; --amber:#FFBE3D;
-  --shade:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -10px rgba(0,0,0,.7);
-  --shade-lg:0 2px 8px rgba(0,0,0,.55), 0 24px 48px -18px rgba(0,0,0,.8);
-}
-*{box-sizing:border-box}
-body{background:var(--page);color:var(--t1);font-family:var(--ui);font-size:15px;
-  line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+button,input,textarea,select{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
 
-
-/* header */
-
-
-
-.blob svg{width:27px;height:27px}
-
-
-
-
-
-
-
-
-@media (max-width:900px){.stage{grid-template-columns:1fr;gap:30px}}
-
-@media (max-width:900px){.col{position:static}}
-
-
-
-
-
-
-
-/* phone */
-
-.scr{background:var(--page);border-radius:30px;overflow:hidden;height:632px;
-  display:flex;flex-direction:column}
-.sb{display:flex;justify-content:space-between;padding:11px 22px 4px;font-size:12px;
-  font-weight:700;color:var(--t1);letter-spacing:-.01em}
-.nb{padding:6px 18px 12px}
-.nb h2{font-size:29px;font-weight:800;margin:0;letter-spacing:-.035em}
-.nb p{margin:2px 0 0;font-size:13.5px;color:var(--t2);font-weight:500}
-.bd{flex:1;overflow-y:auto;padding:2px 14px 16px;display:flex;flex-direction:column;gap:15px}
-.bd::-webkit-scrollbar{width:0}
-
-/* tab bar */
-.tb{display:flex;background:var(--card);border-top:1px solid var(--sep);padding-bottom:6px}
-.tb div{flex:1;text-align:center;padding:9px 1px 4px;font-size:9.5px;color:var(--t3);
-  font-weight:600;letter-spacing:-.01em}
-.tb div.on{color:var(--green)}
-.tb svg{width:24px;height:24px;display:block;margin:0 auto 3px;pointer-events:none}
-
-/* grouped inset card */
-.grp{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:var(--shade)}
-.ghd{padding:11px 15px 9px;display:flex;justify-content:space-between;align-items:center;
-  gap:10px}
-.ghd .lb{font-size:12.5px;font-weight:800;color:var(--t2);letter-spacing:-.005em}
-.gbd{padding:0 15px 14px;display:flex;flex-direction:column;gap:11px}
-
-/* rows with icon tiles */
-.it{display:flex;align-items:center;gap:12px;padding:11px 15px;border-top:1px solid var(--sep)}
-.it:first-child{border-top:0}
-.tile{width:38px;height:38px;border-radius:11px;flex:none;display:grid;place-items:center;
-  box-shadow:0 3px 8px -2px rgba(20,19,15,.28)}
-.tile svg{width:21px;height:21px}
-.it .tx{flex:1;min-width:0}
-.it .tx b{display:block;font-size:15px;font-weight:700;letter-spacing:-.018em}
-.it .tx span{display:block;font-size:12.5px;color:var(--t2);margin-top:1px;font-weight:500}
-.it .rt{text-align:right;flex:none}
-.it .rt .p{font-size:15.5px;font-weight:800;letter-spacing:-.025em}
-.it .rt .q{font-size:12px;color:var(--t3);font-weight:600;margin-top:1px}
-
-/* hero */
-.hero{border-radius:20px;padding:17px 18px 19px;color:#fff;position:relative;
-  overflow:hidden;box-shadow:0 10px 26px -10px rgba(14,143,107,.6)}
-.hero.g{background:linear-gradient(140deg,#25CC80,#0E9070 55%,#0A7C84)}
-.hero.o{background:linear-gradient(140deg,#FFB43D,#F0801F 55%,#E0631A);
-  box-shadow:0 10px 26px -10px rgba(240,128,31,.6)}
-.hero::after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;
-  background:rgba(255,255,255,.13);top:-88px;right:-52px}
-.hero .k{font-size:12.5px;font-weight:700;opacity:.88;letter-spacing:-.005em}
-.hero .v{font-size:40px;font-weight:900;letter-spacing:-.045em;margin-top:2px;line-height:1.05}
-.hero .u{font-size:14px;font-weight:700;opacity:.9;margin-top:3px}
-.hero .row{display:flex;gap:8px;margin-top:13px;position:relative}
-.hpill{background:rgba(255,255,255,.22);border-radius:9px;padding:6px 11px;
-  font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
-
-/* pills */
-.pill{font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:9px;white-space:nowrap;
-  letter-spacing:-.008em}
-.pg1{background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green)}
-.pb1{background:color-mix(in srgb,var(--blue) 15%,transparent);color:var(--blue)}
-.po1{background:color-mix(in srgb,var(--orange) 17%,transparent);color:var(--orange)}
-.pr1{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red)}
-
-/* money */
-.mm{display:flex;flex-direction:column;gap:8px;padding:0 15px 15px}
-.mr{display:flex;justify-content:space-between;font-size:14px;color:var(--t2);font-weight:600}
-.mr b{color:var(--t1);font-weight:700}
-.mt{display:flex;justify-content:space-between;align-items:baseline;padding-top:11px;
-  border-top:1px solid var(--sep)}
-.mt span{font-size:16px;font-weight:800;letter-spacing:-.022em}
-.mt b{font-size:23px;font-weight:900;letter-spacing:-.035em}
-
-/* buttons */
-.btn{font:inherit;font-size:16px;font-weight:800;letter-spacing:-.022em;border:0;
-  border-radius:15px;height:52px;cursor:pointer;width:100%;color:#fff;
-  background:linear-gradient(140deg,#22C77A,#0E9070);
-  box-shadow:0 8px 20px -7px rgba(14,143,107,.6);transition:transform .12s}
-.btn:active{transform:scale(.985)}
-.btn.s{background:var(--card);color:var(--t1);box-shadow:var(--shade)}
-.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
-.btns{display:flex;gap:9px}
-
-/* bubbles */
-.bub{max-width:84%;padding:11px 14px;font-size:15px;line-height:1.42;font-weight:500;
-  letter-spacing:-.015em}
-.bub.a{background:var(--card);border-radius:19px 19px 19px 6px;align-self:flex-start;
-  box-shadow:var(--shade)}
-.bub.b{background:linear-gradient(140deg,#22C77A,#0E9070);color:#fff;
-  border-radius:19px 19px 6px 19px;align-self:flex-end;
-  box-shadow:0 6px 16px -6px rgba(14,143,107,.55)}
-
-/* timeline */
-.tl{padding:2px 15px 15px;display:flex;flex-direction:column}
-.tls{display:grid;grid-template-columns:30px 1fr;gap:12px;padding-bottom:16px;position:relative}
-.tls:last-child{padding-bottom:0}
-.tls::before{content:"";position:absolute;left:14px;top:32px;bottom:-2px;width:2px;
-  background:var(--sep);border-radius:2px}
-.tls:last-child::before{display:none}
-.tls.done::before{background:var(--green)}
-.tlp{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;
-  background:var(--sep);position:relative;z-index:1}
-.tlp svg{width:16px;height:16px}
-.tls.done .tlp{background:var(--green);box-shadow:0 4px 10px -3px color-mix(in srgb,var(--green) 70%,transparent)}
-.tls.now .tlp{background:var(--orange);box-shadow:0 4px 10px -3px color-mix(in srgb,var(--orange) 70%,transparent)}
-.tls .lb{font-size:15px;font-weight:700;letter-spacing:-.018em;padding-top:4px}
-.tls .sb2{font-size:12.5px;color:var(--t2);margin-top:1px;font-weight:600}
-.tls.todo .lb{color:var(--t3)}
-
-/* stats */
-.st2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.stc{background:var(--card);border-radius:17px;padding:13px 14px;box-shadow:var(--shade)}
-.stc .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
-  margin-bottom:9px}
-.stc .ic svg{width:17px;height:17px}
-.stc .k{font-size:12px;color:var(--t2);font-weight:700}
-.stc .v{font-size:24px;font-weight:900;letter-spacing:-.038em;margin-top:1px}
-.stc .n{font-size:11.5px;color:var(--t3);font-weight:600}
-
-.mtr{padding:0 15px 4px;display:flex;flex-direction:column;gap:12px}
-.mtr>div{display:flex;flex-direction:column;gap:6px}
-.mtr .h{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;
-  letter-spacing:-.015em}
-.mtr .h i{font-style:normal;font-weight:800;font-size:13px}
-.trk{height:9px;background:var(--sep);border-radius:5px;overflow:hidden}
-.trk i{display:block;height:100%;border-radius:5px}
-
-.tip{font-size:13px;line-height:1.55;color:var(--t2);font-weight:500;padding:0 15px 15px}
-.tip b{color:var(--t1);font-weight:700}
-
-
-/* notes */
-
-
-
-
-
-.nt p:last-child{margin-bottom:0}
-
-@media (prefers-reduced-motion:reduce){*{transition-duration:1ms!important}}
-
-
-html,body{height:100%;margin:0;overscroll-behavior:none}
-body{background:var(--page);color:var(--t1);font-family:var(--ui);
-  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.011em;
-  display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
-.scr{flex:1;display:flex;flex-direction:column;min-height:0;background:var(--page)}
+/* ---------- chrome ---------- */
 .sb{display:flex;justify-content:space-between;align-items:center;
-  padding:calc(env(safe-area-inset-top,0px) + 10px) 20px 4px;
-  font-size:12.5px;font-weight:700;color:var(--t1);letter-spacing:-.01em}
-.nb{padding:6px 18px 12px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-.nb h2{font-size:30px;font-weight:800;margin:0;letter-spacing:-.035em}
-.nb p{margin:2px 0 0;font-size:13.5px;color:var(--t2);font-weight:500}
-.ph{display:flex;background:var(--sep);border-radius:11px;padding:3px;gap:2px;flex:none}
-.ph button{font:inherit;font-size:12px;font-weight:800;border:0;background:transparent;
-  color:var(--t2);padding:6px 11px;border-radius:8px;cursor:pointer;letter-spacing:-.01em}
-.ph button[aria-pressed="true"]{background:var(--card);color:var(--t1);box-shadow:var(--shade)}
-.bd{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:2px 14px 18px;display:flex;flex-direction:column;gap:15px}
-/* children must keep their natural height, otherwise flex shrinks every card
-   to fit the viewport and their contents get clipped instead of scrolling */
-.bd > *{flex:0 0 auto}
-.bd::-webkit-scrollbar{width:0}
-.tb{display:flex;background:var(--card);border-top:1px solid var(--sep);
-  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6px);flex:none}
-.tb div{flex:1;text-align:center;padding:9px 1px 4px;font-size:9.5px;color:var(--t3);
-  font-weight:600;letter-spacing:-.01em;cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:opacity .12s}
-.tb div:active{opacity:.45}
-.tb div.on{color:var(--green)}
-.tb svg{width:24px;height:24px;display:block;margin:0 auto 3px;pointer-events:none}
+    padding:10px var(--pad) 4px;font-size:13px;font-weight:700;flex:0 0 auto}
+.sb .brand{letter-spacing:.2px}
+.main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 var(--pad) 24px;
+      -webkit-overflow-scrolling:touch}
+h1{font-size:30px;line-height:1.1;margin:6px 0 2px;letter-spacing:-.6px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+
+.tabbar{flex:0 0 auto;display:flex;border-top:1px solid var(--line);
+        background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+        padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+               padding:6px 2px;color:var(--muted);font-size:11px;font-weight:600;border-radius:12px}
+.tabbar button.on{color:var(--green)}
+.tabbar .ic{width:22px;height:22px;display:block}
+.tabbar button:active{background:rgba(0,0,0,.05)}
+
+/* ---------- blocks ---------- */
+.card{background:var(--card);border-radius:var(--r);padding:var(--pad);margin-bottom:12px;
+      box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.hero{background:var(--hero);color:#fff;border-radius:var(--r);padding:20px var(--pad);
+      margin-bottom:14px}
+.hero .k{font-size:13px;opacity:.9;font-weight:600}
+.hero .v{font-size:32px;font-weight:800;letter-spacing:-1px;margin:2px 0 4px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.row+.row{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.t{font-weight:700}
+.s{color:var(--muted);font-size:13px}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.g{background:rgba(23,163,74,.12);color:var(--green)}
+.pill.o{background:rgba(240,130,34,.14);color:#B45F10}
+.pill.b{background:rgba(10,122,255,.12);color:var(--blue)}
+.pill.r{background:rgba(226,59,55,.12);color:var(--red)}
+.pill.m{background:rgba(108,101,89,.12);color:var(--muted)}
+
+.btn{display:block;width:100%;padding:14px;border-radius:14px;background:var(--ink);color:#fff;
+     font-weight:700;text-align:center}
+.btn:active{opacity:.85}
+.btn[disabled]{opacity:.4}
+.btn.g{background:var(--green)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{padding:9px 14px;width:auto;font-size:13px;border-radius:11px;display:inline-block}
+
+input[type=text],input[type=password],input[type=number],input[type=search],textarea,select{
+  width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:13px;
+  background:#fff;outline:none}
+input:focus,textarea:focus{border-color:var(--green)}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
+textarea{min-height:120px;resize:vertical}
+
+.err{background:rgba(226,59,55,.1);color:#9B1D1A;border-radius:12px;padding:12px;
+     font-size:13px;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
+.ok{background:rgba(23,163,74,.1);color:#0C6B31;border-radius:12px;padding:12px;
+    font-size:13px;margin-bottom:12px}
+.empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid var(--line);
+      border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;
+      vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:32px;height:32px;border-radius:10px;background:var(--ground);
+            font-weight:800;font-size:17px;line-height:1}
+.qty span{min-width:26px;text-align:center;font-weight:700}
+
+/* chat */
+.msgs{display:flex;flex-direction:column;gap:8px;padding-bottom:8px}
+.msg{max-width:82%;padding:10px 13px;border-radius:16px;font-size:14px;word-break:break-word}
+.msg.me{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:5px}
+.msg.them{align-self:flex-start;background:#fff;border-bottom-left-radius:5px}
+.msg .w{display:block;font-size:11px;opacity:.75;margin-bottom:2px;font-weight:700}
+.composer{display:flex;gap:8px;align-items:flex-end;margin-top:10px}
+.composer textarea{min-height:44px;max-height:120px}
+
+.chip{display:inline-block;padding:7px 12px;border-radius:999px;border:1.5px solid var(--line);
+      background:#fff;font-size:13px;font-weight:600;margin:0 6px 6px 0}
+.chip.on{border-color:var(--green);background:rgba(23,163,74,.08);color:#0C6B31}
+code{background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px;font-size:12px;
+     font-family:ui-monospace,Menlo,monospace}
 </style>
 </head>
 <body>
-<div class="scr">
-  <div class="sb"><span id="clk">9:41</span><span>PH Store</span></div>
-  <div class="nb">
-    <div><h2 id="ttl">Conversa</h2><p id="sub">Farmácia Nhlamankulo</p></div>
-    <div class="ph" role="group" aria-label="modo">
-      <button type="button" id="p1" aria-pressed="true">F1</button>
-      <button type="button" id="p2" aria-pressed="false">F2</button>
-    </div>
-  </div>
-  <div class="bd" id="bd"></div>
-  <nav class="tb" id="tbn"></nav>
-</div>
+
+<div class="sb"><span id="clock">—</span><span class="brand">PH Store</span></div>
+<div class="main" id="main"></div>
+
+<nav class="tabbar" id="tabbar"></nav>
+
 <script>
 "use strict";
+/* ===================================================================
+   PH Store — the pharmacy client.
 
-const E = s => String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const MT = (n,s) => {
-  const [i,d] = Math.abs(n).toFixed(2).split(".");
-  return i.replace(/\B(?=(\d{3})+(?!\d))/g," ")+","+d+(s===false?"":" MT");
-};
-let phase=1, scr="chat";
+   Every screen below is backed by a real call to the PH Store API. There
+   is no sample data in this file: if the server is unreachable the screen
+   says so, in place, instead of rendering a number that came from nowhere.
 
-/* ── product vectors: real drawn packaging ── */
-const PILL = c => `<svg viewBox="0 0 40 40" fill="none">
-  <rect x="6" y="9" width="28" height="22" rx="4" fill="${c}" opacity=".16"/>
-  <rect x="6" y="9" width="28" height="22" rx="4" stroke="${c}" stroke-width="2"/>
-  <circle cx="13" cy="16" r="2.6" fill="${c}"/><circle cx="20" cy="16" r="2.6" fill="${c}"/>
-  <circle cx="27" cy="16" r="2.6" fill="${c}"/><circle cx="13" cy="24" r="2.6" fill="${c}"/>
-  <circle cx="20" cy="24" r="2.6" fill="${c}"/><circle cx="27" cy="24" r="2.6" fill="${c}"/></svg>`;
-const CAPS = c => `<svg viewBox="0 0 40 40" fill="none">
-  <rect x="9" y="12" width="22" height="17" rx="3" fill="${c}" opacity=".16"/>
-  <rect x="9" y="12" width="22" height="17" rx="3" stroke="${c}" stroke-width="2"/>
-  <path d="M15 8.5h10v3.5H15z" fill="${c}"/>
-  <rect x="13" y="18" width="14" height="2.4" rx="1.2" fill="${c}"/>
-  <rect x="13" y="22.6" width="9" height="2.4" rx="1.2" fill="${c}" opacity=".55"/></svg>`;
-const BOTT = c => `<svg viewBox="0 0 40 40" fill="none">
-  <path d="M14 13h12v15a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3z" fill="${c}" opacity=".16"/>
-  <path d="M14 13h12v15a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3z" stroke="${c}" stroke-width="2"/>
-  <rect x="16" y="7.5" width="8" height="5.5" rx="1.5" fill="${c}"/>
-  <rect x="16.5" y="19" width="7" height="7" rx="1.5" fill="${c}" opacity=".6"/></svg>`;
+   Three rules this file keeps:
 
-const I = {
-  chat:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.9 3 3 6.5 3 11c0 2.4 1.2 4.5 3 6l-.8 3.3a.6.6 0 0 0 .9.6L9.7 19c.8.2 1.6.3 2.3.3 5.1 0 9-3.5 9-8s-3.9-8-9-8z"/></svg>',
-  bag:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7V6a5 5 0 0 1 10 0v1h1.7A2.3 2.3 0 0 1 21 9.3V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.3A2.3 2.3 0 0 1 5.3 7zm2 0h6V6a3 3 0 0 0-6 0z"/></svg>',
-  cat:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.4"/><rect x="13" y="3" width="8" height="8" rx="2.4"/><rect x="3" y="13" width="8" height="8" rx="2.4"/><rect x="13" y="13" width="8" height="8" rx="2.4"/></svg>',
-  chart:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4.4" height="9" rx="1.7"/><rect x="9.8" y="6" width="4.4" height="15" rx="1.7"/><rect x="16.6" y="9" width="4.4" height="12" rx="1.7"/></svg>',
-  ck:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
-  bx:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5z"/><path d="M3 8.5 12 13l9-4.5M12 13v7"/></svg>',
-  tr:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17.5" cy="18" r="1.8"/></svg>',
-  cl:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.2l3.3 2"/></svg>',
-  wal:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M4 6h13a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h10v3z"/><circle cx="16.5" cy="13.5" r="1.6" fill="#0A7AFF"/></svg>',
-  shd:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5 20 5v7c0 5-3.4 8.3-8 9.5C7.4 20.3 4 17 4 12V5z"/></svg>',
-  bolt:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M13.5 2 5 13.5h5L9.5 22 19 10h-5.5z"/></svg>',
-  up:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3.5 19 11h-4v8h-6v-8H5z"/></svg>'
-};
-const tile = (c,svg) => `<div class="tile" style="background:${c}">${svg}</div>`;
+   1. Money is never parsed into a JS number. The API sends 2dp strings
+      (A2.4) and they are displayed as strings. A float here would quietly
+      lose a metical over enough additions — the exact defect the backend
+      was fixed for.
+   2. A line the matcher did not resolve is never auto-picked. `ASK` lines
+      render their candidates and wait; `UNRESOLVED` lines offer a search.
+      This mirrors the server guard rather than working around it.
+   3. Every render is wrapped. A thrown error paints the error into the
+      screen instead of killing the handler — an earlier build of this app
+      died on one null reference and every later tap silently did nothing,
+      which looked exactly like "the app is just an image".
+   =================================================================== */
 
-const prod = (nm,sub,qty,price,art) => `
-  <div class="it">${tile("color-mix(in srgb,"+art[1]+" 13%,transparent)", art[0](art[1]))}
-    <div class="tx"><b>${E(nm)}</b><span>${E(sub)}</span></div>
-    <div class="rt"><div class="p">${MT(price,false)}</div><div class="q">× ${qty}</div></div></div>`;
-
-const P1 = [PILL,"var(--blue)"], P2 = [CAPS,"var(--orange)"], P3 = [BOTT,"var(--purple)"];
-
-/* ══ SCREENS ══ */
-function chat(){
-  const tot = phase===1 ? 3370.5 : 3570.5;
-  const dl  = phase===1 ? 250 : 450;
-  return `
-  <div class="bub b">preciso amoxil 500 x4, panadol 500 x10, omeprazol 20 x6</div>
-  <div class="bub a">Encontrei 2 produtos. Falta confirmar um.</div>
-  <div class="grp">
-    <div class="ghd"><span class="lb">Confirmar produto</span><span class="pill po1">1 de 3</span></div>
-    <div class="gbd"><p style="margin:0;font-size:14px;color:var(--t2);font-weight:500">Escreveu <b style="color:var(--t1)">«panadol 500»</b>. É este?</p></div>
-    ${prod("Paracetamol 500 mg","Comprimidos · cx 20",1,58.5,P2)}
-    <div class="gbd"><div class="btns">
-      <button class="btn" type="button">Sim, é este</button>
-      <button class="btn s" type="button" style="width:42%">Outros</button></div></div>
-  </div>
-  <div class="hero g">
-    <div class="k">Total da cotação</div>
-    <div class="v">${MT(tot,false)}</div>
-    <div class="u">MT · RQ-2041</div>
-    <div class="row"><span class="hpill">${phase===1?"1 fornecedor":"3 fornecedores"}</span>
-      <span class="hpill">Entrega hoje</span></div>
-  </div>
-  <div class="grp">
-    ${prod("Amoxicilina 500 mg","cx 21 · Amoxil",4,1648,P1)}
-    ${prod("Paracetamol 500 mg","cx 20 · Panadol",10,585,P2)}
-    ${prod("Omeprazol 20 mg","cx 14 · Losec",6,1176,P3)}
-    <div class="mm">
-      <div class="mr"><span>Medicamentos</span><b>${MT(3000.5,false)}</b></div>
-      <div class="mr"><span>Entrega</span><b>${MT(dl,false)}</b></div>
-      <div class="mr"><span>Serviço PH Store</span><b>${MT(120,false)}</b></div>
-      <div class="mt"><span>Total</span><b>${MT(tot,false)}</b></div>
-    </div>
-    <div class="gbd"><button class="btn" type="button">Confirmar pedido</button></div>
-  </div>`;
-}
-
-function cart(){
-  const v = (nm,col,ini,lines,sub,ok,short) => `
-  <div class="grp">
-    <div class="ghd">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="tile" style="background:${col};width:32px;height:32px;border-radius:10px;
-          color:#fff;font-weight:800;font-size:12.5px;letter-spacing:-.02em">${ini}</div>
-        <span class="lb" style="font-size:14.5px;color:var(--t1)">${nm}</span></div>
-      <span class="pill ${ok?"pg1":"pr1"}">${ok?"Mínimo OK":"Faltam "+MT(short,false)}</span></div>
-    ${lines}
-    <div class="mm"><div class="mt"><span>Subtotal</span><b>${MT(sub,false)}</b></div></div>
-  </div>`;
-  if(phase===1) return v("Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD",
-    prod("Amoxicilina 500 mg","cx 21",4,1648,P1)+prod("Paracetamol 500 mg","cx 20",10,585,P2)+
-    prod("Omeprazol 20 mg","cx 14",6,1176,P3),3000.5,true)
-    + `<div class="grp"><div class="gbd" style="padding-top:14px">
-       <button class="btn" type="button">Finalizar pedido</button></div></div>`;
-  return v("Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD",
-      prod("Amoxicilina 500 mg","cx 21",4,1648,P1),1648,true)
-   + v("MozPharma","linear-gradient(140deg,#FFB43D,#E8701A)","MP",
-      prod("Paracetamol 500 mg","cx 20",10,585,P2),585,false,1915)
-   + v("EMS Pharma","linear-gradient(140deg,#8B6BFF,#5C3ADB)","EP",
-      prod("Omeprazol 20 mg","cx 14",6,1176,P3),1176,true);
-}
-
-function sup(){
-  const s = (n,nm,col,ini,fresh,fill,disp,best) => `
-  <div class="it" style="${best?"background:color-mix(in srgb,var(--green) 7%,transparent)":""}">
-    <div class="tile" style="background:${col};color:#fff;font-weight:800;font-size:13px">${ini}</div>
-    <div class="tx"><b>${n} · ${nm}</b><span>Satisfação ${fill} · expedição ${disp}</span></div>
-    <div class="rt"><div class="p" style="font-size:13.5px;color:var(--orange)">${fresh}</div>
-      <div class="q">stock</div></div></div>`;
-  const head = `
-  <div class="hero o">
-    <div class="k">Preço regulado por lei</div>
-    <div class="v">${MT(412,false)}</div>
-    <div class="u">MT · Amoxicilina 500 mg · cx 21</div>
-    <div class="row"><span class="hpill">Igual em todos os fornecedores</span></div>
-  </div>`;
-  if(phase===1) return head + `
-  <div class="grp">
-    ${s("1","Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD","há 2 h","94 %","&lt; 12 h",true)}
-    <div class="tip"><b>Diploma Ministerial 21/2017</b> fixa o preço. Nenhum fornecedor pode vender acima ou abaixo.</div>
-    <div class="gbd" style="padding-top:0"><button class="btn" type="button">Adicionar ao carrinho</button></div>
-  </div>`;
-  return head + `
-  <div class="grp">
-    ${s("1","EMS Pharma","linear-gradient(140deg,#8B6BFF,#5C3ADB)","EP","há 40 min","97 %","&lt; 6 h",true)}
-    ${s("2","Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD","há 2 h","94 %","&lt; 12 h")}
-    ${s("3","MozPharma","linear-gradient(140deg,#FFB43D,#E8701A)","MP","há 19 h","88 %","&lt; 24 h")}
-    <div class="tip"><b>Porquê esta ordem?</b> O preço é igual por lei. Ordenamos por frescura do stock, quantidade confirmada, satisfação e expedição. <b>Ninguém paga para subir.</b></div>
-  </div>`;
-}
-
-function trk(){
-  return `
-  <div class="hero o">
-    <div class="k">Chegada prevista</div>
-    <div class="v" style="font-size:34px">14:00–16:00</div>
-    <div class="u">Hoje · a janela estreita a cada etapa</div>
-    <div class="row"><span class="hpill">RQ-2041-A</span><span class="hpill">Ahmed Distribuição</span></div>
-  </div>
-  <div class="grp">
-    <div class="ghd"><span class="lb">Estado do pedido</span><span class="pill po1">A preparar</span></div>
-    <div class="tl">
-      <div class="tls done"><div class="tlp">${I.ck}</div>
-        <div><div class="lb">Pedido aceite</div><div class="sb2">09:41 · 3 de 3 linhas</div></div></div>
-      <div class="tls now"><div class="tlp">${I.bx}</div>
-        <div><div class="lb">Em preparação</div><div class="sb2">10:12 · lote e validade</div></div></div>
-      <div class="tls todo"><div class="tlp">${I.tr}</div>
-        <div><div class="lb">A caminho</div><div class="sb2">previsto 12:30</div></div></div>
-      <div class="tls todo"><div class="tlp">${I.ck}</div>
-        <div><div class="lb">Conferir e receber</div><div class="sb2">linha a linha</div></div></div>
-    </div>
-  </div>
-  ${phase===2?`<div class="grp">
-    <div class="ghd"><span class="lb">RQ-2041-B · MozPharma</span><span class="pill pr1">Aguarda</span></div>
-    <div class="tip">Prazo de resposta termina às <b>13:41</b>. Cada fornecedor segue o seu caminho — um atraso aqui não trava o pedido A.</div>
-  </div>`:""}`;
-}
-
-function pan(){
-  const m = [["Amoxicilina 500 mg",100,"+38 %","var(--blue)"],
-    ["Paracetamol 500 mg",74,"+21 %","var(--orange)"],
-    ["Sais de reidratação",61,"+64 %","var(--teal)"],
-    ["Artemeter/Lumefantrina",47,"+12 %","var(--pink)"],
-    ["Omeprazol 20 mg",22,"−4 %","var(--purple)"]]
-    .map(([n,p,d,c])=>`<div><div class="h"><span>${E(n)}</span><i style="color:${c}">${E(d)}</i></div>
-      <div class="trk"><i style="width:${p}%;background:${c}"></i></div></div>`).join("");
-  return `
-  <div class="st2">
-    <div class="stc"><div class="ic" style="background:var(--blue)">${I.wal}</div>
-      <div class="k">Gasto 30 dias</div><div class="v">${MT(84210,false)}</div><div class="n">11 pedidos</div></div>
-    <div class="stc"><div class="ic" style="background:var(--red)">${I.bolt}</div>
-      <div class="k">Crédito aberto</div><div class="v">${MT(21400,false)}</div><div class="n">2 fornecedores</div></div>
-    <div class="stc"><div class="ic" style="background:var(--green)">${I.shd}</div>
-      <div class="k">Ruturas evitadas</div><div class="v">7</div><div class="n">avisos aceites</div></div>
-    <div class="stc"><div class="ic" style="background:var(--orange)">${I.cl}</div>
-      <div class="k">Prazo médio</div><div class="v">6,4</div><div class="n">horas</div></div>
-  </div>
-  <div class="grp">
-    <div class="ghd"><span class="lb">Procura prevista · 14 dias</span><span class="pill pb1">Bairro</span></div>
-    <div class="mtr">${m}</div>
-    <div class="tip">Variação face às suas vendas. Sinal do bairro agregado — nunca dados de doentes.</div>
-  </div>
-  <div class="grp">
-    <div class="ghd"><span class="lb">A notar</span><span class="pill pg1">Poupa ${MT(250,false)}</span></div>
-    <div class="tip">Compra <b>Amoxicilina</b> a crédito mas <b>Paracetamol</b> sempre a pronto. Juntando os dois no mesmo pedido, atinge o mínimo e poupa <b>${MT(250)}</b> de entrega por semana.</div>
-    <div class="gbd" style="padding-top:0"><button class="btn s" type="button">Criar pedido sugerido</button></div>
-  </div>`;
-}
-
-const NAV=[["chat","Conversa",I.chat],["cart","Pedidos",I.bag],["trk","Entrega",I.tr],["sup","Catálogo",I.cat],["pan","Painel",I.chart]];
-const R={chat,cart,sup,trk,pan};
-const T={chat:["Conversa","Farmácia Nhlamankulo"],cart:["Carrinho","3 produtos"],
-  sup:["Fornecedores","Amoxicilina 500 mg"],trk:["Entrega","RQ-2041"],pan:["Painel","30 dias"]};
-
-const NOTES={
- chat:[["المحادثة هي المنتج","الصيدلي بيبعت قائمته زي واتساب بالظبط، والنظام يرجّع عرض سعر مرقّم <b>جوّه نفس الخيط</b>. مفيش شاشة جديدة يتعلمها.",
-  "المفتاح <code>primary_interface</code> بيقرر: محادثة أولاً ولا تطبيق تقليدي. الاتنين مبنيين."],
-  ["سؤال المطابقة","«panadol 500» مش اسم في الـ<code>Index</code>. بدل ما النظام يخمّن ويطلّع تركيز غلط، بيسأل <b>مرة واحدة</b> — والإجابة تدخل قاموس المرادفات للأبد."]],
- cart:[["نفس الشاشة في الطورين","الطور الأول كارت واحد، التاني تلاتة. <code>vendor_mode</code> مفتاح مش إعادة بناء."],
-  ["الحد الأدنى شرط المورّد","لما مايتحققش، الصيدلي بيشوف كام ناقص بالظبط — والحد ده شرط تجاري للمورّد مش إعداد للصيدلية."]],
- sup:[["السعر مش ساحة منافسة","<b>Diploma Ministerial 21/2017</b> بيثبّت السعر. الموردين بنفس الرقم حرفياً — فحطّيناه في الهيدر مرة واحدة بدل ما نكرره جنب كل مورّد ونوحي بفرق مش موجود."],
-  ["البرتقالي للوقت","لون واحد محجوز للزمن: نضارة المخزون، البث، الوصول. لأن السعر ماينفعش يفرّق، الوقت هو المنافسة الوحيدة."],
-  ["الترتيب مشروح ومش للبيع","المادة 94: الترتيب مايتشتراش. وهنا مشكلة الطور التاني — أحمد بيدفعلك وإنت بترتّبه. الحل: محرك الترتيب <b>أعمى عن الرسوم</b> وتدقيق دوري بيتحقق."]],
- trk:[["وقت وصول صادق","إنت ماتملكش التحضير ولا التوصيل. فالوعد <b>نطاق بيضيق</b> مع كل خطوة مش رقم دقيق كداب. وبنقيس الموعود مقابل الفعلي لكل مورّد."],
-  ["كل مورّد مساره لوحده","تأخّر مورّد مابيوقّفش باقي الطلب. الصيدلي شايف رقم واحد، والنظام بيتابع <code>N</code> طلبات."]],
- pan:[["طبقة الذكاء","«اللي تلاحظه» مش إحصاء — ده <b>قرار</b>: اجمع الصنفين في طلب كاش واحد، توصل للحد الأدنى وتوفّر رسم توصيل.",
-  "بس ده محتاج بيانات <b>صرف</b> مش طلب — وهي في نظام إدارة الصيدليات. يعني تبنّي النظام ده هو المؤشر القائد مش تحميلات التطبيق."],
-  ["خريطة الأمراض","التوقّع من أنماط الصرف <b>مجمّعة بالمنطقة</b>. مفيش ولا سجل مريض — وده اللي بيخلّيها أصلاً مش مسؤولية."]]
+/* ---------------- storage (never required) ---------------- */
+const mem = {};
+const store = {
+  get(k){ try { const v = localStorage.getItem(k); return v === null ? mem[k] : v; }
+          catch(e){ return mem[k]; } },
+  set(k,v){ mem[k] = v; try { localStorage.setItem(k,v); } catch(e){} },
+  del(k){ delete mem[k]; try { localStorage.removeItem(k); } catch(e){} }
 };
 
-function draw(){
-  document.getElementById("bd").innerHTML = R[scr]();
-  const [a,b]=T[scr];
-  document.getElementById("ttl").textContent=a;
-  document.getElementById("sub").textContent=b;
-  document.getElementById("tbn").innerHTML = NAV.map(([k,l,ic])=>
-    `<div data-go="${k}" class="${scr===k?"on":""}">${ic}${l}</div>`).join("");
-  /* app mode has no side-notes column; guard instead of throwing */
-  const _n = document.getElementById("nts");
-  if (_n) {
-    _n.innerHTML = NOTES[scr].map((n,i)=>{
-      const [h,...ps]=n;
-      return `<div class="nt">${i===0?`<span class="tg">${scr} · fase ${phase}</span>`:""}
-        <h3>${h}</h3>${ps.map(p=>`<p>${p}</p>`).join("")}</div>`;
-    }).join("");
+/* ---------------- config ---------------- */
+const DEFAULT_API = "http://127.0.0.1:8099";
+function apiBase(){ return (store.get("api") || DEFAULT_API).replace(/\/+$/,""); }
+
+/* ---------------- state ---------------- */
+const S = {
+  tab: "home",
+  token: store.get("token") || null,
+  me: null,
+  busy: false,
+  err: null,
+  flash: null,
+  cart: [],            // [{product, qty}]
+  search: "",
+  results: null,
+  requests: null,
+  order: null,
+  norm: null,          // normalisation view for a pasted list
+  thread: null,
+  assistant: null,
+  lastRequestId: null
+};
+
+/* ---------------- api ---------------- */
+async function api(path, opts){
+  opts = opts || {};
+  const headers = Object.assign({}, opts.headers || {});
+  if (opts.body !== undefined && !(opts.body instanceof FormData))
+    headers["Content-Type"] = "application/json";
+  if (S.token) headers["Authorization"] = "Bearer " + S.token;
+
+  let res;
+  try {
+    res = await fetch(apiBase() + path, {
+      method: opts.method || "GET",
+      headers,
+      body: opts.body === undefined ? undefined
+            : (opts.body instanceof FormData ? opts.body : JSON.stringify(opts.body))
+    });
+  } catch (e) {
+    throw new Error("Sem ligação ao servidor.\n" + apiBase() + "\n\n" + e.message);
+  }
+
+  if (res.status === 204) return null;
+  const txt = await res.text();
+  let data = null;
+  try { data = txt ? JSON.parse(txt) : null; } catch(e){ data = { raw: txt }; }
+
+  if (!res.ok){
+    if (res.status === 401){ S.token = null; S.me = null; store.del("token"); }
+    const err = (data && data.error) || {};
+    const detail = (err.details || []).map(d => "· " + d.field + ": " + d.reason).join("\n");
+    const e = new Error([err.message || ("HTTP " + res.status), detail].filter(Boolean).join("\n"));
+    e.code = err.code; e.status = res.status; e.rule = err.rule;
+    throw e;
+  }
+  return data;
+}
+
+/* ---------------- helpers ---------------- */
+const esc = s => String(s == null ? "" : s)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+// money stays a string, start to finish
+function MT(v){
+  if (v === null || v === undefined) return "—";
+  const s = String(v);
+  const [i, d] = s.split(".");
+  const grouped = i.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return grouped + "," + (d || "00") + " MT";
+}
+function productName(p){
+  return [p.inn, p.strength, p.form].filter(Boolean).join(" · ")
+       + (p.pack_size ? " (" + p.pack_size + ")" : "");
+}
+const STATUS_PT = {
+  DRAFT:"Rascunho", NORMALIZING:"A ler a lista", AWAITING_CONFIRMATION:"A confirmar",
+  AWAITING_ADMIN_APPROVAL:"A aguardar aprovação", CONFIRMED:"Confirmado",
+  IN_FULFILMENT:"Em execução", CLOSED:"Fechado", CANCELLED:"Cancelado",
+  PENDING_ACCEPTANCE:"A aguardar fornecedor", ACCEPTED:"Aceite", DISPATCHED:"A caminho",
+  DELIVERED_PENDING_RECEIPT:"Entregue — a conferir", RECEIPT_ACCEPTED:"Conferido",
+  DISPUTED:"Em disputa", REJECTED:"Recusado", RETURN_IN_PROGRESS:"Devolução em curso"
+};
+const statusPill = st => {
+  const cls = ({CLOSED:"m", CANCELLED:"m", REJECTED:"r", DISPUTED:"r",
+                CONFIRMED:"g", ACCEPTED:"g", RECEIPT_ACCEPTED:"g",
+                DISPATCHED:"b", IN_FULFILMENT:"b"})[st] || "o";
+  return '<span class="pill ' + cls + '">' + esc(STATUS_PT[st] || st) + "</span>";
+};
+
+/* ---------------- forms ----------------
+   Every action runs through `guard`, and `guard` re-renders immediately to
+   show the spinner. That rebuilds `#main`, which destroys the very inputs the
+   action is about to read — so a login handler read two empty strings and the
+   server answered 401 with correct credentials typed in front of you.
+
+   Caught by the live end-to-end drive, not by reading the code. The fix is to
+   snapshot the form the moment the tap happens, before anything re-renders,
+   and have actions read the snapshot. `restoreForm` then puts the text back
+   after a render so nothing the user typed is lost mid-request. */
+S.form = {};
+
+function snapshotForm(){
+  const f = {};
+  document.querySelectorAll("#main input, #main textarea, #main select")
+    .forEach(el => { if (el.id) f[el.id] = el.value; });
+  S.form = f;
+}
+function restoreForm(){
+  document.querySelectorAll("#main input, #main textarea, #main select")
+    .forEach(el => {
+      if (el.id && S.form[el.id] !== undefined && !el.value) el.value = S.form[el.id];
+    });
+}
+function val(id){
+  if (S.form[id] !== undefined) return S.form[id];
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+function clearField(id){
+  S.form[id] = "";
+  const el = document.getElementById(id);
+  if (el) el.value = "";
+}
+
+/* ---------------- render ---------------- */
+function setBusy(v){ S.busy = v; render(); }
+
+async function guard(fn){
+  S.err = null;
+  setBusy(true);
+  try { await fn(); }
+  catch (e) { S.err = e.message || String(e); }
+  finally { setBusy(false); }
+}
+
+const ICONS = {
+  home:'<path d="M3 10.5 12 3l9 7.5V21H3z"/>',
+  catalogue:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>',
+  orders:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+  chat:'<path d="M21 12a8 8 0 1 1-3.2-6.4"/><path d="M21 4v5h-5"/>',
+  panel:'<path d="M4 20V10M10 20V4M16 20v-7M22 20v-4"/>'
+};
+const TABS = [
+  ["home","Início"], ["catalogue","Catálogo"], ["orders","Pedidos"],
+  ["chat","Conversa"], ["panel","Painel"]
+];
+
+function renderTabs(){
+  const bar = document.getElementById("tabbar");
+  if (!bar) return;
+  if (!S.token){ bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  bar.innerHTML = TABS.map(([id,label]) =>
+    '<button data-tab="' + id + '" class="' + (S.tab === id ? "on" : "") + '">' +
+      '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + ICONS[id] + "</svg>" +
+      "<span>" + label + "</span></button>"
+  ).join("");
+}
+
+function render(){
+  const main = document.getElementById("main");
+  if (!main) return;
+  try {
+    main.innerHTML =
+      (S.err   ? '<div class="err">'  + esc(S.err)   + "</div>" : "") +
+      (S.flash ? '<div class="ok">'   + esc(S.flash) + "</div>" : "") +
+      (S.token ? VIEW[S.tab]() : loginView());
+  } catch (e) {
+    // rule 3: a broken screen still shows why, and the app stays alive
+    main.innerHTML = '<div class="err">Erro ao desenhar o ecrã:\n' + esc(e.message) + "</div>";
+  }
+  restoreForm();
+  renderTabs();
+  if (S.scrollTo){
+    const target = document.getElementById(S.scrollTo);
+    S.scrollTo = null;
+    if (target) target.scrollIntoView({ behavior:"smooth", block:"start" });
   }
 }
-document.querySelectorAll('[role="tab"]').forEach(b=>b.addEventListener("click",()=>{
-  document.querySelectorAll('[role="tab"]').forEach(x=>x.setAttribute("aria-selected","false"));
-  b.setAttribute("aria-selected","true"); scr=b.dataset.s; draw();
-}));
-function ph(p){phase=p;
-  document.getElementById("p1").setAttribute("aria-pressed",p===1?"true":"false");
-  document.getElementById("p2").setAttribute("aria-pressed",p===2?"true":"false");draw();}
-document.getElementById("p1").addEventListener("click",()=>ph(1));
-document.getElementById("p2").addEventListener("click",()=>ph(2));
-draw();
 
-/* app-mode: bottom tab bar navigates */
-document.getElementById("tbn").addEventListener("click", function(e){
-  var d = e.target.closest("[data-go]");
-  if(!d) return;
-  scr = d.getAttribute("data-go");
-  draw();
-  document.getElementById("bd").scrollTop = 0;
+/* ---------------- login ---------------- */
+function loginView(){
+  return '' +
+  '<h1>PH Store</h1>' +
+  '<p class="sub">Entrar na sua farmácia</p>' +
+  '<div class="card">' +
+    '<label for="ph">Telemóvel</label>' +
+    '<input id="ph" type="text" inputmode="tel" placeholder="+258 84 000 0011" ' +
+      'value="' + esc(store.get("lastPhone") || "") + '">' +
+    '<label for="pw">Palavra-passe</label>' +
+    '<input id="pw" type="password" placeholder="••••••••">' +
+    '<div style="height:16px"></div>' +
+    '<button class="btn g" data-act="login"' + (S.busy ? " disabled" : "") + '>' +
+      (S.busy ? '<span class="spin"></span>' : "Entrar") + "</button>" +
+  "</div>" +
+  '<div class="card">' +
+    '<label for="api">Servidor</label>' +
+    '<input id="api" type="text" value="' + esc(apiBase()) + '">' +
+    '<p class="s" style="margin:8px 0 0">O endereço da API. Mude apenas se a sua equipa lho pediu.</p>' +
+    '<div style="height:12px"></div>' +
+    '<button class="btn ghost sm" data-act="saveApi">Guardar servidor</button> ' +
+    '<button class="btn ghost sm" data-act="ping">Testar ligação</button>' +
+  "</div>";
+}
+
+/* ---------------- home ---------------- */
+function homeView(){
+  const a = S.assistant;
+  return '' +
+  "<h1>Olá</h1>" +
+  '<p class="sub">' + esc(S.me ? (S.me.roles || []).join(" · ") : "") + "</p>" +
+  '<div class="hero">' +
+    '<div class="k">Em dívida aos fornecedores</div>' +
+    '<div class="v">' + (a ? esc(MT(a.outstanding_to_vendors)) : "—") + "</div>" +
+    '<div class="k">' + (a ? esc(a.open_orders + " pedido(s) em curso") : "a carregar…") + "</div>" +
+  "</div>" +
+  (a ? '<div class="card">' +
+      '<div class="row"><span class="t">Pedidos abertos</span><span>' + a.open_requests + "</span></div>" +
+      '<div class="row"><span class="t">Encomendas em curso</span><span>' + a.open_orders + "</span></div>" +
+      '<div class="row"><span class="t">Disputas</span><span>' + a.open_disputes + "</span></div>" +
+      '<div class="row"><span class="t">Devoluções</span><span>' + a.open_returns + "</span></div>" +
+      '<p class="s" style="margin:12px 0 0">Calculado de: ' + esc(a.basis.source) + "</p>" +
+    "</div>"
+   : '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "Sem dados") + "</div>") +
+  '<div class="card">' +
+    '<span class="t">Enviar uma lista</span>' +
+    '<p class="s">Cole a lista como a escreve no WhatsApp — um produto por linha.</p>' +
+    '<textarea id="paste" placeholder="Amoxicilina 500 mg 21&#10;Paracetamol 500&#10;..."></textarea>' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn" data-act="paste"' + (S.busy ? " disabled" : "") + ">Enviar lista</button>" +
+  "</div>" +
+  (S.norm ? normBlock() : "");
+}
+
+function normBlock(){
+  const n = S.norm;
+  const lines = n.lines.map(l => {
+    if (l.match_status === "AUTO" || l.match_status === "RESOLVED")
+      return '<div class="row"><span><span class="t">' + esc(l.source_span || "") + "</span>" +
+             '<br><span class="s">Identificado</span></span>' +
+             '<span class="pill g">OK</span></div>';
+    const cands = (l.candidates || []).map(c =>
+      '<button class="chip" data-act="resolve" data-line="' + esc(l.id) + '" data-prod="' + esc(c.id) + '">' +
+      esc(productName(c)) + "</button>").join("");
+    return '<div class="row" style="display:block">' +
+      '<div class="row" style="margin:0;padding:0;border:0">' +
+        '<span class="t">' + esc(l.source_span || "") + "</span>" +
+        '<span class="pill ' + (l.match_status === "ASK" ? "o" : "r") + '">' +
+        (l.match_status === "ASK" ? "Confirmar" : "Não encontrado") + "</span>" +
+      "</div>" +
+      '<p class="s" style="margin:6px 0">' +
+        (cands ? "Qual destes?" : "Nada no índice corresponde a esta linha.") + "</p>" +
+      cands +
+      '<button class="chip" data-act="dropline" data-line="' + esc(l.id) + '">Remover linha</button>' +
+    "</div>";
+  }).join("");
+
+  return '<div class="card" id="normblock">' +
+    '<div class="row" style="margin:0;padding:0;border:0">' +
+      '<span class="t">' + esc(n.request.number) + "</span>" + statusPill(n.request.status) +
+    "</div>" +
+    '<p class="s">Nada avança enquanto uma linha estiver por decidir.</p>' +
+    lines +
+    '<div style="height:12px"></div>' +
+    (n.can_complete_normalisation
+      ? '<button class="btn g" data-act="normdone">Confirmar lista</button>'
+      : '<button class="btn" disabled>' + n.blocking_line_ids.length + " linha(s) por decidir</button>") +
+  "</div>";
+}
+
+/* ---------------- catalogue ---------------- */
+function catalogueView(){
+  const cartCount = S.cart.reduce((n,i) => n + i.qty, 0);
+  const results = S.results;
+  return '' +
+  "<h1>Catálogo</h1>" +
+  '<p class="sub">' + (cartCount ? cartCount + " item(ns) no carrinho" : "Procure por nome ou substância") + "</p>" +
+  '<div class="card">' +
+    '<input id="q" type="search" placeholder="Paracetamol…" value="' + esc(S.search) + '">' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn" data-act="search"' + (S.busy ? " disabled" : "") + ">" +
+      (S.busy ? '<span class="spin"></span>' : "Procurar") + "</button>" +
+  "</div>" +
+  (results === null ? ""
+   : results.length === 0 ? '<div class="card empty">Nada encontrado.</div>'
+   : results.map(p => {
+      const inCart = S.cart.find(i => i.product.id === p.id);
+      return '<div class="card">' +
+        '<div class="row" style="margin:0;padding:0;border:0">' +
+          '<span><span class="t">' + esc(productName(p)) + "</span><br>" +
+          '<span class="s">' + (p.fresh_offer_count || 0) + " oferta(s)" +
+          (p.regulated_price ? " · preço regulado" : "") + "</span></span>" +
+        "</div>" +
+        '<div style="height:10px"></div>' +
+        (inCart
+          ? '<div class="qty">' +
+              '<button data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
+              "<span>" + inCart.qty + "</span>" +
+              '<button data-act="inc" data-id="' + esc(p.id) + '">+</button>' +
+            "</div>"
+          : '<button class="btn ghost sm" data-act="add" data-id="' + esc(p.id) + '">Adicionar</button>') +
+      "</div>";
+   }).join("")) +
+  (S.cart.length ? '<div class="card">' +
+      '<span class="t">Carrinho</span>' +
+      S.cart.map(i => '<div class="row"><span class="s">' + esc(productName(i.product)) +
+        "</span><span>" + i.qty + "</span></div>").join("") +
+      '<div style="height:12px"></div>' +
+      '<button class="btn g" data-act="checkout"' + (S.busy ? " disabled" : "") + ">" +
+        (S.busy ? '<span class="spin"></span>' : "Fazer pedido") + "</button>" +
+    "</div>" : "");
+}
+
+/* ---------------- orders ---------------- */
+function ordersView(){
+  if (S.order) return orderDetail();
+  const rs = S.requests;
+  return '' +
+  "<h1>Pedidos</h1>" +
+  '<p class="sub">Os seus pedidos, do mais recente</p>' +
+  '<button class="btn ghost sm" data-act="reloadOrders">Actualizar</button>' +
+  '<div style="height:12px"></div>' +
+  (rs === null ? '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "—") + "</div>"
+   : rs.length === 0 ? '<div class="card empty">Ainda sem pedidos.</div>'
+   : rs.map(r => '<div class="card" data-act="openReq" data-id="' + esc(r.id) + '">' +
+        '<div class="row" style="margin:0;padding:0;border:0">' +
+          '<span><span class="t">' + esc(r.number) + "</span><br>" +
+          '<span class="s">' + esc(r.channel) + " · " + (r.line_count || 0) + " linha(s)</span></span>" +
+          statusPill(r.status) +
+        "</div>" +
+      "</div>").join(""));
+}
+
+function orderDetail(){
+  const o = S.order;
+  const orders = o.orders || [];
+  return '' +
+  '<button class="btn ghost sm" data-act="backOrders">← Voltar</button>' +
+  '<div style="height:12px"></div>' +
+  "<h1>" + esc(o.number) + "</h1>" +
+  '<p class="sub">' + esc(STATUS_PT[o.status] || o.status) + "</p>" +
+  '<div class="card">' +
+    '<span class="t">Linhas</span>' +
+    (o.lines || []).map(l => '<div class="row"><span class="s">' +
+      esc(l.source_span || l.index_product_id || "—") + "</span><span>" +
+      l.qty_requested + "</span></div>").join("") +
+  "</div>" +
+  (orders.length ? orders.map(x => '<div class="card">' +
+      '<div class="row" style="margin:0;padding:0;border:0">' +
+        '<span class="t">' + esc(x.number || x.id) + "</span>" + statusPill(x.status) +
+      "</div>" +
+      '<div class="row"><span class="s">Mercadoria</span><span class="t">' +
+        esc(MT(x.goods_total)) + "</span></div>" +
+    "</div>").join("")
+   : '<div class="card empty">Sem encomendas geradas.</div>');
+}
+
+/* ---------------- chat ---------------- */
+function chatView(){
+  const t = S.thread;
+  return '' +
+  "<h1>Conversa</h1>" +
+  '<p class="sub">' +
+    (t ? (t.active_handler === "HUMAN" ? "Está a falar com um colega"
+        : t.active_handler === "ESCALATING" ? "A passar para um colega…"
+        : "Assistente automático") : "a carregar…") + "</p>" +
+  (t ? '<div class="card">' +
+      '<div class="msgs">' +
+        (t.messages.length ? t.messages.map(m =>
+          '<div class="msg ' + (m.sender_type === "PHARMACY" ? "me" : "them") + '">' +
+            '<span class="w">' + esc(m.sender_type === "PHARMACY" ? "Você" :
+                                     m.sender_type === "AGENT" ? "PH Store" : "Sistema") + "</span>" +
+            esc(m.body) + "</div>").join("")
+         : '<div class="empty">Sem mensagens ainda.</div>') +
+      "</div>" +
+      '<div class="composer">' +
+        '<textarea id="msg" placeholder="Escreva aqui…"></textarea>' +
+        '<button class="btn sm g" data-act="send">Enviar</button>' +
+      "</div>" +
+      (t.active_handler === "BOT"
+        ? '<div style="height:10px"></div>' +
+          '<button class="btn ghost sm" data-act="escalate">Falar com uma pessoa</button>' : "") +
+    "</div>"
+   : '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "—") + "</div>");
+}
+
+/* ---------------- panel ---------------- */
+function panelView(){
+  const a = S.assistant;
+  return '' +
+  "<h1>Painel</h1>" +
+  '<p class="sub">Sobre a sua farmácia</p>' +
+  '<div class="card">' +
+    '<span class="t">Pergunte</span>' +
+    '<p class="s">Ex.: «quando vou ficar sem stock?»</p>' +
+    '<input id="ask" type="text" placeholder="A sua pergunta…">' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn" data-act="ask"' + (S.busy ? " disabled" : "") + ">Perguntar</button>" +
+    (S.askResult ? '<div style="height:12px"></div>' +
+      '<p class="s">Respondido por: <code>' + esc(S.askResult.answered_by || "—") + "</code></p>" +
+      (S.askResult.message_pt ? '<p class="s">' + esc(S.askResult.message_pt) + "</p>" : "") : "") +
+  "</div>" +
+  (a ? '<div class="card">' +
+      '<span class="t">Resumo</span>' +
+      '<div class="row"><span class="s">Em dívida</span><span class="t">' +
+        esc(MT(a.outstanding_to_vendors)) + "</span></div>" +
+      '<div class="row"><span class="s">Pedidos abertos</span><span>' + a.open_requests + "</span></div>" +
+    "</div>" : "") +
+  '<div class="card">' +
+    '<span class="t">Sessão</span>' +
+    '<p class="s">' + esc(S.me ? S.me.user_id : "") + "<br>" + esc(apiBase()) + "</p>" +
+    '<div style="height:10px"></div>' +
+    '<button class="btn ghost" data-act="logout">Sair</button>' +
+  "</div>";
+}
+
+const VIEW = { home:homeView, catalogue:catalogueView, orders:ordersView, chat:chatView, panel:panelView };
+
+/* ---------------- loaders ---------------- */
+async function loadHome(){
+  S.assistant = await api("/v1/assistant/summary");
+}
+async function loadOrders(){
+  const r = await api("/v1/requests?limit=50");
+  S.requests = r.items;
+}
+async function loadThread(){
+  S.thread = await api("/v1/support/threads/me");
+}
+async function afterLogin(){
+  S.me = await api("/v1/auth/me");
+  await loadHome();
+}
+
+/* ---------------- actions ---------------- */
+const ACT = {
+  async login(){
+    const phone = val("ph");
+    const pw = val("pw");
+    const apiVal = val("api");
+    if (apiVal) store.set("api", apiVal.trim());
+    const out = await api("/v1/auth/login", {
+      method:"POST", body:{ phone: phone.trim(), password: pw, surface:"PH" }
+    });
+    S.token = out.access_token;
+    store.set("token", S.token);
+    store.set("lastPhone", phone.trim());
+    await afterLogin();
+    S.tab = "home";
+  },
+  async saveApi(){
+    const v = val("api").trim();
+    if (v) store.set("api", v);
+    S.flash = "Servidor guardado.";
+  },
+  async ping(){
+    const r = await fetch(apiBase() + "/healthz");
+    const j = await r.json();
+    S.flash = "Servidor OK · " + (j.status || "?");
+  },
+  async logout(){
+    S.token = null; S.me = null; store.del("token");
+    S.cart = []; S.results = null; S.requests = null; S.thread = null;
+    S.assistant = null; S.norm = null; S.order = null; S.form = {};
+  },
+
+  async paste(){
+    const body = val("paste");
+    if (!body.trim()) throw new Error("Escreva pelo menos uma linha.");
+    const out = await api("/v1/intake/text", {
+      method:"POST", body:{ body: body, channel:"WHATSAPP_TEXT" }
+    });
+    S.lastRequestId = out.id;
+    S.norm = await api("/v1/intake/" + out.id);
+    S.scrollTo = "normblock";   // the block lands below the fold otherwise
+    clearField("paste");
+  },
+  async resolve(el){
+    await api("/v1/request-lines/" + el.dataset.line + "/resolve", {
+      method:"POST", body:{ index_product_id: el.dataset.prod }
+    });
+    S.norm = await api("/v1/intake/" + S.lastRequestId);
+    S.scrollTo = "normblock";
+  },
+  async dropline(el){
+    await api("/v1/request-lines/" + el.dataset.line, { method:"DELETE" });
+    S.norm = await api("/v1/intake/" + S.lastRequestId);
+    S.scrollTo = "normblock";
+  },
+  async normdone(){
+    await api("/v1/requests/" + S.lastRequestId + "/normalization-complete", { method:"POST" });
+    await api("/v1/requests/" + S.lastRequestId + "/confirm", { method:"POST" });
+    S.flash = "Lista confirmada.";
+    S.norm = null;
+    await loadOrders();
+    S.tab = "orders";
+  },
+
+  async search(){
+    S.search = val("q");
+    if (!S.search.trim()){ S.results = []; return; }
+    const out = await api("/v1/catalogue/search?q=" + encodeURIComponent(S.search.trim()));
+    S.results = out.items;
+  },
+  async add(el){
+    const p = (S.results || []).find(x => x.id === el.dataset.id);
+    if (p) S.cart.push({ product: p, qty: 1 });
+  },
+  async inc(el){
+    const i = S.cart.find(x => x.product.id === el.dataset.id);
+    if (i) i.qty += 1;
+  },
+  async dec(el){
+    const i = S.cart.find(x => x.product.id === el.dataset.id);
+    if (!i) return;
+    i.qty -= 1;
+    if (i.qty <= 0) S.cart = S.cart.filter(x => x !== i);
+  },
+  async checkout(){
+    if (!S.cart.length) throw new Error("O carrinho está vazio.");
+    const req = await api("/v1/requests", {
+      method:"POST", body:{ mode:"CATALOGUE", allocation_strategy:"FEWEST_VENDORS" }
+    });
+    for (const item of S.cart){
+      await api("/v1/requests/" + req.id + "/lines", {
+        method:"POST", body:{ index_product_id: item.product.id, qty_requested: item.qty }
+      });
+    }
+    // the key is tied to this basket, so a retry replays instead of duplicating
+    const key = "co-" + req.id;
+    const out = await api("/v1/requests/" + req.id + "/checkout", {
+      method:"POST", headers:{ "Idempotency-Key": key }, body:{}
+    });
+    const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
+    S.flash = "Pedido criado: " + (out.orders || []).length + " encomenda(s) · " + total;
+    S.cart = [];
+    await loadOrders();
+    S.tab = "orders";
+  },
+
+  async reloadOrders(){ await loadOrders(); },
+  async openReq(el){ S.order = await api("/v1/requests/" + el.dataset.id); },
+  async backOrders(){ S.order = null; },
+
+  async send(){
+    const body = val("msg").trim();
+    if (!body) throw new Error("Escreva uma mensagem.");
+    await api("/v1/support/threads/me/messages", { method:"POST", body:{ body: body, channel:"APP" } });
+    clearField("msg");
+    await loadThread();
+  },
+  async escalate(){
+    await api("/v1/support/threads/me/escalate", { method:"POST" });
+    await loadThread();
+  },
+
+  async ask(){
+    const q = val("ask").trim();
+    if (!q) throw new Error("Escreva uma pergunta.");
+    S.askResult = await api("/v1/assistant/ask", { method:"POST", body:{ question: q } });
+  }
+};
+
+/* ---------------- events ---------------- */
+document.addEventListener("click", function(ev){
+  const tabBtn = ev.target.closest && ev.target.closest("[data-tab]");
+  if (tabBtn){
+    S.tab = tabBtn.dataset.tab;
+    S.err = null; S.flash = null; S.order = null;
+    render();
+    if (S.tab === "orders" && S.requests === null) guard(loadOrders);
+    if (S.tab === "chat"   && S.thread   === null) guard(loadThread);
+    if ((S.tab === "home" || S.tab === "panel") && S.assistant === null) guard(loadHome);
+    return;
+  }
+  const el = ev.target.closest && ev.target.closest("[data-act]");
+  if (!el) return;
+  const fn = ACT[el.dataset.act];
+  if (!fn) return;
+  ev.preventDefault();
+  snapshotForm();          // before guard() re-renders and destroys the inputs
+  S.flash = null;
+  guard(() => fn(el));
 });
-(function tick(){
-  var n = new Date();
-  document.getElementById("clk").textContent =
-    n.getHours() + ":" + String(n.getMinutes()).padStart(2,"0");
-  setTimeout(tick, 20000);
-})();
+
+/* ---------------- boot ---------------- */
+function tick(){
+  const c = document.getElementById("clock");
+  if (c){
+    const d = new Date();
+    c.textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+}
+tick(); setInterval(tick, 20000);
+
+render();
+if (S.token) guard(afterLogin);
 </script>
 </body>
 </html>

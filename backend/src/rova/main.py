@@ -8,12 +8,14 @@ prefixes already written into rows. The brand lives in `APP_TITLE`; the
 codename lives in the import path. Nothing user-facing says `ROVA`.
 """
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from rova.admin.router import router as admin_router
 from rova.assistant.router import router as assistant_router
 from rova.auth.router import router as auth_router
 from rova.billing.router import router as billing_router
 from rova.catalogue.router import router as catalogue_router
+from rova.config import get_settings
 from rova.core.errors import install_error_handlers
 from rova.core.json_encoding import install_decimal_string_encoder
 from rova.domain.hooks import wire as wire_hooks
@@ -34,6 +36,21 @@ APP_VERSION = "1.0.0"
 
 def create_app() -> FastAPI:
     app = FastAPI(title=APP_TITLE, version=APP_VERSION)
+
+    # The Android client's page origin is the literal `null` (it is loaded
+    # from file:///android_asset/), which only a wildcard matches.
+    # `allow_credentials` is False and must stay False: this API carries its
+    # token in an Authorization header, never a cookie, so there is nothing
+    # for a browser to attach automatically to a cross-origin request.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=get_settings().cors_origin_list(),
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["*"],
+        expose_headers=["Idempotency-Replayed"],
+    )
+
     install_error_handlers(app)
     install_decimal_string_encoder()  # B fix 1b — Decimal (money and otherwise) is a JSON string, never a number
     wire_hooks()

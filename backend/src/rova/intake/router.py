@@ -473,10 +473,18 @@ def drop_line(line_id: str,
 
 @router.post("/requests/{request_id}/normalization-complete")
 def normalization_complete(request_id: str,
-                           principal: Principal = Depends(require_roles(*_OPS)),
+                           principal: Principal = Depends(require_roles(*(_PHARMACY + _OPS))),
                            session: Session = Depends(get_session, scope="function")):
     """SM-01 NORMALIZATION_COMPLETE — refused while any line is still
-    unresolved, and refused on an empty basket."""
+    unresolved, and refused on an empty basket.
+
+    Open to the pharmacy itself, not only to ops. The pharmacy resolves its
+    own `ASK` lines through `/request-lines/{id}/resolve`; requiring an ops
+    agent to then press one more button would put a human in the loop on
+    every single WhatsApp order for no added safety — the guard below, not
+    the caller's role, is what actually protects the basket. The transition
+    is applied as SYSTEM because that is the only actor SM-01 accepts for it.
+    """
     _request_or_404(session, request_id, principal)
     rows = session.execute(
         text("SELECT match_status FROM request_line WHERE request_id=:r"), {"r": request_id}
