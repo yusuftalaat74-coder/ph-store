@@ -1,0 +1,112 @@
+# PH Store
+
+منصّة توريد أدوية `B2B` للصيدليات في موزمبيق — مابوتو ومَتولا أولاً.
+
+## ما في هذا المستودع
+
+```
+backend/     الواجهة الخلفية — Python 3.11 · FastAPI · PostgreSQL 16
+apps/ui/     واجهة التطبيق (HTML مستقل، مصدر ما يُحزَم داخل الـ APK)
+apps/*.apk   نسخة قابلة للتثبيت
+docs/        حقيبة التسليم — فريق التطوير، المستثمر، المورّد، الاختبارات الميدانية
+```
+
+## الحالة
+
+```
+201  نقطة API حيّة
+332  اختبار — كلها ناجحة
+67   جدول في قاعدة البيانات (66 + alembic_version)
+17   آلة حالة
+```
+
+## التشغيل في دقيقتين
+
+```bash
+cd backend
+pip install -e .
+
+createdb phstore_dev
+
+export ROVA_DATABASE_URL="postgresql+psycopg://postgres:postgres@localhost:5432/phstore_dev"
+export ROVA_JWT_SECRET="a-secret-of-at-least-32-bytes-please"
+
+python3 -m alembic upgrade head
+python3 -m rova.cli seed
+python3 -m uvicorn --factory rova.main:create_app --port 8099
+```
+
+ثم افتح:
+
+```
+http://localhost:8099/docs
+```
+
+كلمة مرور كل الحسابات المبذورة:
+
+```
+rova-demo
+```
+
+## الاختبارات
+
+```bash
+cd backend
+python3 -m pytest -q
+```
+
+تحتاج `PostgreSQL` يعمل محلياً على المنفذ `5432` بمستخدم `postgres` وكلمة مرور
+`postgres` — الاختبارات تنشئ قاعدة بيانات خاصة بها وتحذفها بعدها.
+
+## تحديث جرد النقاط
+
+`backend/docs/endpoints.csv` ملف مُلزِم لا توثيقاً حراً: اختبار
+`tests/api/test_endpoint_inventory.py` يقارنه بمخطط `OpenAPI` الحيّ ويفشل عند
+أي فرق. بعد إضافة أو حذف مسار:
+
+```bash
+cd backend
+python3 scripts/regen_endpoints.py
+```
+
+## الاسم الكودي
+
+المنتج اسمه **PH Store**. الشيفرة تحتفظ بالاسم الكودي القديم في:
+
+```
+rova/            حزمة Python ومسارات الاستيراد
+ROVA_*           بادئة متغيّرات البيئة
+mz.rova.store    معرّف حزمة أندرويد
+req_ / ord_ /…   بادئات معرّفات قاعدة البيانات
+```
+
+هذا مقصود. تغييرها يلمس كل وحدة وكل ترحيل بلا مكسب وظيفي؛ والترحيلات أحادية
+الاتجاه فلا يمكن تغيير بادئة معرّف مكتوب في صفوف قائمة. كما أن تغيير معرّف حزمة
+أندرويد يجعل النسخة الجديدة تطبيقاً منفصلاً على الهاتف بدل أن تحدّث القديم. لا
+شيء يراه المستخدم يقول `ROVA`.
+
+## الضمانات البنيوية
+
+هذه مفروضة على مستوى قاعدة البيانات لا على مستوى الشيفرة — أي أنها تصمد حتى لو
+أخطأ كود جديد:
+
+- سعر مورّد على دواء مسعَّر حكومياً **غير قابل للتمثيل**: مفتاح خارجي مركّب إلى
+  `index_product(id, regulated_price)` مع قيود `CHECK`.
+- أربعة سجلات لا تُعدَّل ولا تُحذف (`rova_forbid_mutation()`):
+
+```
+ledger_entry
+audit_event
+state_transition
+traceability_event
+```
+
+- فاتورة بضاعة صادرة من المنصّة **غير قابلة للتمثيل**: `organisation.type`
+  ليس فيه قيمة `PLATFORM`.
+- صفر مفاتيح خارجية بين جداول الرسوم وجداول الفواتير.
+
+## اقرأ أولاً
+
+```
+docs/00-اقرأني-أولاً.md
+```

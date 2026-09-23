@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#EFEDE8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100F0D" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>PH Store</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap">
+<style>
+:root{
+  --page:#EFEDE8; --card:#FFFFFF; --card2:#F7F6F2; --sep:#E7E4DC;
+  --t1:#14130F; --t2:#5E5B52; --t3:#949084;
+  --blue:#0A7AFF; --green:#17A34A; --teal:#0FA5A0; --orange:#F08222;
+  --pink:#E8447A; --purple:#7B5CF0; --red:#E23B37; --amber:#E8A317;
+  --shade:0 1px 2px rgba(20,19,15,.05), 0 8px 22px -10px rgba(20,19,15,.16);
+  --shade-lg:0 2px 6px rgba(20,19,15,.06), 0 22px 44px -18px rgba(20,19,15,.26);
+  --ui:"Figtree",system-ui,-apple-system,sans-serif;
+  --ar:"IBM Plex Sans Arabic","Figtree",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --page:#100F0D; --card:#1B1A17; --card2:#232219; --sep:#2C2A25;
+    --t1:#F6F4EF; --t2:#ADA99D; --t3:#7E7A6F;
+    --blue:#3D95FF; --green:#3DC46C; --teal:#2FC2BC; --orange:#FF9A45;
+    --pink:#FF6B96; --purple:#9B82FF; --red:#FF5F5A; --amber:#FFBE3D;
+    --shade:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -10px rgba(0,0,0,.7);
+    --shade-lg:0 2px 8px rgba(0,0,0,.55), 0 24px 48px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --page:#100F0D; --card:#1B1A17; --card2:#232219; --sep:#2C2A25;
+  --t1:#F6F4EF; --t2:#ADA99D; --t3:#7E7A6F;
+  --blue:#3D95FF; --green:#3DC46C; --teal:#2FC2BC; --orange:#FF9A45;
+  --pink:#FF6B96; --purple:#9B82FF; --red:#FF5F5A; --amber:#FFBE3D;
+  --shade:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -10px rgba(0,0,0,.7);
+  --shade-lg:0 2px 8px rgba(0,0,0,.55), 0 24px 48px -18px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--t1);font-family:var(--ui);font-size:15px;
+  line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+
+
+/* header */
+
+
+
+.blob svg{width:27px;height:27px}
+
+
+
+
+
+
+
+
+@media (max-width:900px){.stage{grid-template-columns:1fr;gap:30px}}
+
+@media (max-width:900px){.col{position:static}}
+
+
+
+
+
+
+
+/* phone */
+
+.scr{background:var(--page);border-radius:30px;overflow:hidden;height:632px;
+  display:flex;flex-direction:column}
+.sb{display:flex;justify-content:space-between;padding:11px 22px 4px;font-size:12px;
+  font-weight:700;color:var(--t1);letter-spacing:-.01em}
+.nb{padding:6px 18px 12px}
+.nb h2{font-size:29px;font-weight:800;margin:0;letter-spacing:-.035em}
+.nb p{margin:2px 0 0;font-size:13.5px;color:var(--t2);font-weight:500}
+.bd{flex:1;overflow-y:auto;padding:2px 14px 16px;display:flex;flex-direction:column;gap:15px}
+.bd::-webkit-scrollbar{width:0}
+
+/* tab bar */
+.tb{display:flex;background:var(--card);border-top:1px solid var(--sep);padding-bottom:6px}
+.tb div{flex:1;text-align:center;padding:9px 1px 4px;font-size:9.5px;color:var(--t3);
+  font-weight:600;letter-spacing:-.01em}
+.tb div.on{color:var(--green)}
+.tb svg{width:24px;height:24px;display:block;margin:0 auto 3px;pointer-events:none}
+
+/* grouped inset card */
+.grp{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:var(--shade)}
+.ghd{padding:11px 15px 9px;display:flex;justify-content:space-between;align-items:center;
+  gap:10px}
+.ghd .lb{font-size:12.5px;font-weight:800;color:var(--t2);letter-spacing:-.005em}
+.gbd{padding:0 15px 14px;display:flex;flex-direction:column;gap:11px}
+
+/* rows with icon tiles */
+.it{display:flex;align-items:center;gap:12px;padding:11px 15px;border-top:1px solid var(--sep)}
+.it:first-child{border-top:0}
+.tile{width:38px;height:38px;border-radius:11px;flex:none;display:grid;place-items:center;
+  box-shadow:0 3px 8px -2px rgba(20,19,15,.28)}
+.tile svg{width:21px;height:21px}
+.it .tx{flex:1;min-width:0}
+.it .tx b{display:block;font-size:15px;font-weight:700;letter-spacing:-.018em}
+.it .tx span{display:block;font-size:12.5px;color:var(--t2);margin-top:1px;font-weight:500}
+.it .rt{text-align:right;flex:none}
+.it .rt .p{font-size:15.5px;font-weight:800;letter-spacing:-.025em}
+.it .rt .q{font-size:12px;color:var(--t3);font-weight:600;margin-top:1px}
+
+/* hero */
+.hero{border-radius:20px;padding:17px 18px 19px;color:#fff;position:relative;
+  overflow:hidden;box-shadow:0 10px 26px -10px rgba(14,143,107,.6)}
+.hero.g{background:linear-gradient(140deg,#25CC80,#0E9070 55%,#0A7C84)}
+.hero.o{background:linear-gradient(140deg,#FFB43D,#F0801F 55%,#E0631A);
+  box-shadow:0 10px 26px -10px rgba(240,128,31,.6)}
+.hero::after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;
+  background:rgba(255,255,255,.13);top:-88px;right:-52px}
+.hero .k{font-size:12.5px;font-weight:700;opacity:.88;letter-spacing:-.005em}
+.hero .v{font-size:40px;font-weight:900;letter-spacing:-.045em;margin-top:2px;line-height:1.05}
+.hero .u{font-size:14px;font-weight:700;opacity:.9;margin-top:3px}
+.hero .row{display:flex;gap:8px;margin-top:13px;position:relative}
+.hpill{background:rgba(255,255,255,.22);border-radius:9px;padding:6px 11px;
+  font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+
+/* pills */
+.pill{font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:9px;white-space:nowrap;
+  letter-spacing:-.008em}
+.pg1{background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green)}
+.pb1{background:color-mix(in srgb,var(--blue) 15%,transparent);color:var(--blue)}
+.po1{background:color-mix(in srgb,var(--orange) 17%,transparent);color:var(--orange)}
+.pr1{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red)}
+
+/* money */
+.mm{display:flex;flex-direction:column;gap:8px;padding:0 15px 15px}
+.mr{display:flex;justify-content:space-between;font-size:14px;color:var(--t2);font-weight:600}
+.mr b{color:var(--t1);font-weight:700}
+.mt{display:flex;justify-content:space-between;align-items:baseline;padding-top:11px;
+  border-top:1px solid var(--sep)}
+.mt span{font-size:16px;font-weight:800;letter-spacing:-.022em}
+.mt b{font-size:23px;font-weight:900;letter-spacing:-.035em}
+
+/* buttons */
+.btn{font:inherit;font-size:16px;font-weight:800;letter-spacing:-.022em;border:0;
+  border-radius:15px;height:52px;cursor:pointer;width:100%;color:#fff;
+  background:linear-gradient(140deg,#22C77A,#0E9070);
+  box-shadow:0 8px 20px -7px rgba(14,143,107,.6);transition:transform .12s}
+.btn:active{transform:scale(.985)}
+.btn.s{background:var(--card);color:var(--t1);box-shadow:var(--shade)}
+.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btns{display:flex;gap:9px}
+
+/* bubbles */
+.bub{max-width:84%;padding:11px 14px;font-size:15px;line-height:1.42;font-weight:500;
+  letter-spacing:-.015em}
+.bub.a{background:var(--card);border-radius:19px 19px 19px 6px;align-self:flex-start;
+  box-shadow:var(--shade)}
+.bub.b{background:linear-gradient(140deg,#22C77A,#0E9070);color:#fff;
+  border-radius:19px 19px 6px 19px;align-self:flex-end;
+  box-shadow:0 6px 16px -6px rgba(14,143,107,.55)}
+
+/* timeline */
+.tl{padding:2px 15px 15px;display:flex;flex-direction:column}
+.tls{display:grid;grid-template-columns:30px 1fr;gap:12px;padding-bottom:16px;position:relative}
+.tls:last-child{padding-bottom:0}
+.tls::before{content:"";position:absolute;left:14px;top:32px;bottom:-2px;width:2px;
+  background:var(--sep);border-radius:2px}
+.tls:last-child::before{display:none}
+.tls.done::before{background:var(--green)}
+.tlp{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;
+  background:var(--sep);position:relative;z-index:1}
+.tlp svg{width:16px;height:16px}
+.tls.done .tlp{background:var(--green);box-shadow:0 4px 10px -3px color-mix(in srgb,var(--green) 70%,transparent)}
+.tls.now .tlp{background:var(--orange);box-shadow:0 4px 10px -3px color-mix(in srgb,var(--orange) 70%,transparent)}
+.tls .lb{font-size:15px;font-weight:700;letter-spacing:-.018em;padding-top:4px}
+.tls .sb2{font-size:12.5px;color:var(--t2);margin-top:1px;font-weight:600}
+.tls.todo .lb{color:var(--t3)}
+
+/* stats */
+.st2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.stc{background:var(--card);border-radius:17px;padding:13px 14px;box-shadow:var(--shade)}
+.stc .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  margin-bottom:9px}
+.stc .ic svg{width:17px;height:17px}
+.stc .k{font-size:12px;color:var(--t2);font-weight:700}
+.stc .v{font-size:24px;font-weight:900;letter-spacing:-.038em;margin-top:1px}
+.stc .n{font-size:11.5px;color:var(--t3);font-weight:600}
+
+.mtr{padding:0 15px 4px;display:flex;flex-direction:column;gap:12px}
+.mtr>div{display:flex;flex-direction:column;gap:6px}
+.mtr .h{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;
+  letter-spacing:-.015em}
+.mtr .h i{font-style:normal;font-weight:800;font-size:13px}
+.trk{height:9px;background:var(--sep);border-radius:5px;overflow:hidden}
+.trk i{display:block;height:100%;border-radius:5px}
+
+.tip{font-size:13px;line-height:1.55;color:var(--t2);font-weight:500;padding:0 15px 15px}
+.tip b{color:var(--t1);font-weight:700}
+
+
+/* notes */
+
+
+
+
+
+.nt p:last-child{margin-bottom:0}
+
+@media (prefers-reduced-motion:reduce){*{transition-duration:1ms!important}}
+
+
+html,body{height:100%;margin:0;overscroll-behavior:none}
+body{background:var(--page);color:var(--t1);font-family:var(--ui);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.011em;
+  display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+.scr{flex:1;display:flex;flex-direction:column;min-height:0;background:var(--page)}
+.sb{display:flex;justify-content:space-between;align-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 20px 4px;
+  font-size:12.5px;font-weight:700;color:var(--t1);letter-spacing:-.01em}
+.nb{padding:6px 18px 12px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.nb h2{font-size:30px;font-weight:800;margin:0;letter-spacing:-.035em}
+.nb p{margin:2px 0 0;font-size:13.5px;color:var(--t2);font-weight:500}
+.ph{display:flex;background:var(--sep);border-radius:11px;padding:3px;gap:2px;flex:none}
+.ph button{font:inherit;font-size:12px;font-weight:800;border:0;background:transparent;
+  color:var(--t2);padding:6px 11px;border-radius:8px;cursor:pointer;letter-spacing:-.01em}
+.ph button[aria-pressed="true"]{background:var(--card);color:var(--t1);box-shadow:var(--shade)}
+.bd{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:2px 14px 18px;display:flex;flex-direction:column;gap:15px}
+/* children must keep their natural height, otherwise flex shrinks every card
+   to fit the viewport and their contents get clipped instead of scrolling */
+.bd > *{flex:0 0 auto}
+.bd::-webkit-scrollbar{width:0}
+.tb{display:flex;background:var(--card);border-top:1px solid var(--sep);
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6px);flex:none}
+.tb div{flex:1;text-align:center;padding:9px 1px 4px;font-size:9.5px;color:var(--t3);
+  font-weight:600;letter-spacing:-.01em;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:opacity .12s}
+.tb div:active{opacity:.45}
+.tb div.on{color:var(--green)}
+.tb svg{width:24px;height:24px;display:block;margin:0 auto 3px;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="scr">
+  <div class="sb"><span id="clk">9:41</span><span>PH Store</span></div>
+  <div class="nb">
+    <div><h2 id="ttl">Conversa</h2><p id="sub">Farmácia Nhlamankulo</p></div>
+    <div class="ph" role="group" aria-label="modo">
+      <button type="button" id="p1" aria-pressed="true">F1</button>
+      <button type="button" id="p2" aria-pressed="false">F2</button>
+    </div>
+  </div>
+  <div class="bd" id="bd"></div>
+  <nav class="tb" id="tbn"></nav>
+</div>
+<script>
+"use strict";
+
+const E = s => String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const MT = (n,s) => {
+  const [i,d] = Math.abs(n).toFixed(2).split(".");
+  return i.replace(/\B(?=(\d{3})+(?!\d))/g," ")+","+d+(s===false?"":" MT");
+};
+let phase=1, scr="chat";
+
+/* ── product vectors: real drawn packaging ── */
+const PILL = c => `<svg viewBox="0 0 40 40" fill="none">
+  <rect x="6" y="9" width="28" height="22" rx="4" fill="${c}" opacity=".16"/>
+  <rect x="6" y="9" width="28" height="22" rx="4" stroke="${c}" stroke-width="2"/>
+  <circle cx="13" cy="16" r="2.6" fill="${c}"/><circle cx="20" cy="16" r="2.6" fill="${c}"/>
+  <circle cx="27" cy="16" r="2.6" fill="${c}"/><circle cx="13" cy="24" r="2.6" fill="${c}"/>
+  <circle cx="20" cy="24" r="2.6" fill="${c}"/><circle cx="27" cy="24" r="2.6" fill="${c}"/></svg>`;
+const CAPS = c => `<svg viewBox="0 0 40 40" fill="none">
+  <rect x="9" y="12" width="22" height="17" rx="3" fill="${c}" opacity=".16"/>
+  <rect x="9" y="12" width="22" height="17" rx="3" stroke="${c}" stroke-width="2"/>
+  <path d="M15 8.5h10v3.5H15z" fill="${c}"/>
+  <rect x="13" y="18" width="14" height="2.4" rx="1.2" fill="${c}"/>
+  <rect x="13" y="22.6" width="9" height="2.4" rx="1.2" fill="${c}" opacity=".55"/></svg>`;
+const BOTT = c => `<svg viewBox="0 0 40 40" fill="none">
+  <path d="M14 13h12v15a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3z" fill="${c}" opacity=".16"/>
+  <path d="M14 13h12v15a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3z" stroke="${c}" stroke-width="2"/>
+  <rect x="16" y="7.5" width="8" height="5.5" rx="1.5" fill="${c}"/>
+  <rect x="16.5" y="19" width="7" height="7" rx="1.5" fill="${c}" opacity=".6"/></svg>`;
+
+const I = {
+  chat:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.9 3 3 6.5 3 11c0 2.4 1.2 4.5 3 6l-.8 3.3a.6.6 0 0 0 .9.6L9.7 19c.8.2 1.6.3 2.3.3 5.1 0 9-3.5 9-8s-3.9-8-9-8z"/></svg>',
+  bag:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7V6a5 5 0 0 1 10 0v1h1.7A2.3 2.3 0 0 1 21 9.3V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.3A2.3 2.3 0 0 1 5.3 7zm2 0h6V6a3 3 0 0 0-6 0z"/></svg>',
+  cat:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.4"/><rect x="13" y="3" width="8" height="8" rx="2.4"/><rect x="3" y="13" width="8" height="8" rx="2.4"/><rect x="13" y="13" width="8" height="8" rx="2.4"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4.4" height="9" rx="1.7"/><rect x="9.8" y="6" width="4.4" height="15" rx="1.7"/><rect x="16.6" y="9" width="4.4" height="12" rx="1.7"/></svg>',
+  ck:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
+  bx:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5z"/><path d="M3 8.5 12 13l9-4.5M12 13v7"/></svg>',
+  tr:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17.5" cy="18" r="1.8"/></svg>',
+  cl:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.2l3.3 2"/></svg>',
+  wal:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M4 6h13a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h10v3z"/><circle cx="16.5" cy="13.5" r="1.6" fill="#0A7AFF"/></svg>',
+  shd:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5 20 5v7c0 5-3.4 8.3-8 9.5C7.4 20.3 4 17 4 12V5z"/></svg>',
+  bolt:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M13.5 2 5 13.5h5L9.5 22 19 10h-5.5z"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3.5 19 11h-4v8h-6v-8H5z"/></svg>'
+};
+const tile = (c,svg) => `<div class="tile" style="background:${c}">${svg}</div>`;
+
+const prod = (nm,sub,qty,price,art) => `
+  <div class="it">${tile("color-mix(in srgb,"+art[1]+" 13%,transparent)", art[0](art[1]))}
+    <div class="tx"><b>${E(nm)}</b><span>${E(sub)}</span></div>
+    <div class="rt"><div class="p">${MT(price,false)}</div><div class="q">× ${qty}</div></div></div>`;
+
+const P1 = [PILL,"var(--blue)"], P2 = [CAPS,"var(--orange)"], P3 = [BOTT,"var(--purple)"];
+
+/* ══ SCREENS ══ */
+function chat(){
+  const tot = phase===1 ? 3370.5 : 3570.5;
+  const dl  = phase===1 ? 250 : 450;
+  return `
+  <div class="bub b">preciso amoxil 500 x4, panadol 500 x10, omeprazol 20 x6</div>
+  <div class="bub a">Encontrei 2 produtos. Falta confirmar um.</div>
+  <div class="grp">
+    <div class="ghd"><span class="lb">Confirmar produto</span><span class="pill po1">1 de 3</span></div>
+    <div class="gbd"><p style="margin:0;font-size:14px;color:var(--t2);font-weight:500">Escreveu <b style="color:var(--t1)">«panadol 500»</b>. É este?</p></div>
+    ${prod("Paracetamol 500 mg","Comprimidos · cx 20",1,58.5,P2)}
+    <div class="gbd"><div class="btns">
+      <button class="btn" type="button">Sim, é este</button>
+      <button class="btn s" type="button" style="width:42%">Outros</button></div></div>
+  </div>
+  <div class="hero g">
+    <div class="k">Total da cotação</div>
+    <div class="v">${MT(tot,false)}</div>
+    <div class="u">MT · RQ-2041</div>
+    <div class="row"><span class="hpill">${phase===1?"1 fornecedor":"3 fornecedores"}</span>
+      <span class="hpill">Entrega hoje</span></div>
+  </div>
+  <div class="grp">
+    ${prod("Amoxicilina 500 mg","cx 21 · Amoxil",4,1648,P1)}
+    ${prod("Paracetamol 500 mg","cx 20 · Panadol",10,585,P2)}
+    ${prod("Omeprazol 20 mg","cx 14 · Losec",6,1176,P3)}
+    <div class="mm">
+      <div class="mr"><span>Medicamentos</span><b>${MT(3000.5,false)}</b></div>
+      <div class="mr"><span>Entrega</span><b>${MT(dl,false)}</b></div>
+      <div class="mr"><span>Serviço PH Store</span><b>${MT(120,false)}</b></div>
+      <div class="mt"><span>Total</span><b>${MT(tot,false)}</b></div>
+    </div>
+    <div class="gbd"><button class="btn" type="button">Confirmar pedido</button></div>
+  </div>`;
+}
+
+function cart(){
+  const v = (nm,col,ini,lines,sub,ok,short) => `
+  <div class="grp">
+    <div class="ghd">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="tile" style="background:${col};width:32px;height:32px;border-radius:10px;
+          color:#fff;font-weight:800;font-size:12.5px;letter-spacing:-.02em">${ini}</div>
+        <span class="lb" style="font-size:14.5px;color:var(--t1)">${nm}</span></div>
+      <span class="pill ${ok?"pg1":"pr1"}">${ok?"Mínimo OK":"Faltam "+MT(short,false)}</span></div>
+    ${lines}
+    <div class="mm"><div class="mt"><span>Subtotal</span><b>${MT(sub,false)}</b></div></div>
+  </div>`;
+  if(phase===1) return v("Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD",
+    prod("Amoxicilina 500 mg","cx 21",4,1648,P1)+prod("Paracetamol 500 mg","cx 20",10,585,P2)+
+    prod("Omeprazol 20 mg","cx 14",6,1176,P3),3000.5,true)
+    + `<div class="grp"><div class="gbd" style="padding-top:14px">
+       <button class="btn" type="button">Finalizar pedido</button></div></div>`;
+  return v("Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD",
+      prod("Amoxicilina 500 mg","cx 21",4,1648,P1),1648,true)
+   + v("MozPharma","linear-gradient(140deg,#FFB43D,#E8701A)","MP",
+      prod("Paracetamol 500 mg","cx 20",10,585,P2),585,false,1915)
+   + v("EMS Pharma","linear-gradient(140deg,#8B6BFF,#5C3ADB)","EP",
+      prod("Omeprazol 20 mg","cx 14",6,1176,P3),1176,true);
+}
+
+function sup(){
+  const s = (n,nm,col,ini,fresh,fill,disp,best) => `
+  <div class="it" style="${best?"background:color-mix(in srgb,var(--green) 7%,transparent)":""}">
+    <div class="tile" style="background:${col};color:#fff;font-weight:800;font-size:13px">${ini}</div>
+    <div class="tx"><b>${n} · ${nm}</b><span>Satisfação ${fill} · expedição ${disp}</span></div>
+    <div class="rt"><div class="p" style="font-size:13.5px;color:var(--orange)">${fresh}</div>
+      <div class="q">stock</div></div></div>`;
+  const head = `
+  <div class="hero o">
+    <div class="k">Preço regulado por lei</div>
+    <div class="v">${MT(412,false)}</div>
+    <div class="u">MT · Amoxicilina 500 mg · cx 21</div>
+    <div class="row"><span class="hpill">Igual em todos os fornecedores</span></div>
+  </div>`;
+  if(phase===1) return head + `
+  <div class="grp">
+    ${s("1","Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD","há 2 h","94 %","&lt; 12 h",true)}
+    <div class="tip"><b>Diploma Ministerial 21/2017</b> fixa o preço. Nenhum fornecedor pode vender acima ou abaixo.</div>
+    <div class="gbd" style="padding-top:0"><button class="btn" type="button">Adicionar ao carrinho</button></div>
+  </div>`;
+  return head + `
+  <div class="grp">
+    ${s("1","EMS Pharma","linear-gradient(140deg,#8B6BFF,#5C3ADB)","EP","há 40 min","97 %","&lt; 6 h",true)}
+    ${s("2","Ahmed Distribuição","linear-gradient(140deg,#22C77A,#0E9070)","AD","há 2 h","94 %","&lt; 12 h")}
+    ${s("3","MozPharma","linear-gradient(140deg,#FFB43D,#E8701A)","MP","há 19 h","88 %","&lt; 24 h")}
+    <div class="tip"><b>Porquê esta ordem?</b> O preço é igual por lei. Ordenamos por frescura do stock, quantidade confirmada, satisfação e expedição. <b>Ninguém paga para subir.</b></div>
+  </div>`;
+}
+
+function trk(){
+  return `
+  <div class="hero o">
+    <div class="k">Chegada prevista</div>
+    <div class="v" style="font-size:34px">14:00–16:00</div>
+    <div class="u">Hoje · a janela estreita a cada etapa</div>
+    <div class="row"><span class="hpill">RQ-2041-A</span><span class="hpill">Ahmed Distribuição</span></div>
+  </div>
+  <div class="grp">
+    <div class="ghd"><span class="lb">Estado do pedido</span><span class="pill po1">A preparar</span></div>
+    <div class="tl">
+      <div class="tls done"><div class="tlp">${I.ck}</div>
+        <div><div class="lb">Pedido aceite</div><div class="sb2">09:41 · 3 de 3 linhas</div></div></div>
+      <div class="tls now"><div class="tlp">${I.bx}</div>
+        <div><div class="lb">Em preparação</div><div class="sb2">10:12 · lote e validade</div></div></div>
+      <div class="tls todo"><div class="tlp">${I.tr}</div>
+        <div><div class="lb">A caminho</div><div class="sb2">previsto 12:30</div></div></div>
+      <div class="tls todo"><div class="tlp">${I.ck}</div>
+        <div><div class="lb">Conferir e receber</div><div class="sb2">linha a linha</div></div></div>
+    </div>
+  </div>
+  ${phase===2?`<div class="grp">
+    <div class="ghd"><span class="lb">RQ-2041-B · MozPharma</span><span class="pill pr1">Aguarda</span></div>
+    <div class="tip">Prazo de resposta termina às <b>13:41</b>. Cada fornecedor segue o seu caminho — um atraso aqui não trava o pedido A.</div>
+  </div>`:""}`;
+}
+
+function pan(){
+  const m = [["Amoxicilina 500 mg",100,"+38 %","var(--blue)"],
+    ["Paracetamol 500 mg",74,"+21 %","var(--orange)"],
+    ["Sais de reidratação",61,"+64 %","var(--teal)"],
+    ["Artemeter/Lumefantrina",47,"+12 %","var(--pink)"],
+    ["Omeprazol 20 mg",22,"−4 %","var(--purple)"]]
+    .map(([n,p,d,c])=>`<div><div class="h"><span>${E(n)}</span><i style="color:${c}">${E(d)}</i></div>
+      <div class="trk"><i style="width:${p}%;background:${c}"></i></div></div>`).join("");
+  return `
+  <div class="st2">
+    <div class="stc"><div class="ic" style="background:var(--blue)">${I.wal}</div>
+      <div class="k">Gasto 30 dias</div><div class="v">${MT(84210,false)}</div><div class="n">11 pedidos</div></div>
+    <div class="stc"><div class="ic" style="background:var(--red)">${I.bolt}</div>
+      <div class="k">Crédito aberto</div><div class="v">${MT(21400,false)}</div><div class="n">2 fornecedores</div></div>
+    <div class="stc"><div class="ic" style="background:var(--green)">${I.shd}</div>
+      <div class="k">Ruturas evitadas</div><div class="v">7</div><div class="n">avisos aceites</div></div>
+    <div class="stc"><div class="ic" style="background:var(--orange)">${I.cl}</div>
+      <div class="k">Prazo médio</div><div class="v">6,4</div><div class="n">horas</div></div>
+  </div>
+  <div class="grp">
+    <div class="ghd"><span class="lb">Procura prevista · 14 dias</span><span class="pill pb1">Bairro</span></div>
+    <div class="mtr">${m}</div>
+    <div class="tip">Variação face às suas vendas. Sinal do bairro agregado — nunca dados de doentes.</div>
+  </div>
+  <div class="grp">
+    <div class="ghd"><span class="lb">A notar</span><span class="pill pg1">Poupa ${MT(250,false)}</span></div>
+    <div class="tip">Compra <b>Amoxicilina</b> a crédito mas <b>Paracetamol</b> sempre a pronto. Juntando os dois no mesmo pedido, atinge o mínimo e poupa <b>${MT(250)}</b> de entrega por semana.</div>
+    <div class="gbd" style="padding-top:0"><button class="btn s" type="button">Criar pedido sugerido</button></div>
+  </div>`;
+}
+
+const NAV=[["chat","Conversa",I.chat],["cart","Pedidos",I.bag],["trk","Entrega",I.tr],["sup","Catálogo",I.cat],["pan","Painel",I.chart]];
+const R={chat,cart,sup,trk,pan};
+const T={chat:["Conversa","Farmácia Nhlamankulo"],cart:["Carrinho","3 produtos"],
+  sup:["Fornecedores","Amoxicilina 500 mg"],trk:["Entrega","RQ-2041"],pan:["Painel","30 dias"]};
+
+const NOTES={
+ chat:[["المحادثة هي المنتج","الصيدلي بيبعت قائمته زي واتساب بالظبط، والنظام يرجّع عرض سعر مرقّم <b>جوّه نفس الخيط</b>. مفيش شاشة جديدة يتعلمها.",
+  "المفتاح <code>primary_interface</code> بيقرر: محادثة أولاً ولا تطبيق تقليدي. الاتنين مبنيين."],
+  ["سؤال المطابقة","«panadol 500» مش اسم في الـ<code>Index</code>. بدل ما النظام يخمّن ويطلّع تركيز غلط، بيسأل <b>مرة واحدة</b> — والإجابة تدخل قاموس المرادفات للأبد."]],
+ cart:[["نفس الشاشة في الطورين","الطور الأول كارت واحد، التاني تلاتة. <code>vendor_mode</code> مفتاح مش إعادة بناء."],
+  ["الحد الأدنى شرط المورّد","لما مايتحققش، الصيدلي بيشوف كام ناقص بالظبط — والحد ده شرط تجاري للمورّد مش إعداد للصيدلية."]],
+ sup:[["السعر مش ساحة منافسة","<b>Diploma Ministerial 21/2017</b> بيثبّت السعر. الموردين بنفس الرقم حرفياً — فحطّيناه في الهيدر مرة واحدة بدل ما نكرره جنب كل مورّد ونوحي بفرق مش موجود."],
+  ["البرتقالي للوقت","لون واحد محجوز للزمن: نضارة المخزون، البث، الوصول. لأن السعر ماينفعش يفرّق، الوقت هو المنافسة الوحيدة."],
+  ["الترتيب مشروح ومش للبيع","المادة 94: الترتيب مايتشتراش. وهنا مشكلة الطور التاني — أحمد بيدفعلك وإنت بترتّبه. الحل: محرك الترتيب <b>أعمى عن الرسوم</b> وتدقيق دوري بيتحقق."]],
+ trk:[["وقت وصول صادق","إنت ماتملكش التحضير ولا التوصيل. فالوعد <b>نطاق بيضيق</b> مع كل خطوة مش رقم دقيق كداب. وبنقيس الموعود مقابل الفعلي لكل مورّد."],
+  ["كل مورّد مساره لوحده","تأخّر مورّد مابيوقّفش باقي الطلب. الصيدلي شايف رقم واحد، والنظام بيتابع <code>N</code> طلبات."]],
+ pan:[["طبقة الذكاء","«اللي تلاحظه» مش إحصاء — ده <b>قرار</b>: اجمع الصنفين في طلب كاش واحد، توصل للحد الأدنى وتوفّر رسم توصيل.",
+  "بس ده محتاج بيانات <b>صرف</b> مش طلب — وهي في نظام إدارة الصيدليات. يعني تبنّي النظام ده هو المؤشر القائد مش تحميلات التطبيق."],
+  ["خريطة الأمراض","التوقّع من أنماط الصرف <b>مجمّعة بالمنطقة</b>. مفيش ولا سجل مريض — وده اللي بيخلّيها أصلاً مش مسؤولية."]]
+};
+
+function draw(){
+  document.getElementById("bd").innerHTML = R[scr]();
+  const [a,b]=T[scr];
+  document.getElementById("ttl").textContent=a;
+  document.getElementById("sub").textContent=b;
+  document.getElementById("tbn").innerHTML = NAV.map(([k,l,ic])=>
+    `<div data-go="${k}" class="${scr===k?"on":""}">${ic}${l}</div>`).join("");
+  /* app mode has no side-notes column; guard instead of throwing */
+  const _n = document.getElementById("nts");
+  if (_n) {
+    _n.innerHTML = NOTES[scr].map((n,i)=>{
+      const [h,...ps]=n;
+      return `<div class="nt">${i===0?`<span class="tg">${scr} · fase ${phase}</span>`:""}
+        <h3>${h}</h3>${ps.map(p=>`<p>${p}</p>`).join("")}</div>`;
+    }).join("");
+  }
+}
+document.querySelectorAll('[role="tab"]').forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll('[role="tab"]').forEach(x=>x.setAttribute("aria-selected","false"));
+  b.setAttribute("aria-selected","true"); scr=b.dataset.s; draw();
+}));
+function ph(p){phase=p;
+  document.getElementById("p1").setAttribute("aria-pressed",p===1?"true":"false");
+  document.getElementById("p2").setAttribute("aria-pressed",p===2?"true":"false");draw();}
+document.getElementById("p1").addEventListener("click",()=>ph(1));
+document.getElementById("p2").addEventListener("click",()=>ph(2));
+draw();
+
+/* app-mode: bottom tab bar navigates */
+document.getElementById("tbn").addEventListener("click", function(e){
+  var d = e.target.closest("[data-go]");
+  if(!d) return;
+  scr = d.getAttribute("data-go");
+  draw();
+  document.getElementById("bd").scrollTop = 0;
+});
+(function tick(){
+  var n = new Date();
+  document.getElementById("clk").textContent =
+    n.getHours() + ":" + String(n.getMinutes()).padStart(2,"0");
+  setTimeout(tick, 20000);
+})();
+</script>
+</body>
+</html>
