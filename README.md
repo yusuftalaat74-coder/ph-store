@@ -96,7 +96,7 @@ ROVA_OFFICE_EMIT              true في مرحلة الظل: يبثّ الأحد
 
 ```
 backend/src/rova/integrations/office/
-backend/migrations/sql/0005_office_link.sql
+backend/migrations/sql/0007_office_link.sql
 backend/tests/integrations/test_office_link.py
 ```
 
