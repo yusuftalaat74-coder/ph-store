@@ -102,6 +102,12 @@ backend/tests/integrations/test_office_link.py
 
 والناشر يعمل داخل `rova jobs tick` باسم `office_outbox`.
 
+الأحداث المطبَّقة من Office: `order.accepted|rejected|picked|dispatched`، `delivery.attempted`،
+`invoice.issued`، `payment.received`، `payment.reversed`، `credit_note.issued`، `account.updated`
+(`order.picked` يفحص تفرّد الأختام `R-057` كمسار `pick`). مسارات السحب `GET` الموقَّعة توقّع على
+`timestamp + "." + METHOD + " " + path + "?" + query` لا على الجسم الفارغ (`SPEC 5.3 v1.1`) —
+يُنشر الطرفان معاً. الانحرافات والقرارات: `ph-office/docs/DEVIATIONS.md` (`S-01…S-16`).
+
 ## الاسم الكودي
 
 المنتج اسمه **PH Store**. الشيفرة تحتفظ بالاسم الكودي القديم في:
