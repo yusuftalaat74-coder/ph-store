@@ -551,7 +551,13 @@ def list_requests(status: str | None = None, channel: Channel | None = None,
              # in the order history, where it would read as an order the
              # pharmacist had sent. Default stays True so nothing that already
              # calls this changes shape.
-             "AND (:cart OR NOT (r.status='DRAFT' AND r.mode='CATALOGUE' AND r.channel='APP')) "
+             #
+             # `is_cart AND status='DRAFT'`, the same definition the partial
+             # unique index uses — not `is_cart` alone. The flag is never
+             # cleared, on purpose: it is the provenance a re-order shelf is
+             # built from. Excluding on the flag by itself hid every order the
+             # pharmacy had ever placed from the app.
+             "AND (:cart OR NOT (r.is_cart AND r.status='DRAFT')) "
              "ORDER BY r.created_at DESC LIMIT :lim"),
         {"ph": scope_pharmacy, "st": status, "ch": channel, "lim": limit,
          "cart": include_cart},

@@ -550,7 +550,22 @@ async function guard(fn){
   S.err = null;
   setBusy(true);
   try { await fn(); }
-  catch (e) { S.err = e.message || String(e); }
+  catch (e) {
+    S.err = e.message || String(e);
+    // A refusal that names line ids is unreadable and, worse, unactionable:
+    // the screen still shows the old prices, so the next tap sends the same
+    // stale numbers and earns the same refusal. Reload the cart instead, so
+    // the rows show what changed and the button becomes "continue at the new
+    // prices". The reload must not mask the original refusal if it fails.
+    if (e && e.code === "PRICE_MOVED") {
+      // The reloaded cart raises its own "prices changed" banner and marks
+      // the rows, so clearing this one avoids saying the same sentence twice.
+      // If the reload fails the message stays, because then nothing else
+      // will say it.
+      S.err = t("prices_changed");
+      try { await loadCart(); S.err = null; } catch (_) { /* keep the message */ }
+    }
+  }
   finally { setBusy(false); }
 }
 
@@ -669,13 +684,17 @@ function cartCount(){ return cartLines().reduce((n, l) => n + l.qty_requested, 0
 
 function qtyRound(p){
   const line = cartLineFor(p.id);
+  // Disabled while a call is in flight. Two taps on `+` before the first
+  // reply landed used to create two carts; the database now refuses the
+  // second, but the pharmacist should not be tapping into a refusal either.
+  const off = S.busy ? " disabled" : "";
   if (!line)
-    return '<button class="rnd" data-act="add" data-id="' + esc(p.id) + '" ' +
-           'aria-label="' + esc(t("add")) + '">+</button>';
+    return '<button class="rnd" data-act="add" data-id="' + esc(p.id) + '"' + off +
+           ' aria-label="' + esc(t("add")) + '">+</button>';
   return '<span class="cnt">' +
-    '<button class="rnd o" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
+    '<button class="rnd o" data-act="dec" data-id="' + esc(p.id) + '"' + off + ">−</button>" +
     '<span class="n">' + line.qty_requested + "</span>" +
-    '<button class="rnd" data-act="inc" data-id="' + esc(p.id) + '">+</button>' +
+    '<button class="rnd" data-act="inc" data-id="' + esc(p.id) + '"' + off + ">+</button>" +
   "</span>";
 }
 
@@ -1085,7 +1104,11 @@ async function loadProducts(reset){
   S.nextOffset = out.next_offset;
 }
 async function loadHome(){ S.assistant = await api("/v1/assistant/summary"); }
-async function loadOrders(){ S.requests = (await api("/v1/requests?limit=50")).items; }
+/* `include_cart=false`: the cart is a DRAFT request, and without this it
+   shows up in the order history as a draft the pharmacist never sent. */
+async function loadOrders(){
+  S.requests = (await api("/v1/requests?limit=50&include_cart=false")).items;
+}
 async function loadThread(){ S.thread = await api("/v1/support/threads/me"); }
 async function loadCart(){ S.cart = await api("/v1/cart"); }
 
@@ -1172,10 +1195,30 @@ const ACT = {
       await loadCart();
       return;
     }
-    S.cart = await api("/v1/cart/lines", {
-      method:"POST",
-      body:{ lines:[{ index_product_id: productId, qty_requested: qty }] }
-    });
+    // The price this screen is showing goes with the line, and that number
+    // -- not one the server works out a moment later -- is what checkout
+    // holds us to. The grid prices by cheapest fresh offer while the cart
+    // prices through the ranking engine, which also drops suspended vendors
+    // and prefers one that can cover the quantity, so the two can differ.
+    // When they do, the pharmacist sees "was X, now Y" instead of quietly
+    // being charged Y.
+    // The open product page first, the grid second. The detail page shows the
+    // ranked price from its own offer list, the grid shows the cheapest fresh
+    // offer; taking the grid's number while he is looking at the detail page
+    // would make the cart announce a change he never saw. The product
+    // endpoint carries no `best_price`, so its own top offer is the number
+    // that was on that screen.
+    let seen = null;
+    if (S.product && S.product.id === productId) {
+      const best = (S.product.offers || [])[0];
+      seen = best ? best.price : null;
+    } else {
+      const card = (S.results || []).find(x => x.id === productId);
+      seen = card ? card.best_price : null;
+    }
+    const line = { index_product_id: productId, qty_requested: qty };
+    if (seen) line.price_seen = String(seen);
+    S.cart = await api("/v1/cart/lines", { method:"POST", body:{ lines:[line] } });
   },
   async add(el){ await ACT.setQty(el.dataset.id, 1); },
   async inc(el){

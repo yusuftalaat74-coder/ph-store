@@ -6,6 +6,8 @@ pharmacy editing the same cart converge on the next tap instead of drifting
 apart. That is worth the extra rows on the wire: a cart is a few lines, and
 a wrong cart that looks right is the failure that costs money.
 """
+from decimal import Decimal
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
@@ -28,6 +30,14 @@ class CartLine(BaseModel):
     # retry after a dropped connection lands on the same quantity instead of
     # doubling it.
     qty_requested: int = Field(ge=1, le=100000)
+    # The price printed on the card that was tapped. It becomes the claim the
+    # invoice is checked against, so the pharmacist is held to the number he
+    # actually saw and not to one computed a moment later on the server.
+    #
+    # Two decimals, because the column is NUMERIC(14,2): without this a claim
+    # of "120.005" would be rounded on the way in and then read back as a
+    # price that had moved, against a price that had not.
+    price_seen: Decimal | None = Field(default=None, ge=0, decimal_places=2)
 
 
 class QtyBody(BaseModel):
@@ -40,7 +50,9 @@ class QtyBody(BaseModel):
 class CartLinesBody(BaseModel):
     """One line, or a batch — "add this order again" is one call."""
     model_config = ConfigDict(extra="forbid")
-    lines: list[CartLine]
+    # Bounded: each line is a full ranking, and an unbounded list would let
+    # one request hold a connection for as long as it liked.
+    lines: list[CartLine] = Field(min_length=1, max_length=200)
 
 
 def _pharmacy(principal: Principal) -> str:
@@ -60,11 +72,10 @@ def put_cart_lines(body: CartLinesBody,
                    principal: Principal = Depends(require_roles(*_PHARMACY)),
                    session: Session = Depends(get_session, scope="function")):
     pharmacy_id = _pharmacy(principal)
-    if not body.lines:
-        raise ApiError("VALIDATION_ERROR", "lines must not be empty")
     for line in body.lines:
         set_line(session, pharmacy_id=pharmacy_id, user_id=principal.user_id,
-                 index_product_id=line.index_product_id, qty=line.qty_requested)
+                 index_product_id=line.index_product_id, qty=line.qty_requested,
+                 price_shown=line.price_seen)
     return read_cart(session, pharmacy_id)
 
 

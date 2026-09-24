@@ -100,9 +100,13 @@ class CheckoutBody(BaseModel):
     # J-20 minimum (item 3, backend-review-r1.md): {vendor_id: "UPFRONT"} forces
     # that vendor's sub-basket onto UPFRONT terms, bypassing a blocked credit gate.
     payment_overrides: dict[str, str] = {}
-    # What the screen was showing, line id -> price as a 2dp string. Required
-    # for a cart checkout so a basket cannot reprice between looking and
-    # paying; ignored on the WhatsApp lane, which shows no prices at all.
+    # What the screen is showing right now, line id -> price as a 2dp string.
+    # Optional, and it does not weaken the guard to leave it out: a line's
+    # stored `price_seen` is already a claim, and checkout refuses when the
+    # figure about to be billed does not match it. Sending this replaces that
+    # claim with a newer one, which is what the "continue at the new prices"
+    # button does after a refusal. A line that never displayed a price -- the
+    # WhatsApp lane -- claims nothing and is not policed.
     acknowledged_prices: dict[str, str] | None = None
 
 

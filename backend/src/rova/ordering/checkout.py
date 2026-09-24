@@ -21,9 +21,41 @@ from rova.domain.fsm import Ctx
 from rova.domain.machines.registry import MACHINES
 from rova.domain.machines.sm20_eta_estimate import create_provisional
 from rova.fees.selection import active_schedules_for
-from rova.ordering.pricing import price_line
 from rova.ranking.engine import rank
 from rova.ranking.inputs import build_ranking_input
+
+
+def _decide_price(session: Session, *, index_product_id: str, top, result) -> dict:
+    """What one line costs, decided once.
+
+    Both callers of `_create_order_for_vendor` go through here, so the price
+    guard, the order line and the basket total are three readers of one
+    decision rather than three opinions. The regulated case is why that
+    matters: `rank()` returns `price=None` for a regulated product (R-009
+    forbids a price on such an offer) and the real figure lives in
+    `price_reference`, so anything that took `top.price` as the billing
+    price was holding `None` for every regulated line.
+    """
+    regulated = session.execute(
+        text("SELECT regulated_price FROM index_product WHERE id=:p"),
+        {"p": index_product_id},
+    ).scalar()
+    if regulated:
+        ref = session.execute(
+            text("SELECT id, wholesale_derived_price FROM price_reference "
+                 "WHERE index_product_id=:p AND effective_from <= :today "
+                 "ORDER BY effective_from DESC LIMIT 1"),
+            {"p": index_product_id, "today": date.today()},
+        ).mappings().first()
+        if ref is None:
+            raise ApiError("GUARD_FAILED", "no price reference for regulated product",
+                           rule="R-006")
+        unit_price, source, source_id = ref["wholesale_derived_price"], "PRICE_REFERENCE", ref["id"]
+    else:
+        unit_price, source, source_id = top.price, "VENDOR_OFFER", top.offer_id
+    return {"offer_id": top.offer_id, "price": top.price, "unit_price": unit_price,
+            "price_source": source, "price_source_id": source_id,
+            "snapshot": result.snapshot, "fingerprint": result.inputs_fingerprint}
 
 
 def _create_order_for_vendor(
@@ -53,21 +85,12 @@ def _create_order_for_vendor(
     for line in vendor_lines:
         product = products[line["index_product_id"]]
         offer_info = chosen_offer[line["id"]]
-        if product["regulated_price"]:
-            ref = session.execute(
-                text(
-                    "SELECT id, wholesale_derived_price FROM price_reference WHERE index_product_id=:p "
-                    "AND effective_from <= :today ORDER BY effective_from DESC LIMIT 1"
-                ),
-                {"p": line["index_product_id"], "today": date.today()},
-            ).mappings().first()
-            if ref is None:
-                raise ApiError("GUARD_FAILED", "no price reference for regulated product", rule="R-006")
-            unit_price = ref["wholesale_derived_price"]
-            price_source, price_source_id = "PRICE_REFERENCE", ref["id"]
-        else:
-            unit_price = offer_info["price"]
-            price_source, price_source_id = "VENDOR_OFFER", offer_info["offer_id"]
+        # Decided in checkout()'s ranking loop and already checked against
+        # what the pharmacist was shown. Recomputing it here would be a
+        # second opinion about the same number, which is how the price guard
+        # came to be checking a figure the invoice did not use.
+        unit_price = offer_info["unit_price"]
+        price_source, price_source_id = offer_info["price_source"], offer_info["price_source_id"]
         goods_total += unit_price * line["qty_requested"]
         line_payloads.append((line, product, unit_price, price_source, price_source_id))
 
@@ -218,10 +241,8 @@ def allocate_remainder(session: Session, *, request_line_id: str, actor) -> dict
         return {"request_line_id": request_line_id, "match_status": "UNRESOLVED", "order": None}
 
     top = result.ordered[0]
-    chosen_offer = {
-        request_line_id: {"offer_id": top.offer_id, "price": top.price, "snapshot": result.snapshot,
-                           "fingerprint": result.inputs_fingerprint}
-    }
+    chosen_offer = {request_line_id: _decide_price(
+        session, index_product_id=line["index_product_id"], top=top, result=result)}
     order_info = _create_order_for_vendor(
         session, req=req, pharmacy=pharmacy, vendor_id=top.vendor_id, vendor_lines=[dict(line)],
         chosen_offer=chosen_offer, payment_overrides={},
@@ -230,47 +251,56 @@ def allocate_remainder(session: Session, *, request_line_id: str, actor) -> dict
     return {"request_line_id": request_line_id, "match_status": "RESOLVED", "order": order_info}
 
 
-def _enforce_prices(session: Session, *, req: dict, acknowledged: dict[str, str] | None) -> None:
+def _enforce_prices(session: Session, *, lines, chosen_offer: dict[str, dict],
+                    acknowledged: dict[str, str] | None) -> None:
     """Refuse a checkout that would charge a price nobody agreed to.
 
     The rule is about the claim, not about the route. A cart line records
-    `price_seen` — what was on the screen when it went in — and that is the
-    pharmacist's standing claim about what this costs. Sending
+    `price_seen` — the number that was on the card the pharmacist tapped —
+    and that is his standing claim about what this costs. Sending
     `acknowledged_prices` replaces that claim with a newer one, which is what
-    the "continue at the new prices" button does. Either way, checkout
-    compares the claim against what would actually be billed and refuses if
-    they differ.
+    the "continue at the new prices" button does.
 
-    A line with no `price_seen` made no claim: the WhatsApp lane creates
-    lines before any price exists, and a client that builds a request through
-    `POST /requests` + `/lines` never displayed one. There is nothing to
-    contradict, so there is nothing to enforce — inventing a requirement
-    there would reject honest callers to no end.
+    A line with NEITHER a `price_seen` NOR an acknowledgement made no claim:
+    the WhatsApp lane creates lines before any price exists, and a client
+    that builds a request through `POST /requests` + `/lines` never displayed
+    one. There is nothing to contradict, so there is nothing to enforce.
 
-    An unpriceable line is left alone here; `checkout()` refuses it a few
-    lines later under R-014, which is where that rule already lived.
+    Note which of the two is tested. An earlier version skipped any line
+    whose `price_seen` column was NULL, which is not the same thing: a cart
+    line added on a day the product had no offer stores NULL, and once an
+    offer appeared the cart displayed that price like any other while
+    checkout quietly stopped policing it. The claim is what was shown, not
+    which column happens to hold it.
+
+    This runs against `chosen_offer` — the price the order is about to be
+    written from — and not against a second, independent pricing pass. It
+    used to price the lines itself and throw the result away, which meant the
+    number being checked and the number being billed were two reads of the
+    same table a few statements apart: under READ COMMITTED a price list
+    importing in between could be approved in the first and charged in the
+    second. Checking the figure actually being written leaves no window at
+    all, whatever the isolation level.
     """
-    lines = session.execute(
-        text("SELECT id, index_product_id, qty_requested, price_seen FROM request_line "
-             "WHERE request_id=:r AND price_seen IS NOT NULL"),
-        {"r": req["id"]},
-    ).mappings().all()
-    if not lines:
-        return
-
     moved = []
     for line in lines:
-        priced = price_line(session, index_product_id=line["index_product_id"],
-                            qty=line["qty_requested"], pharmacy_id=req["pharmacy_id"],
-                            strategy=req["allocation_strategy"])
-        if priced.unit_price is None:
-            continue                       # R-014 handles this below
-        claim = (acknowledged or {}).get(line["id"])
-        claimed = Decimal(claim) if claim is not None else line["price_seen"]
-        if claimed != priced.unit_price:
+        raw = (acknowledged or {}).get(line["id"])
+        if raw is not None:
+            try:
+                claimed = Decimal(str(raw))
+            except (ArithmeticError, ValueError):
+                raise ApiError("VALIDATION_ERROR",
+                               f"acknowledged price for {line['id']} is not a number",
+                               details=[{"field": line["id"], "reason": str(raw)}])
+        else:
+            claimed = line["price_seen"]
+        if claimed is None:
+            continue                       # nothing was ever shown for this line
+        about_to_charge = chosen_offer[line["id"]]["unit_price"]
+        if claimed != about_to_charge:
             moved.append({"field": line["id"],
                           "reason": f"shown {money_str(claimed)}, "
-                                    f"now {money_str(priced.unit_price)}"})
+                                    f"now {money_str(about_to_charge)}"})
 
     if moved:
         raise ApiError("PRICE_MOVED", "the price changed since you looked",
@@ -308,8 +338,6 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
     # restricted to PharmacyBuyer/OpsReviewer), and checkout must not perform
     # it on their behalf — a PharmacyAdmin could otherwise buy a basket the
     # buyer never confirmed.
-    _enforce_prices(session, req=dict(req), acknowledged=acknowledged_prices)
-
     entry_status = req["status"]
     if entry_status not in ("DRAFT", "CONFIRMED"):
         raise ApiError(
@@ -352,8 +380,13 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
         result = ranked[line["id"]]
         top = result.ordered[0]
         by_vendor.setdefault(top.vendor_id, []).append(dict(line))
-        chosen_offer[line["id"]] = {"offer_id": top.offer_id, "price": top.price, "snapshot": result.snapshot,
-                                     "fingerprint": result.inputs_fingerprint}
+        chosen_offer[line["id"]] = _decide_price(
+            session, index_product_id=line["index_product_id"], top=top, result=result)
+
+    # After the ranking, so the figure checked is the figure written, and
+    # before any order exists, so a refusal costs nothing to undo.
+    _enforce_prices(session, lines=lines, chosen_offer=chosen_offer,
+                    acknowledged=acknowledged_prices)
 
     orders_out = []
     for vendor_id, vendor_lines in by_vendor.items():

@@ -14,6 +14,3 @@ var/
 # put a 1.2MB .tgz into a commit once
 *.tgz
 *.tar.gz
-
-# files moved aside for the user to delete
-_to_delete/

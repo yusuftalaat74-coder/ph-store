@@ -25,6 +25,10 @@ const DB = process.env.UI_DB || "rova_ui";
 const errors = [];
 const calls = [];
 let n = 0;
+// One step below refuses a checkout on purpose. The browser logs every
+// non-2xx as a console error, and swallowing all of them would hide a real
+// 500, so it is only ignored inside that step.
+let expectRefusal = false;
 
 function step(msg) { console.log(`  ${String(++n).padStart(2)}. ${msg}`); }
 function note(msg) { console.log(`      ${msg}`); }
@@ -41,7 +45,11 @@ function sql(q) {
   const page = await ctx.newPage();
 
   page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
-  page.on("console", (m) => { if (m.type() === "error") errors.push("console: " + m.text()); });
+  page.on("console", (m) => {
+    if (m.type() !== "error") return;
+    if (expectRefusal && /Failed to load resource/.test(m.text())) return;
+    errors.push("console: " + m.text());
+  });
   page.on("request", (r) => { if (r.url().includes("/v1/")) calls.push(r.method() + " " + r.url().replace(/^.*8099/, "")); });
 
   await page.goto(BASE, { waitUntil: "networkidle" });
@@ -159,26 +167,39 @@ function sql(q) {
   const original = sql(`SELECT price FROM vendor_offer WHERE id='${offer}'`);
   sql(`UPDATE vendor_offer SET price = price + 25 WHERE id='${offer}'`);
   try {
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(1600);
-    await page.click('[data-act="goCart"]');
-    await page.waitForTimeout(1200);
-    const warned = await page.$(".err");
-    const newBtn = (await page.textContent('[data-act="checkout"]')).trim();
+    // Deliberately NO reload: this is the case the guard exists for. The
+    // screen is showing the old price and the pharmacist taps "place order",
+    // so the server refuses and the app has to recover on its own. An
+    // earlier version of this script reloaded first, which meant the client
+    // acknowledged the new number and the refusal path never ran at all.
+    expectRefusal = true;
+    await page.click('[data-act="checkout"]');
+    await page.waitForTimeout(2500);
+    expectRefusal = false;
+    const refused = await page.$(".err");
     const wasShown = await page.$eval(".was", (e) => e.textContent.trim()).catch(() => null);
-    step(`price moved ${original} -> ${Number(original) + 25}: banner=${!!warned}, ` +
-         `old price shown as "${wasShown}", button now "${newBtn}"`);
-    check(!!warned, "a price moved and the cart said nothing");
-    check(wasShown !== null, "the price the pharmacist remembers was not shown");
+    const newBtn = (await page.textContent('[data-act="checkout"]')).trim();
+    const nowShown = await page.$eval(".row .price", (e) => e.textContent.trim()).catch(() => null);
+    step(`price moved ${original} -> ${Number(original) + 25} while the screen showed the old one:`);
+    note(`refused and recovered on its own: ${!!refused}`);
+    note(`row now reads "${wasShown}" then ${nowShown}`);
+    note(`button now "${newBtn}" (was "${btn}")`);
+    check(!!refused, "the order went through at a price that was never shown");
+    check(wasShown !== null, "after the refusal the old price was not shown");
     check(newBtn !== btn, "the button did not change to ask for agreement");
+    check(!/rql_/.test(await page.textContent(".err")), "the refusal showed raw line ids");
     note(`price_seen was ${seen}`);
 
-    /* ---- and ordering at the new price goes through ------------------- */
+    /* ---- and the second tap, now agreeing, goes through --------------- */
     await page.click('[data-act="checkout"]');
     await page.waitForSelector(".ok", { timeout: 25000 });
     const flash = (await page.textContent(".ok")).trim();
     step("ORDER: " + flash);
     check(/\d/.test(flash), "checkout produced no order line");
+    // the agreed figure, formatted the way the app formats money
+    const agreed = (Number(original) + 25).toFixed(2).replace(".", ",");
+    check(flash.replace(/\s/g, "").includes(agreed.replace(/\s/g, "")),
+          `the order total is not the agreed price: expected ${agreed} in "${flash}"`);
   } finally {
     sql(`UPDATE vendor_offer SET price = ${original} WHERE id='${offer}'`);
   }
@@ -189,6 +210,20 @@ function sql(q) {
   const barGone = await page.$(".cartbar");
   step("cart bar after ordering: " + (barGone ? "still there" : "gone"));
   check(!barGone, "the ordered cart is still showing as a cart");
+
+  /* ---- the order he just placed is in the orders tab ------------------
+     The cart is excluded from that list by a flag that is never cleared, so
+     a filter written as "not a cart" rather than "not an open cart" hid
+     every order the pharmacy had ever placed from the app. Nothing else in
+     this walk would have noticed. */
+  await page.click('[data-tab="orders"]');
+  await page.waitForTimeout(1800);
+  const orderRows = await page.$$eval(".card .row", (e) =>
+    e.map((x) => x.textContent.replace(/\s+/g, " ").trim()).filter((t) => /RQ-/.test(t)));
+  step(`orders tab: ${orderRows.length} request(s), first "${(orderRows[0] || "").slice(0, 60)}"`);
+  check(orderRows.length > 0, "the order he just placed is not in the orders tab");
+  check(!orderRows.some((t) => /Draft|Rascunho/i.test(t)),
+        "a draft cart is showing in the order history");
 
   /* ---- the WhatsApp lane still works ---------------------------------- */
   await page.click('[data-tab="list"]');

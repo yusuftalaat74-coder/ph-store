@@ -19,6 +19,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from rova.core.errors import ApiError
@@ -26,9 +27,12 @@ from rova.core.ids import new_id
 from rova.core.money import money_str
 from rova.ordering.pricing import price_line
 
-# The cart is one particular kind of DRAFT: built in the app from the
-# catalogue. A DRAFT that came back from `ADMIN_REJECT`, or one built from a
-# WhatsApp paste, is a different thing and is left alone.
+# The cart is a DRAFT that says so. `is_cart` is set only here, by the cart
+# endpoints, and `uq_one_cart_per_pharmacy` makes it unique per pharmacy
+# while the request is still DRAFT. The mode and channel below describe what
+# it is -- built in the app from the catalogue -- but they no longer identify
+# it: a request made through `POST /v1/requests` carries exactly the same
+# two values and is not a cart.
 CART_MODE = "CATALOGUE"
 CART_CHANNEL = "APP"
 
@@ -39,18 +43,17 @@ NO_OFFER = "NO_OFFER"
 
 
 def find_cart(session: Session, pharmacy_id: str) -> dict | None:
-    """The pharmacy's open cart, newest first.
+    """The pharmacy's one open cart.
 
-    Newest rather than only: `ADMIN_REJECT` returns a request from
-    `AWAITING_ADMIN_APPROVAL` to `DRAFT`, so a second cart can legitimately
-    exist for a moment. A unique index would have failed that transition; the
-    rule belongs here instead, where it can prefer one without forbidding the
-    other.
+    `uq_one_cart_per_pharmacy` (migration 0006) makes a second one
+    impossible, so this is a lookup and not a choice. It used to be a choice
+    -- newest of the DRAFT/CATALOGUE/APP requests -- and that was the bug:
+    two taps on `+` before the first reply landed created two, and the one
+    the pharmacist could not see was still counted in his order list.
     """
     return session.execute(
-        text("SELECT * FROM request WHERE pharmacy_id=:p AND status='DRAFT' "
-             "AND mode=:m AND channel=:c ORDER BY created_at DESC LIMIT 1"),
-        {"p": pharmacy_id, "m": CART_MODE, "c": CART_CHANNEL},
+        text("SELECT * FROM request WHERE pharmacy_id=:p AND status='DRAFT' AND is_cart"),
+        {"p": pharmacy_id},
     ).mappings().first()
 
 
@@ -63,35 +66,84 @@ def _open_cart(session: Session, *, pharmacy_id: str, user_id: str,
     year = session.execute(text("SELECT EXTRACT(YEAR FROM now())::int")).scalar()
     seq = session.execute(text("SELECT nextval('request_number_seq')")).scalar()
     rid = new_id("req")
-    session.execute(
-        text("INSERT INTO request (id, number, pharmacy_id, mode, channel, status, "
-             "allocation_strategy, created_by_user_id) "
-             "VALUES (:id, :num, :ph, :m, :c, 'DRAFT', :s, :u)"),
-        {"id": rid, "num": f"RQ-{year}-{str(seq).zfill(6)}", "ph": pharmacy_id,
-         "m": CART_MODE, "c": CART_CHANNEL, "s": strategy, "u": user_id},
-    )
+    try:
+        # A SAVEPOINT, so losing the race costs this statement and not the
+        # caller's whole transaction.
+        with session.begin_nested():
+            session.execute(
+                text("INSERT INTO request (id, number, pharmacy_id, mode, channel, status, "
+                     "allocation_strategy, created_by_user_id, is_cart) "
+                     "VALUES (:id, :num, :ph, :m, :c, 'DRAFT', :s, :u, true)"),
+                {"id": rid, "num": f"RQ-{year}-{str(seq).zfill(6)}", "ph": pharmacy_id,
+                 "m": CART_MODE, "c": CART_CHANNEL, "s": strategy, "u": user_id},
+            )
+    except IntegrityError:
+        # `uq_one_cart_per_pharmacy` fired: two taps on `+` arrived together
+        # and the other one won. Its cart is the cart — the pharmacist tapped
+        # twice and expects one basket, not an error.
+        existing = find_cart(session, pharmacy_id)
+        if existing is None:
+            raise
+        return dict(existing)
     return dict(session.execute(
         text("SELECT * FROM request WHERE id=:r"), {"r": rid}).mappings().one())
 
 
 def touch(session: Session, request_id: str) -> None:
-    """`last_touched_at` is what the idle-cart job reads, and adding a line
-    does not otherwise change the request row at all."""
+    """`request.updated_at` is what the cart reports as `last_touched_at` and
+    what the idle-cart job will read; adding a line does not otherwise change
+    the request row at all.
+
+    Edits touch, reads do not — so this measures when the basket last
+    changed, not when it was last looked at."""
     session.execute(text("UPDATE request SET updated_at = now() WHERE id=:r"),
                     {"r": request_id})
 
 
 def set_line(session: Session, *, pharmacy_id: str, user_id: str,
-             index_product_id: str, qty: int) -> str:
+             index_product_id: str, qty: int,
+             price_shown: Decimal | None = None) -> str:
     """Set a product's quantity in the cart — set, not add.
 
     The phone sends the number it is displaying, so a retry after a dropped
     connection lands on the same quantity instead of doubling it. Merging is
     limited to `CATALOGUE` lines: two lines of a WhatsApp paste may resolve to
     the same product and both deserve to exist.
+
+    `price_shown` is the price that was actually on the card the pharmacist
+    tapped, and it is what gets stored as the claim. The storefront grid
+    prices by a cheapest-fresh-offer subquery while this module prices
+    through `rank()`, which also drops suspended vendors and orders a vendor
+    that cannot cover the quantity behind one that can — so the two can
+    differ, and when they do it is the card's number the pharmacist
+    remembers. Storing our own computation instead would have moved the lie
+    one screen to the left rather than ending it: the cart would have shown
+    the higher number as though it had always been there. With the card's
+    number stored, the cart says "was 331, now 440" and checkout refuses
+    until he agrees. The server's own price is the fallback for a caller
+    that sends nothing.
+
+    It is read only when the line is created. Changing the quantity of a line
+    already in the cart leaves the claim where it was, even if the caller
+    sends a newer price: refreshing it would make the cart read SAME at 140
+    for a line he first put in at 120, which is the silent reprice this whole
+    module exists to prevent. Agreeing to a new price is a separate act, and
+    `acknowledged_prices` at checkout is where it happens.
     """
     if qty < 1:
         raise ApiError("VALIDATION_ERROR", "qty_requested must be at least 1")
+    if price_shown is not None and price_shown < 0:
+        raise ApiError("VALIDATION_ERROR", "price_seen cannot be negative")
+
+    # A product that is not published cannot be shown, so it cannot be in a
+    # cart; without this the foreign key fails and an unknown id surfaces as
+    # a 500 instead of a 404.
+    published = session.execute(
+        text("SELECT 1 FROM index_product WHERE id=:p AND review_status='PUBLISHED'"),
+        {"p": index_product_id},
+    ).scalar()
+    if not published:
+        raise ApiError("NOT_FOUND", "product not found")
 
     cart = _open_cart(session, pharmacy_id=pharmacy_id, user_id=user_id)
     existing = session.execute(
@@ -116,7 +168,8 @@ def set_line(session: Session, *, pharmacy_id: str, user_id: str,
                  "line_kind, match_status, price_seen, vendor_seen_id) "
                  "VALUES (:id, :r, :p, :q, 'CATALOGUE', 'RESOLVED', :ps, :vs)"),
             {"id": line_id, "r": cart["id"], "p": index_product_id, "q": qty,
-             "ps": priced.unit_price, "vs": priced.vendor_id},
+             "ps": price_shown if price_shown is not None else priced.unit_price,
+             "vs": priced.vendor_id},
         )
     touch(session, cart["id"])
     return cart["id"]
@@ -190,8 +243,12 @@ def read_cart(session: Session, pharmacy_id: str) -> dict:
         else:
             line_total = priced.unit_price * r["qty_requested"]
             total += line_total
-            if priced.vendor_id:
-                by_vendor[priced.vendor_id] = by_vendor.get(priced.vendor_id, Decimal("0")) + line_total
+            # `None` is a real bucket, not a dropped one: a regulated product
+            # is priced from the published reference and has no vendor until
+            # checkout ranks it, and silently leaving it out made the
+            # per-distributor subtotals stop adding up to the total the
+            # pharmacist is about to pay.
+            by_vendor[priced.vendor_id] = by_vendor.get(priced.vendor_id, Decimal("0")) + line_total
 
         if r["updated_at"] and r["updated_at"] > last_touched:
             last_touched = r["updated_at"]
@@ -223,8 +280,10 @@ def read_cart(session: Session, pharmacy_id: str) -> dict:
         "lines": lines,
         "totals": {
             "goods_total": money_str(total),
-            "by_vendor": [{"vendor_id": v, "vendor_name": vendor_names.get(v, v),
-                           "goods_total": money_str(a)} for v, a in sorted(by_vendor.items())],
+            "by_vendor": [{"vendor_id": v,
+                           "vendor_name": vendor_names.get(v) if v else None,
+                           "goods_total": money_str(a)}
+                          for v, a in sorted(by_vendor.items(), key=lambda kv: kv[0] or "")],
         },
         "checkout_blocked_by": blocked,
     }

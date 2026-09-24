@@ -313,14 +313,80 @@ def test_12b_a_request_that_showed_no_price_is_not_asked_to_confirm_one(client, 
 
 def test_12c_the_whatsapp_lane_still_needs_no_acknowledgement(client, h, db_engine):
     """That lane enters from CONFIRMED through a screen that shows no prices,
-    so demanding agreement there would demand agreement to nothing."""
+    so demanding agreement there would demand agreement to nothing.
+
+    `price_seen` is cleared as well as the channel: leaving it set would have
+    made this pass whether or not the exemption existed, which is the kind of
+    test that proves nothing while looking like it proves something."""
     cart = _put(client, h, P2, 1)
     with db_engine.begin() as c:
-        c.execute(text("UPDATE request SET status='CONFIRMED', channel='WHATSAPP_TEXT' WHERE id=:r"),
+        c.execute(text("UPDATE request SET status='CONFIRMED', channel='WHATSAPP_TEXT', "
+                       "is_cart=false WHERE id=:r"), {"r": cart["request_id"]})
+        c.execute(text("UPDATE request_line SET price_seen=NULL WHERE request_id=:r"),
                   {"r": cart["request_id"]})
     r = client.post(f"/v1/requests/{cart['request_id']}/checkout",
                     headers={**h, "Idempotency-Key": f"ck-{cart['request_id']}"}, json={})
     assert r.status_code == 200, r.text
+
+
+def test_12d_a_line_added_before_any_offer_is_policed_once_it_has_one(client, h, db_engine):
+    """The hole the first narrowing left. P3 has no offer, so the line stores
+    no `price_seen`. When an offer appears the cart shows that price like any
+    other -- and a guard keyed on the column rather than on the claim would
+    have stopped policing that line for good."""
+    cart = _put(client, h, P3, 1)
+    line = next(l for l in cart["lines"] if l["index_product_id"] == P3)
+    assert line["price_seen"] is None
+
+    with db_engine.begin() as c:
+        c.execute(text(
+            "INSERT INTO vendor_offer (id, vendor_id, index_product_id, regulated_price, "
+            "qty_available, pack_size, expiry_horizon_days, price, stock_confirmed_at) "
+            f"VALUES ('ofr_late_{SUFFIX}', 'ven_{SUFFIX}', :p, false, 500, '1', 400, "
+            "60.00, now()) ON CONFLICT (id) DO NOTHING"), {"p": P3})
+    try:
+        shown = client.get("/v1/cart", headers=h).json()
+        row = next(l for l in shown["lines"] if l["id"] == line["id"])
+        assert row["price_now"] == "60.00", "the cart now shows a price for it"
+
+        # it moves behind the pharmacist's back, and he checks out on 60.00
+        with db_engine.begin() as c:
+            c.execute(text("UPDATE vendor_offer SET price=71.00 WHERE id=:o"),
+                      {"o": f"ofr_late_{SUFFIX}"})
+        r = client.post(f"/v1/requests/{cart['request_id']}/checkout",
+                        headers={**h, "Idempotency-Key": f"ck-{cart['request_id']}"},
+                        json={"acknowledged_prices": {line["id"]: "60.00"}})
+        assert r.status_code == 409, r.text
+        assert r.json()["error"]["code"] == "PRICE_MOVED"
+    finally:
+        with db_engine.begin() as c:
+            c.execute(text("DELETE FROM vendor_offer WHERE id=:o"),
+                      {"o": f"ofr_late_{SUFFIX}"})
+
+
+def test_12e_the_price_stored_is_the_one_the_card_showed(client, h):
+    """The storefront grid prices by a cheapest-offer subquery and the cart
+    prices through the ranking engine, so the two can disagree -- and when
+    they do it is the card's number the pharmacist remembers. Storing our own
+    would move the lie one screen left instead of ending it."""
+    r = client.post("/v1/cart/lines", headers=h, json={
+        "lines": [{"index_product_id": P1, "qty_requested": 1, "price_seen": "99.00"}]})
+    assert r.status_code == 200, r.text
+    line = next(l for l in r.json()["lines"] if l["index_product_id"] == P1)
+    assert line["price_seen"] == "99.00", "the card's number, not the server's"
+    assert line["price_now"] == "120.00"
+    assert line["price_state"] == "UP"
+
+    out = client.post(f"/v1/requests/{r.json()['request_id']}/checkout",
+                      headers={**h, "Idempotency-Key": "ck-shown"}, json={})
+    assert out.status_code == 409
+    assert out.json()["error"]["code"] == "PRICE_MOVED"
+
+
+def test_12f_a_product_that_cannot_be_shown_cannot_be_added(client, h):
+    r = client.post("/v1/cart/lines", headers=h, json={
+        "lines": [{"index_product_id": "idx_does_not_exist", "qty_requested": 1}]})
+    assert r.status_code == 404, r.text
 
 
 def test_13_a_line_with_no_offer_is_marked_and_kept(client, h):
@@ -343,7 +409,7 @@ def test_14_checkout_names_the_line_it_cannot_price(client, h):
     assert set(blocked) <= set(fields)
 
 
-# ── 15..16 the cart is not an order ───────────────────────────────────────
+# ── 15..17 the cart is not an order, but an order is still an order ───────
 
 def test_15_the_cart_is_not_counted_as_an_open_request(client, h):
     _put(client, h, P1, 1)
@@ -353,6 +419,26 @@ def test_15_the_cart_is_not_counted_as_an_open_request(client, h):
     cart = client.get("/v1/cart", headers=h).json()
     listed = client.get("/v1/requests", headers=h, params={"include_cart": False}).json()
     assert cart["request_id"] not in [x["id"] for x in listed["items"]]
+
+
+def test_16a_an_ordered_cart_is_back_in_the_order_list(client, h):
+    """The other half of test_15, and the half that was missing: `is_cart`
+    stays true after checkout, so a filter that excluded the flag alone hid
+    every order the pharmacy had ever placed from the app. The cart is
+    `is_cart AND DRAFT`; once it is neither, it is an order like any other.
+    """
+    cart = _put(client, h, P1, 1)
+    rid = cart["request_id"]
+    out = client.post(f"/v1/requests/{rid}/checkout",
+                      headers={**h, "Idempotency-Key": f"ck-{rid}"}, json={})
+    assert out.status_code == 200, out.text
+
+    listed = client.get("/v1/requests", headers=h, params={"include_cart": False}).json()
+    assert rid in [x["id"] for x in listed["items"]], "the order he just placed vanished"
+
+    summary = client.get("/v1/assistant/summary", headers=h).json()
+    assert summary["cart_lines"] == 0, "the cart is empty again"
+    assert summary["open_requests"] >= 1, "an in-fulfilment request still counts as open"
 
 
 def test_16_the_order_list_can_still_ask_for_it(client, h):

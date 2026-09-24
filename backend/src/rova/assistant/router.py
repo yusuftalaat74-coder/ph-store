@@ -286,11 +286,11 @@ def summary(pharmacy_id: str | None = None,
         text('SELECT '
              ' (SELECT count(*) FROM request WHERE pharmacy_id=:p '
              "    AND status NOT IN ('CLOSED','CANCELLED') "
-             "    AND NOT (status = 'DRAFT' AND mode = 'CATALOGUE' AND channel = 'APP')) "
+             "    AND NOT (is_cart AND status = 'DRAFT')) "
              '   AS open_requests,'
              ' (SELECT count(*) FROM request_line rl JOIN request r ON r.id = rl.request_id '
-             "    WHERE r.pharmacy_id=:p AND r.status='DRAFT' AND r.mode='CATALOGUE' "
-             "    AND r.channel='APP' AND rl.line_kind='CATALOGUE') AS cart_lines,"
+             "    WHERE r.pharmacy_id=:p AND r.is_cart AND r.status='DRAFT' "
+             "    AND rl.line_kind='CATALOGUE') AS cart_lines,"
              ' (SELECT count(*) FROM "order" WHERE pharmacy_id=:p AND status NOT IN (\'CLOSED\',\'CANCELLED\',\'REJECTED\')) '
              '   AS open_orders,'
              ' (SELECT count(*) FROM dispute d JOIN "order" o ON o.id=d.order_id WHERE o.pharmacy_id=:p '
