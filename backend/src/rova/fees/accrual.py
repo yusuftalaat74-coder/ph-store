@@ -12,6 +12,7 @@ from rova.core.clock import now
 from rova.core.ids import new_id
 from rova.core.money import quantize
 from rova.domain.fsm import Ctx
+from rova.integrations.office import hooks as office_hooks
 
 
 def _attribution(session, vendor_id: str, pharmacy_id: str) -> str:
@@ -23,14 +24,16 @@ def _attribution(session, vendor_id: str, pharmacy_id: str) -> str:
 
 
 def _insert_fee_event(session, *, fee_schedule_id, payer_org_id, order_id, base_amount, amount, attribution):
+    fee_id = new_id("fev")
     session.execute(
         text(
             "INSERT INTO fee_event (id, fee_schedule_id, payer_org_id, order_id, base_amount, amount, "
             "attribution, status, occurred_at) VALUES (:id, :fs, :org, :o, :base, :amt, :attr, 'ACCRUED', :now)"
         ),
-        {"id": new_id("fev"), "fs": fee_schedule_id, "org": payer_org_id, "o": order_id,
+        {"id": fee_id, "fs": fee_schedule_id, "org": payer_org_id, "o": order_id,
          "base": quantize(base_amount), "amt": quantize(amount), "attr": attribution, "now": now()},
     )
+    office_hooks.fee_accrued(session, fee_id)   # PH Office link: outbox row, no-op when disabled
 
 
 def on_receipt_accepted(ctx: Ctx) -> None:

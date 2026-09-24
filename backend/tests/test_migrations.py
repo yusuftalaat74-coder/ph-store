@@ -22,12 +22,13 @@ def test_downgrade_is_forward_only_refused():
     assert "forward-only" in result.stderr
 
 
-def test_66_tables_exist(db_engine):
+def test_68_tables_exist(db_engine):
+    # 66 through 0004, + integration_outbox and integration_inbound_event from 0005 (PH Office link)
     with db_engine.connect() as conn:
         count = conn.execute(
             text("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'alembic_version'")
         ).scalar()
-    assert count == 66
+    assert count == 68
 
 
 def test_append_only_tables_reject_update_and_delete(db_engine):

@@ -135,7 +135,12 @@ def acceptance_sla() -> int:
     means the vendor missed its window, so only it gets `ACCEPTANCE_TIMEOUT`.
     Item-2 fix (backend-review-r1.md): previously every mode got
     `ACCEPTANCE_TIMEOUT`, silently cancelling `AUTO_ACCEPT_FULL` vendors'
-    orders on their own acceptance SLA."""
+    orders on their own acceptance SLA.
+
+    With the PH Office link enabled, acceptance is PH Office's decision
+    (SPEC 1.2) and this job stands down."""
+    if office_config.enabled():
+        return 0
     wire_hooks()
     session = get_sessionmaker()()
     try:
@@ -181,6 +186,8 @@ def acceptance_sla() -> int:
 
 
 def dispatch_sla() -> int:
+    if office_config.enabled():      # PH Office owns dispatch (SPEC 1.2)
+        return 0
     return _run_timer_job("DISPATCH", "SM-03", "DISPATCH_TIMEOUT")
 
 
@@ -370,6 +377,12 @@ JOBS = {
     "invoice_upload_sla": invoice_upload_sla,
     "close_orders": close_orders,
 }
+
+# PH Office link: publisher + FAILED inbound retry (no-op when disabled)
+from rova.integrations.office import config as office_config  # noqa: E402
+from rova.integrations.office import emitter as office_emitter  # noqa: E402
+
+JOBS["office_outbox"] = office_emitter.run
 
 
 def tick() -> None:

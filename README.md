@@ -79,6 +79,29 @@ cd backend
 python3 scripts/regen_endpoints.py
 ```
 
+## الربط مع PH Office
+
+الربط **مُطفأ افتراضياً**: مع `ROVA_OFFICE_ENABLED=false` يعمل PH Store كما كان تماماً
+(لا صفوف في الصندوق الصادر، لا أقفال على المسارات، و`/v1/office/*` يردّ `503`).
+
+```
+ROVA_OFFICE_ENABLED           true = PH Office يدير القبول والتجهيز والفوترة والذمم
+ROVA_OFFICE_URL               http://phoffice-api:8100
+ROVA_OFFICE_OUTBOUND_SECRET   Store -> Office  (= PHOFFICE_INBOUND_SECRET)
+ROVA_OFFICE_INBOUND_SECRET    Office -> Store  (= PHOFFICE_OUTBOUND_SECRET)
+ROVA_OFFICE_EMIT              true في مرحلة الظل: يبثّ الأحداث دون تفعيل الأقفال
+```
+
+الكود في:
+
+```
+backend/src/rova/integrations/office/
+backend/migrations/sql/0005_office_link.sql
+backend/tests/integrations/test_office_link.py
+```
+
+والناشر يعمل داخل `rova jobs tick` باسم `office_outbox`.
+
 ## الاسم الكودي
 
 المنتج اسمه **PH Store**. الشيفرة تحتفظ بالاسم الكودي القديم في:

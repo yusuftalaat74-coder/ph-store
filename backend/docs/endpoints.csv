@@ -34,12 +34,17 @@ GET,/v1/invoices/{invoice_id}
 GET,/v1/licences
 GET,/v1/licences/{licence_id}
 GET,/v1/licences/{licence_id}/transitions
+GET,/v1/me/account
+GET,/v1/me/statement
 GET,/v1/memberships
 GET,/v1/notifications
 GET,/v1/notifications-admin/queue
 GET,/v1/notifications-admin/summary
 GET,/v1/notifications/unread-count
 GET,/v1/notifications/{notification_id}
+GET,/v1/office/orders/{order_id}
+GET,/v1/office/reconcile/facilities
+GET,/v1/office/reconcile/orders
 GET,/v1/ops/audit-events
 GET,/v1/ops/config
 GET,/v1/ops/config/{key}
@@ -137,6 +142,8 @@ POST,/v1/memberships/{membership_id}/revoke
 POST,/v1/notifications/dispatch
 POST,/v1/notifications/read-all
 POST,/v1/notifications/{notification_id}/read
+POST,/v1/office/events
+POST,/v1/office/outbox/replay
 POST,/v1/ops/data-subject-requests
 POST,/v1/ops/data-subject-requests/{request_id}/decide
 POST,/v1/ops/mode-switches

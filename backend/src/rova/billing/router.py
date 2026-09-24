@@ -17,6 +17,7 @@ from rova.core.ids import new_id
 from rova.core.money import quantize
 from rova.domain.enums import RoleCode
 from rova.domain.machines.registry import MACHINES
+from rova.integrations.office.router import require_not_office_managed  # PH Office SPEC 5.9.6
 
 router = APIRouter(prefix="/v1", tags=["billing"])
 
@@ -63,7 +64,7 @@ class InvoiceBody(BaseModel):
     document_ref: str | None = None
 
 
-@router.post("/orders/{order_id}/invoice")
+@router.post("/orders/{order_id}/invoice", dependencies=[Depends(require_not_office_managed)])
 def upload_invoice(order_id: str, body: InvoiceBody, principal: Principal = Depends(require_roles(*_VENDOR_FINANCE)),
                     session: Session = Depends(get_session, scope="function")):
     """A8.6/A10: computes each line's `match_result` against the price frozen
@@ -181,7 +182,7 @@ def get_invoice(invoice_id: str, principal: Principal = Depends(require_roles(*_
     return out
 
 
-@router.post("/invoices/{invoice_id}/write-off")
+@router.post("/invoices/{invoice_id}/write-off", dependencies=[Depends(require_not_office_managed)])
 def write_off_invoice(invoice_id: str, principal: Principal = Depends(require_roles(RoleCode.VENDOR_FINANCE)),
                        session: Session = Depends(get_session, scope="function")):
     row = _invoice_or_404(session, invoice_id, principal)
@@ -208,7 +209,7 @@ class PaymentBody(BaseModel):
     allocations: list[PaymentAllocationBody]
 
 
-@router.post("/payments")
+@router.post("/payments", dependencies=[Depends(require_not_office_managed)])
 def create_payment(body: PaymentBody, principal: Principal = Depends(require_roles(*_PAYMENT_WRITERS)),
                     session: Session = Depends(get_session, scope="function")):
     """A10: `ledger_entry(PAYMENT, -allocated amount)` one entry per

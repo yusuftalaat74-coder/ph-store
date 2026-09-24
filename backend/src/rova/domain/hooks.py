@@ -46,4 +46,8 @@ def wire() -> None:
     register_hook("SM-03", "CANCELLED", request_lifecycle.on_order_terminal_close_request)
     register_hook("SM-03", "REJECTED", request_lifecycle.on_order_terminal_close_request)
     register_hook("SM-03", "CLOSED", request_lifecycle.on_order_terminal_close_request)
+
+    # PH Office link: outbox-only hooks, inert while ROVA_OFFICE_ENABLED is false
+    from rova.integrations.office import hooks as office_hooks
+    office_hooks.wire_office_hooks()
     _wired = True

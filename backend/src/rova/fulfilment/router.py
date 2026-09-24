@@ -23,6 +23,7 @@ from rova.core.ids import new_id
 from rova.core.money import money_str
 from rova.domain.enums import RoleCode
 from rova.domain.machines.registry import MACHINES
+from rova.integrations.office.router import require_not_office_managed  # PH Office SPEC 5.9.6
 
 router = APIRouter(prefix="/v1", tags=["fulfilment"])
 
@@ -108,7 +109,7 @@ class AcceptBody(BaseModel):
     promised_dispatch_at: str | None = None
 
 
-@router.post("/orders/{order_id}/accept")
+@router.post("/orders/{order_id}/accept", dependencies=[Depends(require_not_office_managed)])
 def accept_order(order_id: str, body: AcceptBody, principal: Principal = Depends(require_roles(*_VENDOR_DESK)),
                   session: Session = Depends(get_session, scope="function")):
     """A8.5: routes every line through SM-04 (`CONFIRM_FULL`/`CONFIRM_SHORT`)
@@ -146,7 +147,7 @@ def accept_order(order_id: str, body: AcceptBody, principal: Principal = Depends
     return dict(updated)
 
 
-@router.post("/orders/{order_id}/reject")
+@router.post("/orders/{order_id}/reject", dependencies=[Depends(require_not_office_managed)])
 def reject_order(order_id: str, principal: Principal = Depends(require_roles(*_VENDOR_DESK)),
                   session: Session = Depends(get_session, scope="function")):
     _order_or_404(session, order_id, principal)
@@ -193,7 +194,7 @@ class PickBody(BaseModel):
     near_expiry_ack: bool = False
 
 
-@router.post("/order-lines/{line_id}/pick")
+@router.post("/order-lines/{line_id}/pick", dependencies=[Depends(require_not_office_managed)])
 def pick_order_line(line_id: str, body: PickBody,
                      principal: Principal = Depends(require_roles(*_VENDOR_PICKER)),
                      session: Session = Depends(get_session, scope="function")):
@@ -295,7 +296,7 @@ def reroute_decision(line_id: str, body: RerouteDecisionBody,
     return dict(updated)
 
 
-@router.post("/orders/{order_id}/dispatch")
+@router.post("/orders/{order_id}/dispatch", dependencies=[Depends(require_not_office_managed)])
 def dispatch_order(order_id: str, principal: Principal = Depends(require_roles(*_VENDOR_PICKER)),
                     session: Session = Depends(get_session, scope="function")):
     """SM-03 DISPATCH: guard R-054, writes traceability_event(DISPATCHED) per
@@ -327,7 +328,7 @@ def get_delivery_job(job_id: str, principal: Principal = Depends(require_roles(
     return {**dict(job), "attempts": [dict(a) for a in attempts]}
 
 
-@router.post("/delivery-jobs/{job_id}/assign")
+@router.post("/delivery-jobs/{job_id}/assign", dependencies=[Depends(require_not_office_managed)])
 def assign_delivery_job(job_id: str, body: AssignBody,
                          principal: Principal = Depends(require_roles(*_DISPATCHER_VENDOR_ADMIN)),
                          session: Session = Depends(get_session, scope="function")):
@@ -337,7 +338,7 @@ def assign_delivery_job(job_id: str, body: AssignBody,
     return dict(updated)
 
 
-@router.post("/delivery-jobs/{job_id}/start")
+@router.post("/delivery-jobs/{job_id}/start", dependencies=[Depends(require_not_office_managed)])
 def start_delivery_job(job_id: str, principal: Principal = Depends(require_roles(*_COURIER)),
                         session: Session = Depends(get_session, scope="function")):
     job = _delivery_job_or_404(session, job_id, principal)
@@ -354,7 +355,7 @@ class AttemptBody(BaseModel):
     proof_photo_ref: str | None = None
 
 
-@router.post("/delivery-jobs/{job_id}/attempts")
+@router.post("/delivery-jobs/{job_id}/attempts", dependencies=[Depends(require_not_office_managed)])
 def record_delivery_attempt(job_id: str, body: AttemptBody,
                              principal: Principal = Depends(require_roles(*_COURIER)),
                              session: Session = Depends(get_session, scope="function")):
@@ -392,7 +393,7 @@ def record_delivery_attempt(job_id: str, body: AttemptBody,
     return dict(updated)
 
 
-@router.post("/delivery-jobs/{job_id}/reschedule")
+@router.post("/delivery-jobs/{job_id}/reschedule", dependencies=[Depends(require_not_office_managed)])
 def reschedule_delivery_job(job_id: str, principal: Principal = Depends(require_roles(RoleCode.DISPATCHER)),
                              session: Session = Depends(get_session, scope="function")):
     _delivery_job_or_404(session, job_id, principal)

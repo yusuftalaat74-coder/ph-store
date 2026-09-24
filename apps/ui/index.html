@@ -434,6 +434,29 @@ const S = {
   lastRequestId: null
 };
 
+/* ---- PH Office account screen (Conta corrente) — new keys only ---- */
+Object.assign(T.pt, {
+  tab_account:"Saldo", acc_title:"Conta corrente", acc_sub:"O que deve a cada fornecedor, segundo o PH Office",
+  acc_balance:"Saldo em dívida", acc_limit:"Limite de crédito", acc_available:"Disponível", acc_overdue:"Em atraso",
+  acc_open:"Facturas em aberto", acc_none:"Sem facturas em aberto.", acc_asof:"Actualizado em",
+  acc_statement:"Extracto", acc_st_title:"Extracto de conta", acc_st_off:"O extracto não está disponível agora. Os valores acima são a última fotografia.",
+  acc_due:"vence", acc_empty:"Ainda não há saldo do PH Office para esta farmácia."
+});
+Object.assign(T.en, {
+  tab_account:"Balance", acc_title:"Account statement", acc_sub:"What you owe each supplier, according to PH Office",
+  acc_balance:"Balance owed", acc_limit:"Credit limit", acc_available:"Available", acc_overdue:"Overdue",
+  acc_open:"Open invoices", acc_none:"No open invoices.", acc_asof:"Updated",
+  acc_statement:"Statement", acc_st_title:"Statement", acc_st_off:"The statement is unavailable right now. The figures above are the last snapshot.",
+  acc_due:"due", acc_empty:"No balance from PH Office yet for this pharmacy."
+});
+Object.assign(T.ar, {
+  tab_account:"الرصيد", acc_title:"كشف الحساب", acc_sub:"ما عليك لكل مورّد بحسب PH Office",
+  acc_balance:"الرصيد المستحق", acc_limit:"حد الائتمان", acc_available:"المتاح", acc_overdue:"متأخر",
+  acc_open:"فواتير مفتوحة", acc_none:"لا فواتير مفتوحة.", acc_asof:"آخر تحديث",
+  acc_statement:"الكشف", acc_st_title:"كشف الحساب", acc_st_off:"الكشف غير متاح الآن. الأرقام أعلاه هي آخر لقطة.",
+  acc_due:"يستحق", acc_empty:"لا يوجد رصيد من PH Office لهذه الصيدلية بعد."
+});
+
 /* ---------------- api ---------------- */
 async function api(path, opts){
   opts = opts || {};
@@ -574,7 +597,8 @@ const ICONS = {
   list:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
   orders:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
   chat:'<path d="M21 12a8 8 0 1 1-3.2-6.4"/><path d="M21 4v5h-5"/>',
-  panel:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'
+  panel:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  account:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/>'
 };
 const TABS = [["store","tab_store"], ["list","tab_list"], ["orders","tab_orders"],
               ["chat","tab_chat"], ["panel","tab_panel"]];
@@ -584,7 +608,8 @@ function renderTabs(){
   if (!bar) return;
   if (!S.token){ bar.style.display = "none"; return; }
   bar.style.display = "flex";
-  bar.innerHTML = TABS.map(([id,key]) =>
+  const tabs = TABS.concat(S.officeAccount && (S.officeAccount.accounts || []).length ? [["account","tab_account"]] : []);
+  bar.innerHTML = tabs.map(([id,key]) =>
     '<button data-tab="' + id + '" class="' + (S.tab === id ? "on" : "") + '">' +
       '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + ICONS[id] + "</svg>" +
@@ -1075,8 +1100,46 @@ function panelView(){
   "</div>";
 }
 
+/* ---------------- account (PH Office) ---------------- */
+function accountView(){
+  const a = S.officeAccount;
+  if (!a || !(a.accounts || []).length)
+    return "<h1>" + esc(t("acc_title")) + '</h1><div class="card empty">' + esc(t("acc_empty")) + "</div>";
+  const tile = (k, v, cls) => '<div class="row"><span class="s">' + esc(t(k)) + '</span><span class="t' +
+    (cls ? " " + cls : "") + '">' + money(v) + "</span></div>";
+  const st = S.officeStatement;
+  return '' +
+  "<h1>" + esc(t("acc_title")) + "</h1>" +
+  '<p class="sub">' + esc(t("acc_sub")) + "</p>" +
+  a.accounts.map(x => '<div class="card">' +
+    '<span class="t bidi">' + esc(x.vendor_name) + "</span>" +
+    tile("acc_balance", x.balance) + tile("acc_limit", x.credit_limit) + tile("acc_available", x.available) +
+    tile("acc_overdue", x.overdue_amount) +
+    '<p class="s">' + esc(t("acc_asof")) + ' <span class="bidi">' + esc((x.as_of || "").replace("T", " ").slice(0, 16)) + "</span></p>" +
+    '<span class="t">' + esc(t("acc_open")) + "</span>" +
+    ((x.open_documents || []).length ? x.open_documents.map(d => '<div class="row"><span class="s bidi">' +
+        esc(d.number || d.type) + (d.due_date ? " · " + esc(t("acc_due")) + " " + esc(d.due_date) : "") +
+        '</span><span>' + money(d.open_amount) + "</span></div>").join("")
+      : '<p class="s">' + esc(t("acc_none")) + "</p>") +
+    '<div style="height:10px"></div>' +
+    '<button class="btn ghost sm" data-act="accStatement" data-vendor="' + esc(x.vendor_id) + '">' +
+      esc(t("acc_statement")) + "</button>" +
+  "</div>").join("") +
+  (st === "OFF" ? '<div class="card"><p class="s">' + esc(t("acc_st_off")) + "</p></div>"
+   : st ? '<div class="card"><span class="t">' + esc(t("acc_st_title")) + "</span>" +
+       (st.lines || []).map(l => '<div class="row"><span class="s bidi">' + esc(l.date) + " · " +
+         esc(l.description_pt) + " " + esc(l.number || "") + "</span><span>" + money(l.running_balance) +
+         "</span></div>").join("") + "</div>"
+   : "");
+}
+
+async function loadAccount(){
+  try { S.officeAccount = await api("/v1/me/account"); }
+  catch (e) { S.officeAccount = null; }     // no PH Office link: the tab simply does not appear
+}
+
 const VIEW = { store:storeView, cart:storeView, list:listView, orders:ordersView,
-               chat:chatView, panel:panelView };
+               chat:chatView, panel:panelView, account:accountView };
 
 /* ---------------- loaders ---------------- */
 async function loadFilters(){
@@ -1116,6 +1179,7 @@ async function afterLogin(){
   S.me = await api("/v1/auth/me");
   await Promise.all([loadFilters(), loadCart()]);
   await loadProducts(true);
+  await loadAccount();
 }
 
 /* ---------------- actions ---------------- */
@@ -1325,6 +1389,16 @@ const ACT = {
     await loadThread();
   },
 
+  /* ---- PH Office account ---- */
+  async accStatement(el){
+    try {
+      S.officeStatement = await api("/v1/me/statement?vendor_id=" + encodeURIComponent(el.dataset.vendor));
+    } catch (e) {
+      if (e.status === 503) { S.officeStatement = "OFF"; return; }
+      throw e;
+    }
+  },
+
   /* ---- account ---- */
   async ask(){
     const q = val("ask").trim();
@@ -1345,6 +1419,7 @@ document.addEventListener("click", function(ev){
     if (S.tab === "orders" && S.requests === null) guard(loadOrders);
     if (S.tab === "chat"   && S.thread   === null) guard(loadThread);
     if (S.tab === "panel"  && S.assistant=== null) guard(loadHome);
+    if (S.tab === "account") { S.officeStatement = null; guard(loadAccount); }
     return;
   }
   const el = ev.target.closest && ev.target.closest("[data-act]");

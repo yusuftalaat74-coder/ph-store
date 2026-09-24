@@ -33,6 +33,14 @@ class Settings(BaseSettings):
     # points this at the checked-out apps/ui and it appears under /app.
     ui_dir: str = ""
 
+    # PH Office link (PH Office SPEC 5.9). Off by default: with it off, PH
+    # Store behaves exactly as before. See rova/integrations/office/config.py.
+    office_enabled: bool = False
+    office_url: str = ""
+    office_outbound_secret: str = ""      # Store -> Office (= PHOFFICE_INBOUND_SECRET)
+    office_inbound_secret: str = ""       # Office -> Store (= PHOFFICE_OUTBOUND_SECRET)
+    office_emit: bool = False             # shadow phase: emit events while not enabled
+
     def cors_origin_list(self) -> list[str]:
         raw = self.cors_origins.strip()
         if raw == "*":

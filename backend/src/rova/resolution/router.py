@@ -36,6 +36,8 @@ from rova.credit import exposure as credit_exposure
 from rova.credit.gate import check as credit_check
 from rova.domain.enums import RoleCode
 from rova.domain.machines.registry import MACHINES
+from rova.integrations.office.router import require_not_office_managed  # PH Office SPEC 5.9.6
+from rova.integrations.office import hooks as office_hooks
 
 router = APIRouter(prefix="/v1", tags=["resolution"])
 
@@ -312,13 +314,16 @@ def _return_transition(trigger: str, roles):
 
 
 router.add_api_route("/returns/{return_id}/approve", _return_transition("APPROVE", _VENDOR_FINANCE),
-                     methods=["POST"], name="approve_return", tags=["resolution"])
+                     methods=["POST"], name="approve_return", tags=["resolution"],
+                     dependencies=[Depends(require_not_office_managed)])
 router.add_api_route("/returns/{return_id}/reject", _return_transition("REJECT", _VENDOR_FINANCE),
-                     methods=["POST"], name="reject_return", tags=["resolution"])
+                     methods=["POST"], name="reject_return", tags=["resolution"],
+                     dependencies=[Depends(require_not_office_managed)])
 router.add_api_route("/returns/{return_id}/ship", _return_transition("SHIP", (RoleCode.DISPATCHER,)),
                      methods=["POST"], name="ship_return", tags=["resolution"])
 router.add_api_route("/returns/{return_id}/receive", _return_transition("RECEIVE", _VENDOR_FINANCE),
-                     methods=["POST"], name="receive_return", tags=["resolution"])
+                     methods=["POST"], name="receive_return", tags=["resolution"],
+                     dependencies=[Depends(require_not_office_managed)])
 
 
 # ------------------------------------------------------------------ credit notes
@@ -330,7 +335,7 @@ class IssueCreditNote(Body):
     dispute_id: str | None = None
 
 
-@router.post("/credit-notes", status_code=201)
+@router.post("/credit-notes", status_code=201, dependencies=[Depends(require_not_office_managed)])
 def issue_credit_note(body: IssueCreditNote,
                       principal: Principal = Depends(require_roles(*_VENDOR_FINANCE)),
                       session: Session = Depends(get_session, scope="function")):
@@ -451,6 +456,7 @@ def create_facility(body: CreateFacility,
     if opening != 0:
         _audit(session, principal, action="CREDIT_LIMIT_OVERRIDE", subject_type="credit_facility",
                subject_id=fid, metadata={"opening_balance": money_str(opening)})
+    office_hooks.credit_facility_created(session, fid)   # PH Office link: no-op when disabled
     return _facility_view(session, fid)
 
 
@@ -503,7 +509,7 @@ class PatchFacility(Body):
     reason: str = Field(min_length=1, max_length=500)
 
 
-@router.patch("/credit-facilities/{facility_id}")
+@router.patch("/credit-facilities/{facility_id}", dependencies=[Depends(require_not_office_managed)])
 def patch_facility(facility_id: str, body: PatchFacility,
                    principal: Principal = Depends(require_roles(*_VENDOR_FINANCE)),
                    session: Session = Depends(get_session, scope="function")):
@@ -530,7 +536,7 @@ def patch_facility(facility_id: str, body: PatchFacility,
     return _facility_view(session, facility_id)
 
 
-@router.post("/credit-facilities/{facility_id}/suspend")
+@router.post("/credit-facilities/{facility_id}/suspend", dependencies=[Depends(require_not_office_managed)])
 def suspend_facility(facility_id: str, body: PatchFacility | None = None,
                      principal: Principal = Depends(require_roles(*_VENDOR_FINANCE)),
                      session: Session = Depends(get_session, scope="function")):
@@ -546,7 +552,7 @@ def suspend_facility(facility_id: str, body: PatchFacility | None = None,
     return _facility_view(session, facility_id)
 
 
-@router.post("/credit-facilities/{facility_id}/reinstate")
+@router.post("/credit-facilities/{facility_id}/reinstate", dependencies=[Depends(require_not_office_managed)])
 def reinstate_facility(facility_id: str,
                        principal: Principal = Depends(require_roles(*_VENDOR_FINANCE)),
                        session: Session = Depends(get_session, scope="function")):
@@ -656,7 +662,7 @@ class Adjustment(Body):
     reason: str = Field(min_length=1, max_length=500)
 
 
-@router.post("/credit-facilities/{facility_id}/adjustments", status_code=201)
+@router.post("/credit-facilities/{facility_id}/adjustments", status_code=201, dependencies=[Depends(require_not_office_managed)])
 def post_adjustment(facility_id: str, body: Adjustment,
                     principal: Principal = Depends(require_roles(*_PLATFORM_FINANCE)),
                     session: Session = Depends(get_session, scope="function")):

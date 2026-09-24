@@ -13,7 +13,9 @@ run effects; run cross-cutting hooks registered for (machine, to_state).
 """
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -25,6 +27,10 @@ from rova.core.errors import ApiError
 from rova.core.ids import new_id
 
 SYSTEM = "SYSTEM"
+
+# PH Office SPEC 5.9.5: while an event from PH Office is applied, the
+# state_transition rows it causes carry {"via": "phoffice", "event_id": ...}.
+transition_notes: ContextVar[dict | None] = ContextVar("transition_notes", default=None)
 
 
 @dataclass(frozen=True)
@@ -175,7 +181,7 @@ class Machine:
                 "trigger": trigger,
                 "actor_user_id": ctx.actor_user_id,
                 "actor_role": ctx.actor_role,
-                "notes": "{}",
+                "notes": json.dumps(transition_notes.get() or {}),
                 "occurred_at": now(),
             },
         )

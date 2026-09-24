@@ -21,6 +21,7 @@ from rova.domain.fsm import Ctx
 from rova.domain.machines.registry import MACHINES
 from rova.domain.machines.sm20_eta_estimate import create_provisional
 from rova.fees.selection import active_schedules_for
+from rova.integrations.office import hooks as office_hooks
 from rova.ranking.engine import rank
 from rova.ranking.inputs import build_ranking_input
 
@@ -183,6 +184,7 @@ def _create_order_for_vendor(
             {"o": order_id, "f": schedule["id"]},
         )
 
+    office_hooks.order_created(session, order_id)   # PH Office link: outbox row, no-op when disabled
     return {"id": order_id, "number": order_number, "vendor_id": vendor_id,
             "goods_total": str(goods_total), "payment_terms": payment_terms,
             "platform_fees": [pharmacy_fee] if pharmacy_fee else []}

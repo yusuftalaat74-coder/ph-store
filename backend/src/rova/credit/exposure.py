@@ -12,10 +12,15 @@ PENDING_EXPOSURE_STATES = (
 
 
 def current_exposure(session: Session, facility_id: str) -> Decimal:
-    """R-038: opening_balance + sum of signed ledger_entry.amount (ADJUSTMENT included)."""
-    opening = session.execute(
-        text("SELECT opening_balance FROM credit_facility WHERE id=:f"), {"f": facility_id}
-    ).scalar()
+    """R-038: opening_balance + sum of signed ledger_entry.amount (ADJUSTMENT included).
+    PH Office SPEC 5.9.4: once PH Office has sent a balance (office_balance),
+    that mirror is the current exposure."""
+    row = session.execute(
+        text("SELECT opening_balance, office_balance FROM credit_facility WHERE id=:f"), {"f": facility_id}
+    ).mappings().one()
+    if row["office_balance"] is not None:
+        return Decimal(row["office_balance"])
+    opening = row["opening_balance"]
     ledger_sum = session.execute(
         text("SELECT COALESCE(SUM(amount), 0) FROM ledger_entry WHERE credit_facility_id=:f"), {"f": facility_id}
     ).scalar()

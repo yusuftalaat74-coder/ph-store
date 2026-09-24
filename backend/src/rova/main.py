@@ -26,6 +26,7 @@ from rova.domain.hooks import wire as wire_hooks
 from rova.fulfilment.router import router as fulfilment_router
 from rova.health_router import router as health_router
 from rova.intake.router import router as intake_router
+from rova.integrations.office.router import router as office_router
 from rova.notifications.router import router as notifications_router
 from rova.onboarding.router import router as onboarding_router
 from rova.ops.router import router as ops_router
@@ -75,6 +76,7 @@ def create_app() -> FastAPI:
     app.include_router(notifications_router)
     app.include_router(ops_router)
     app.include_router(assistant_router)
+    app.include_router(office_router)
 
     # The pharmacy client, served from this same origin so a pharmacist can
     # open it in a browser instead of installing the APK. Mounted last so it
