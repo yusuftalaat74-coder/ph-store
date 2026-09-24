@@ -15,6 +15,7 @@ from rova.core.clock import now
 from rova.core.errors import ApiError
 from rova.core.ids import new_id
 from rova.core.money import money_str
+from rova.credit import override as credit_override
 from rova.credit.gate import check as credit_check
 from rova.domain import timers
 from rova.domain.fsm import Ctx
@@ -96,6 +97,7 @@ def _create_order_for_vendor(
 
     payment_terms = "UPFRONT"
     credit_days = None
+    override_row = None
     if payment_overrides.get(vendor_id) == "UPFRONT":
         pass  # J-20 UPFRONT: the pharmacy chose to bypass the credit facility entirely
     else:
@@ -106,8 +108,21 @@ def _create_order_for_vendor(
         if facility:
             gate = credit_check(session, facility["id"], vendor_id, req["pharmacy_id"], goods_total)
             if gate.blocked:
-                raise ApiError("GUARD_FAILED", "credit limit exceeded for this pharmacy/vendor pair",
-                                rule="R-044", details=[{"field": "options", "reason": ",".join(gate.options)}])
+                # Somebody with the standing to say yes may already have said
+                # it. The permission covers this request, this vendor and an
+                # amount, so a basket that has grown since it was granted does
+                # not fit under it and is refused again — which is right,
+                # because nobody approved the larger number.
+                override_row = credit_override.usable(
+                    session, request_id=req["id"], vendor_id=vendor_id, amount=goods_total)
+                if override_row is None:
+                    raise ApiError(
+                        "GUARD_FAILED", "credit limit exceeded for this pharmacy/vendor pair",
+                        rule="R-044",
+                        details=[{"field": "options", "reason": ",".join(gate.options)},
+                                 {"field": "vendor_id", "reason": vendor_id},
+                                 {"field": "headroom", "reason": money_str(gate.headroom)},
+                                 {"field": "order_value", "reason": money_str(goods_total)}])
             payment_terms = "CREDIT_N_DAYS"
             credit_days = facility["terms_days"]
 
@@ -119,12 +134,23 @@ def _create_order_for_vendor(
     session.execute(
         text(
             "INSERT INTO \"order\" (id, number, request_id, vendor_id, pharmacy_id, status, payment_terms, "
-            "credit_days, delivery_mode, goods_total) VALUES "
-            "(:id, :num, :rid, :vid, :pid, 'PENDING_ACCEPTANCE', :terms, :days, :dmode, :total)"
+            "credit_days, delivery_mode, goods_total, credit_override_user_id, credit_override_reason) "
+            "VALUES (:id, :num, :rid, :vid, :pid, 'PENDING_ACCEPTANCE', :terms, :days, :dmode, :total, "
+            ":ovr_user, :ovr_why)"
         ),
         {"id": order_id, "num": order_number, "rid": req["id"], "vid": vendor_id, "pid": req["pharmacy_id"],
-         "terms": payment_terms, "days": credit_days, "dmode": vendor["delivery_mode"], "total": goods_total},
+         "terms": payment_terms, "days": credit_days, "dmode": vendor["delivery_mode"], "total": goods_total,
+         # Who allowed this order past the limit, on the order itself. The two
+         # columns have been in the schema since the first migration with
+         # nothing to write to them; an order on overridden credit that does
+         # not say whose decision it was is the one nobody can answer for.
+         "ovr_user": override_row["decided_by_user_id"] if override_row else None,
+         "ovr_why": override_row["decision_reason"] if override_row else None},
     )
+    if override_row is not None:
+        # In this transaction, so the order and the spending of the permission
+        # that allowed it either both exist or neither does.
+        credit_override.spend(session, override_row["id"], order_id)
     # A8.1 / A4.2: SlaTimer(ACCEPTANCE) starts as soon as the order
     # exists; SM-20's one open eta_estimate per order (R-158) does too.
     timers.start(session, policy_type="ACCEPTANCE", subject_type="order", subject_id=order_id,

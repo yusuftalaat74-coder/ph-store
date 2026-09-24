@@ -26,6 +26,7 @@ from rova.domain.hooks import wire as wire_hooks
 from rova.fulfilment.router import router as fulfilment_router
 from rova.health_router import router as health_router
 from rova.intake.router import router as intake_router
+from rova.credit.router import router as credit_router
 from rova.notifications.router import router as notifications_router
 from rova.onboarding.router import router as onboarding_router
 from rova.ops.router import router as ops_router
@@ -72,6 +73,7 @@ def create_app() -> FastAPI:
     app.include_router(intake_router)
     app.include_router(resolution_router)
     app.include_router(support_router)
+    app.include_router(credit_router)
     app.include_router(notifications_router)
     app.include_router(ops_router)
     app.include_router(assistant_router)

@@ -22,6 +22,7 @@ GET,/v1/credit-facilities/{facility_id}
 GET,/v1/credit-facilities/{facility_id}/ledger
 GET,/v1/credit-facilities/{facility_id}/statement
 GET,/v1/credit-notes
+GET,/v1/credit-overrides
 GET,/v1/delivery-jobs/{job_id}
 GET,/v1/demand-gaps
 GET,/v1/demand-gaps/summary
@@ -112,6 +113,8 @@ POST,/v1/credit-facilities/{facility_id}/gate-check
 POST,/v1/credit-facilities/{facility_id}/reinstate
 POST,/v1/credit-facilities/{facility_id}/suspend
 POST,/v1/credit-notes
+POST,/v1/credit-overrides/{override_id}/approve
+POST,/v1/credit-overrides/{override_id}/decline
 POST,/v1/delivery-jobs/{job_id}/assign
 POST,/v1/delivery-jobs/{job_id}/attempts
 POST,/v1/delivery-jobs/{job_id}/reschedule
@@ -175,6 +178,7 @@ POST,/v1/requests/{request_id}/admin-reject
 POST,/v1/requests/{request_id}/cancel
 POST,/v1/requests/{request_id}/checkout
 POST,/v1/requests/{request_id}/confirm
+POST,/v1/requests/{request_id}/credit-override
 POST,/v1/requests/{request_id}/lines
 POST,/v1/requests/{request_id}/normalization-complete
 POST,/v1/requests/{request_id}/request-changes

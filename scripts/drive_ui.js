@@ -100,9 +100,14 @@ function runJobs() {
   // skipped SM-01 and the `on_cart_left_draft` hook, and then had to mark the
   // notices read by hand to cover for what it had skipped — which is the
   // hook's own job and exactly what this walk is supposed to be exercising.
-  sql("SELECT 1");
   await resetState();
-  step("cleared the previous walk's basket, through the app's own route out");
+  // Every notice from an earlier run, marked read. The one this walk checks
+  // is written during it, by the real tick, a few steps below — so this
+  // starts the inbox at zero rather than asserting against whatever the last
+  // run happened to leave behind. The basket goes through SM-01 ABANDON
+  // above, so slice B's own hook runs rather than being worked around.
+  sql("UPDATE notification SET status='READ', read_at=now() WHERE read_at IS NULL");
+  step("cleared the previous walk's basket and inbox");
 
   await page.goto(BASE, { waitUntil: "networkidle" });
   step("loaded, default language = " + (await page.getAttribute("html", "lang")));
@@ -469,6 +474,142 @@ function runJobs() {
   const ordersAfterReorder = Number(sql("SELECT count(*) FROM \"order\""));
   check(ordersAfterReorder === ordersBeforeReorder,
         `"add all" created ${ordersAfterReorder - ordersBeforeReorder} order(s); it must only fill the basket`);
+
+  /* ---- the credit limit, and the two ways past it ---------------------
+     R-044 used to be the end of the conversation: a full basket and nothing
+     to press. The pilot's own facility is Ahmed Distribuição against
+     Farmácia Central da Baixa, so it is squeezed to something a real basket
+     exceeds and then put back. */
+  // Its own facility, against a distributor whose offers carry prices: the
+  // pilot's existing one is with Ahmed, whose seed catalogue is the regulated
+  // products, and a regulated offer has no price on it by construction
+  // (R-009) — so a basket from Ahmed could never test a credit limit.
+  const pharmacyId = sql("SELECT pa.id FROM pharmacy_account pa " +
+                         "JOIN membership m ON m.organisation_id = pa.organisation_id " +
+                         `JOIN app_user u ON u.id = m.user_id WHERE u.phone='${PHONE}' LIMIT 1`);
+  const vendorOfFacility = sql(
+    "SELECT vendor_id FROM vendor_offer WHERE freshness_state='FRESH' AND price IS NOT NULL " +
+    "GROUP BY vendor_id ORDER BY count(*) DESC LIMIT 1");
+  const facility = "crf_walk_credit";
+  try {
+    sql(`DELETE FROM credit_override WHERE facility_id='${facility}'`);
+    sql(`DELETE FROM credit_facility WHERE id='${facility}'`);
+    sql("INSERT INTO credit_facility (id, vendor_id, pharmacy_id, limit_amount, " +
+        "opening_balance, terms_days, mov_waived, status) VALUES " +
+        `('${facility}', '${vendorOfFacility}', '${pharmacyId}', 1.00, 0, 30, false, 'ACTIVE')`);
+    await resetState();
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(2200);
+
+    // a basket from that distributor alone
+    // a product only that distributor offers, so the ranking cannot route
+    // the line around the facility and out of the test
+    const prod = sql("SELECT o.index_product_id FROM vendor_offer o " +
+                     `WHERE o.vendor_id='${vendorOfFacility}' AND o.freshness_state='FRESH' ` +
+                     "AND o.price IS NOT NULL AND (SELECT count(*) FROM vendor_offer x " +
+                     "  WHERE x.index_product_id=o.index_product_id AND x.freshness_state='FRESH')=1 " +
+                     "ORDER BY o.price DESC LIMIT 1");
+    // The basket is put together through the API rather than by hunting for
+    // one particular product in a grid of three thousand: this step is about
+    // what happens at the limit, and the search is exercised above.
+    const added = await page.evaluate(async (id) => {
+      const tok = localStorage.getItem("token");
+      const r = await fetch("/v1/cart/lines", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok },
+        body: JSON.stringify({ lines: [{ index_product_id: id, qty_requested: 3 }] }),
+      });
+      return r.status;
+    }, prod);
+    check(added === 200, `could not build a basket for the credit step (HTTP ${added})`);
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(2000);
+    await page.click('[data-act="goCart"]');
+    await page.waitForTimeout(1400);
+    expectRefusal = true;
+    await page.click('[data-act="checkout"]');
+    await page.waitForTimeout(2500);
+    expectRefusal = false;
+
+    const wall = await page.$eval("#creditblock", (e) => e.textContent.replace(/\s+/g, " ").trim())
+      .catch(() => null);
+    step("over the credit limit, the cart says: " + (wall ? wall.slice(0, 110) : "(nothing)"));
+    check(!!wall, "the credit refusal is still a wall with nothing to press");
+    check(/\d[\d\s]*,\d{2}\s*MT/.test(wall || ""),
+          "the refusal does not say how much headroom there is or what the order costs");
+    check(!!(await page.$('[data-act="askCredit"]')), "no way to ask for permission");
+    check(!!(await page.$('[data-act="payCash"]')), "no way to pay cash instead");
+
+    // he asks
+    await page.fill("#creditnote", "cliente a espera");
+    await page.click('[data-act="askCredit"]');
+    await page.waitForTimeout(2000);
+    const pendingRow = sql("SELECT status FROM credit_override ORDER BY requested_at DESC LIMIT 1");
+    step("asked for permission -> " + pendingRow);
+    check(pendingRow === "PENDING", "asking produced no pending permission");
+
+    // the distributor's order desk answers, from its own session
+    // Its own context: a second page in the pharmacist's shares his
+    // localStorage, so it opens already signed in as him.
+    const deskCtx = await browser.newContext({ viewport: { width: 420, height: 880 } });
+    const deskPage = await deskCtx.newPage();
+    await deskPage.goto(BASE, { waitUntil: "networkidle" });
+    // Somebody who can actually answer for THIS distributor. A desk hand at
+    // another wholesaler gets a 404, which is the point of that rule and not
+    // a way to drive this one.
+    const decider = sql(
+      "SELECT u.phone FROM app_user u JOIN membership m ON m.user_id = u.id " +
+      "JOIN vendor_account v ON v.organisation_id = m.organisation_id " +
+      `WHERE v.id='${vendorOfFacility}' ` +
+      "AND m.role_codes && ARRAY['VendorOrderDesk','VendorAdmin','VendorFinance'] LIMIT 1") ||
+      sql("SELECT u.phone FROM app_user u JOIN membership m ON m.user_id = u.id " +
+          "WHERE m.role_codes && ARRAY['PlatformFinance','PlatformAdmin'] LIMIT 1");
+    check(!!decider, "nobody in the seed data can answer a credit request");
+    await deskPage.fill("#ph", decider);
+    await deskPage.fill("#pw", PW);
+    await deskPage.click('[data-act="login"]');
+    await deskPage.waitForTimeout(2500);
+    const covId = sql("SELECT id FROM credit_override ORDER BY requested_at DESC LIMIT 1");
+    const approved = await deskPage.evaluate(async (id) => {
+      const tok = localStorage.getItem("token");
+      const r = await fetch("/v1/credit-overrides/" + id + "/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok },
+        body: JSON.stringify({ reason: "cliente antigo" }),
+      });
+      return r.status;
+    }, covId);
+    await deskCtx.close();
+    const side = sql("SELECT decided_by_side FROM credit_override ORDER BY requested_at DESC LIMIT 1");
+    step(`answered by ${decider} (HTTP ${approved}), recorded as ${side || "(nothing)"}`);
+    check(approved === 200, `the decider could not approve it (HTTP ${approved})`);
+    check(side === "VENDOR" || side === "PLATFORM",
+          "the permission does not record which side allowed it");
+
+    // and now the same basket goes through, on credit, with his name on it
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(2000);
+    await page.click('[data-act="goCart"]');
+    await page.waitForTimeout(1200);
+    const ordersBeforeCredit = Number(sql('SELECT count(*) FROM "order"'));
+    await page.click('[data-act="checkout"]');
+    await page.waitForSelector(".ok", { timeout: 25000 });
+    step("ORDER on overridden credit: " + (await page.textContent(".ok")).trim());
+    check(Number(sql('SELECT count(*) FROM "order"')) > ordersBeforeCredit,
+          "the approved permission did not let the order through");
+    const stamped = sql('SELECT credit_override_user_id FROM "order" ' +
+                        "ORDER BY created_at DESC LIMIT 1");
+    const terms = sql('SELECT payment_terms FROM "order" ORDER BY created_at DESC LIMIT 1');
+    step(`the order records: terms=${terms}, allowed by ${stamped || "(nobody)"}`);
+    check(!!stamped, "the order does not say who allowed it past the limit");
+    check(terms === "CREDIT_N_DAYS", "it went through as cash rather than on the credit allowed");
+    check(sql("SELECT status FROM credit_override ORDER BY requested_at DESC LIMIT 1") === "USED",
+          "the permission was not spent, so it could be spent again");
+  } finally {
+    sql(`UPDATE credit_override SET facility_id=facility_id WHERE facility_id='${facility}'`);
+    sql(`DELETE FROM credit_override WHERE facility_id='${facility}'`);
+    sql(`DELETE FROM credit_facility WHERE id='${facility}'`);
+  }
 
   /* ---- the WhatsApp lane, and its price screen ------------------------
      This lane used to go from "confirm" straight to a placed order with no

@@ -22,12 +22,31 @@ def test_downgrade_is_forward_only_refused():
     assert "forward-only" in result.stderr
 
 
-def test_66_tables_exist(db_engine):
+# The spec's schema is 66 tables. Anything beyond it is something this
+# codebase added on purpose, and it is listed here by name and reason so the
+# count keeps catching a table that arrived by accident — which is what the
+# bare `== 66` was for, and what simply raising the number would have thrown
+# away.
+ADDED_SINCE_THE_SPEC = {
+    # A10 names ADMIN_OVERRIDE as an option for a sub-basket the credit gate
+    # blocks, and gives it nothing to live in — which is why R-044 was a wall
+    # for a pharmacist with a full basket. One row is one permission: one
+    # request, one distributor, one amount, spent once, with the name of
+    # whoever allowed it. (migration 0008)
+    "credit_override",
+}
+
+
+def test_the_schema_is_the_spec_plus_what_we_added_on_purpose(db_engine):
     with db_engine.connect() as conn:
-        count = conn.execute(
-            text("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'alembic_version'")
-        ).scalar()
-    assert count == 66
+        names = set(conn.execute(text(
+            "SELECT table_name FROM information_schema.tables "
+            "WHERE table_schema='public' AND table_name <> 'alembic_version'"
+        )).scalars().all())
+
+    unexpected = names - ADDED_SINCE_THE_SPEC
+    assert len(unexpected) == 66, sorted(unexpected)
+    assert ADDED_SINCE_THE_SPEC <= names, sorted(ADDED_SINCE_THE_SPEC - names)
 
 
 def test_append_only_tables_reject_update_and_delete(db_engine):
