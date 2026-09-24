@@ -294,8 +294,13 @@ class _FakeOffice:
         self.status, self.body, self.raise_exc, self.calls = status, body or {}, raise_exc, []
 
     def get(self, url, params=None, headers=None):
-        from rova.integrations.office.signing import verify
-        self.calls.append((url, params, verify(OUT_SECRET, {k.lower(): v for k, v in headers.items()}, b"")))
+        from urllib.parse import parse_qsl, urlsplit
+        from rova.integrations.office.signing import canonical_request, verify
+        assert params is None, "the query must be part of the signed URL, not re-encoded by the client"
+        parts = urlsplit(url)
+        ok = verify(OUT_SECRET, {k.lower(): v for k, v in headers.items()}, b"",
+                    canonical=canonical_request("GET", parts.path, parts.query))
+        self.calls.append((f"{parts.scheme}://{parts.netloc}{parts.path}", dict(parse_qsl(parts.query)), ok))
         if self.raise_exc:
             raise ConnectionError("down")
         r = type("R", (), {})()
@@ -402,16 +407,48 @@ def test_hooks_emit_pharmacy_and_fee_events(client, db_engine, office_on, sessio
     assert p["fee_type"] == "PHARMACY_SERVICE_FEE" and p["vendor_id"] == w["vendor"]
 
 
+def _sign_get(path, query="", secret=IN_SECRET, ts=None):
+    from rova.integrations.office.signing import get_headers
+    return get_headers(secret, path, query, ts=ts)
+
+
 def test_pull_endpoints_are_hmac_protected(client, db_engine, office_on):
     w = _world(db_engine)
     oid = _checkout(client, w).json()["orders"][0]["id"]
     assert client.get(f"/v1/office/orders/{oid}").status_code == 401
-    r = client.get(f"/v1/office/orders/{oid}", headers=_sign(b""))
+    r = client.get(f"/v1/office/orders/{oid}", headers=_sign_get(f"/v1/office/orders/{oid}"))
     assert r.status_code == 200 and r.json()["id"] == oid and len(r.json()["lines"]) == 2
-    r = client.get("/v1/office/reconcile/orders", headers=_sign(b""), params={"from": "2020-01-01"})
+    r = client.get("/v1/office/reconcile/orders?from=2020-01-01",
+                   headers=_sign_get("/v1/office/reconcile/orders", "from=2020-01-01"))
     assert oid in [i["order_id"] for i in r.json()["items"]]
-    r = client.get("/v1/office/reconcile/facilities", headers=_sign(b""))
+    r = client.get("/v1/office/reconcile/facilities", headers=_sign_get("/v1/office/reconcile/facilities"))
     assert w["facility"] in [i["facility_id"] for i in r.json()["items"]]
+
+
+def test_ac48_signed_get_is_bound_to_method_path_and_query(client, db_engine, office_on):
+    """SPEC 5.3 v1.1 AC-48 / REVIEW F-4: a GET signature captured on one pull
+    route (same timestamp, inside the 300 s window) does not open another
+    route, another query, or the same route by the old empty-body scheme."""
+    from rova.integrations.office.signing import headers as body_headers
+    w = _world(db_engine)
+    o1 = _checkout(client, w).json()["orders"][0]["id"]
+    o2 = _checkout(client, w).json()["orders"][0]["id"]
+    ts = int(time.time())
+    captured = _sign_get(f"/v1/office/orders/{o1}", ts=ts)
+    assert client.get(f"/v1/office/orders/{o1}", headers=captured).status_code == 200
+    # another order, another route, another query: all 401 with the captured signature
+    for url in (f"/v1/office/orders/{o2}", "/v1/office/reconcile/facilities", "/v1/office/reconcile/orders",
+                f"/v1/office/orders/{o1}?x=1"):
+        r = client.get(url, headers=captured)
+        assert r.status_code == 401 and r.json()["error"]["code"] == "SIGNATURE_INVALID", url
+    q = _sign_get("/v1/office/reconcile/orders", "from=2020-01-01", ts=ts)
+    assert client.get("/v1/office/reconcile/orders?from=2020-01-01", headers=q).status_code == 200
+    assert client.get("/v1/office/reconcile/orders?from=2026-01-01", headers=q).status_code == 401
+    # the pre-v1.1 signature over the empty body no longer opens a pull route
+    assert client.get(f"/v1/office/orders/{o1}", headers=body_headers(IN_SECRET, b"")).status_code == 401
+    # a signature over the right request line but with the other side's secret: 401
+    assert client.get(f"/v1/office/orders/{o1}", headers=_sign_get(f"/v1/office/orders/{o1}", secret=OUT_SECRET)
+                      ).status_code == 401
 
 
 def test_returns_stay_in_store_when_linked_and_emit_received(client, db_engine, office_on, session):

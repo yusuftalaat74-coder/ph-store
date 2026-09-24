@@ -14,6 +14,7 @@ the dependency lets everything through: the live app behaves as before."""
 import json
 from datetime import date
 from decimal import Decimal
+from urllib.parse import urlencode, urlsplit
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
@@ -50,6 +51,11 @@ def _signed(request: Request, raw: bytes) -> bool:
     return signing.verify(config.inbound_secret(), request.headers, raw)
 
 
+def _signed_get(request: Request) -> bool:
+    """SPEC 5.3 v1.1: a signed GET binds method + path + query, not the empty body."""
+    return signing.verify(config.inbound_secret(), request.headers, b"", canonical=signing.request_canonical(request))
+
+
 @router.post("/v1/office/events")
 async def office_events(request: Request):
     if not config.enabled():
@@ -78,7 +84,7 @@ async def office_events(request: Request):
 def office_order(order_id: str, request: Request, session: Session = Depends(get_session, scope="function")):
     if not config.enabled():
         return _disabled()
-    if not _signed(request, b""):
+    if not _signed_get(request):
         return _error(401, "SIGNATURE_INVALID", "bad or stale signature")
     from rova.fulfilment.router import _order_with_lines
     if session.execute(text('SELECT 1 FROM "order" WHERE id=:o'), {"o": order_id}).first() is None:
@@ -97,7 +103,7 @@ def office_order(order_id: str, request: Request, session: Session = Depends(get
 def office_reconcile_orders(request: Request, session: Session = Depends(get_session, scope="function")):
     if not config.enabled():
         return _disabled()
-    if not _signed(request, b""):
+    if not _signed_get(request):
         return _error(401, "SIGNATURE_INVALID", "bad or stale signature")
     qp = request.query_params
     clauses, params = ["TRUE"], {}
@@ -122,7 +128,7 @@ def office_reconcile_orders(request: Request, session: Session = Depends(get_ses
 def office_reconcile_facilities(request: Request, session: Session = Depends(get_session, scope="function")):
     if not config.enabled():
         return _disabled()
-    if not _signed(request, b""):
+    if not _signed_get(request):
         return _error(401, "SIGNATURE_INVALID", "bad or stale signature")
     rows = session.execute(text("SELECT id AS facility_id, pharmacy_id, vendor_id, office_balance, office_synced_at, "
                                 "limit_amount AS limit, office_credit_limit, office_hold FROM credit_facility")).mappings().all()
@@ -202,10 +208,12 @@ def me_statement(request: Request, vendor_id: str | None = None,
             vendor_id = vendors[0]
     params = {k: v for k, v in (("vendor_id", vendor_id), ("from", request.query_params.get("from")),
                                 ("to", request.query_params.get("to"))) if v}
+    url = f"{config.url()}/office/v1/integration/pharmacies/{principal.pharmacy_id}/statement"
+    query = urlencode(params)
+    # SPEC 5.3 v1.1: sign the request line; the URL is sent exactly as signed
+    hdrs = signing.get_headers(config.outbound_secret(), urlsplit(url).path, query)
     try:
-        resp = emitter.http_client().get(
-            f"{config.url()}/office/v1/integration/pharmacies/{principal.pharmacy_id}/statement",
-            params=params, headers=signing.headers(config.outbound_secret(), b""))
+        resp = emitter.http_client().get(f"{url}?{query}" if query else url, headers=hdrs)
     except Exception:
         return _error(503, "UPSTREAM_UNAVAILABLE", "PH Office is unreachable; showing the last snapshot is advised")
     if resp.status_code == 404:
