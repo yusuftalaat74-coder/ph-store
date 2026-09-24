@@ -27,29 +27,64 @@ def _normalise(q: str) -> str:
 
 SHELF_KEY = "coalesce(nullif(p.manufacturer,''), nullif(p.therapeutic_class,''), nullif(p.form,''), 'Outros')"
 
+# The cheapest fresh offer, and the list price printed on that same offer —
+# not the lowest list price across all of them, which would pair a price
+# from one vendor with a margin from another and invent a discount nobody
+# published.
+_BEST_OFFER = (
+    "(SELECT o.id FROM vendor_offer o WHERE o.index_product_id = p.id "
+    " AND o.freshness_state='FRESH' AND o.price IS NOT NULL "
+    " ORDER BY o.price LIMIT 1)"
+)
+
 _LIST_COLUMNS = (
     "p.id, p.inn, p.brand_name, p.form, p.strength, p.pack_size, "
-    "p.therapeutic_class, p.regulated_price, "
+    "p.therapeutic_class, p.category, p.manufacturer, p.image_url, p.regulated_price, "
     "(SELECT count(*) FROM vendor_offer o WHERE o.index_product_id = p.id "
     " AND o.freshness_state='FRESH') AS fresh_offer_count, "
-    "(SELECT min(o.price) FROM vendor_offer o WHERE o.index_product_id = p.id "
-    " AND o.freshness_state='FRESH' AND o.price IS NOT NULL) AS best_price"
+    f"(SELECT o.price FROM vendor_offer o WHERE o.id = {_BEST_OFFER}) AS best_price, "
+    f"(SELECT o.list_price FROM vendor_offer o WHERE o.id = {_BEST_OFFER}) AS list_price"
 )
 
 
 @router.get("/search")
-def search(q: str, offset: int = 0, limit: int = 50,
-           in_stock: bool = False,
+def search(q: str = "", vendor_id: str = "", category: str = "",
+           offset: int = 0, limit: int = 50, in_stock: bool = False,
            principal: Principal = Depends(require_roles(*_READERS)),
            session: Session = Depends(get_session, scope="function")):
-    """A shelf is useless without a price, so each row carries the cheapest
+    """Text, distributor and category, in any combination.
+
+    The three narrow the same result set rather than being three separate
+    screens: a pharmacist looking for syrups from one distributor is asking
+    one question, not two. `vendor_id` implies in-stock — a distributor's
+    shelf that listed products they do not offer would be a lie about who
+    sells what — while `category` alone still shows the whole catalogue
+    unless `in_stock` says otherwise.
+
+    A shelf is useless without a price, so each row carries the cheapest
     fresh offer and how many vendors have it. `best_price` is a string like
-    every other money value in this API — never a JSON number."""
+    every other money value in this API — never a JSON number.
+    """
     limit = max(1, min(limit, 100))
     offset = max(0, offset)
-    needle = f"%{_normalise(q)}%"
-    having = ("AND EXISTS (SELECT 1 FROM vendor_offer o WHERE o.index_product_id = p.id "
-              "AND o.freshness_state='FRESH')") if in_stock else ""
+    params: dict = {"limit": limit + 1, "offset": offset}
+    where = ["p.review_status='PUBLISHED'"]
+
+    if q.strip():
+        where.append("p.search_text LIKE :q")
+        params["q"] = f"%{_normalise(q)}%"
+    if category.strip():
+        where.append("p.category = :category")
+        params["category"] = category.strip()
+
+    if vendor_id.strip():
+        where.append("EXISTS (SELECT 1 FROM vendor_offer o WHERE o.index_product_id = p.id "
+                     "AND o.freshness_state='FRESH' AND o.vendor_id = :vendor)")
+        params["vendor"] = vendor_id.strip()
+    elif in_stock:
+        where.append("EXISTS (SELECT 1 FROM vendor_offer o WHERE o.index_product_id = p.id "
+                     "AND o.freshness_state='FRESH')")
+
     rows = session.execute(
         text(
             # PostgreSQL will not accept a select alias inside an ORDER BY
@@ -58,12 +93,11 @@ def search(q: str, offset: int = 0, limit: int = 50,
             # inner select raises `UndefinedColumn`, which the API would
             # return as a bare 500.
             "SELECT * FROM ("
-            f"  SELECT {_LIST_COLUMNS} FROM index_product p "
-            f"  WHERE p.review_status='PUBLISHED' AND p.search_text LIKE :q {having}"
+            f"  SELECT {_LIST_COLUMNS} FROM index_product p WHERE " + " AND ".join(where) +
             ") x ORDER BY (x.best_price IS NULL), x.brand_name "
             "LIMIT :limit OFFSET :offset"
         ),
-        {"q": needle, "limit": limit + 1, "offset": offset},
+        params,
     ).mappings().all()
     more = len(rows) > limit
     return {"items": [_row(r) for r in rows[:limit]],
@@ -71,10 +105,53 @@ def search(q: str, offset: int = 0, limit: int = 50,
             "next_cursor": None}
 
 
+@router.get("/filters")
+def filters(principal: Principal = Depends(require_roles(*_READERS)),
+            session: Session = Depends(get_session, scope="function")):
+    """What the store can be narrowed by, with the counts, so the screen
+    never offers a filter that would come back empty.
+
+    Distributors are counted by distinct products they have a fresh offer
+    on — not by offer rows, which would make a vendor with two pack sizes of
+    one medicine look like it carries two medicines.
+    """
+    vendors = session.execute(text(
+        "SELECT v.id, v.trade_name, count(DISTINCT o.index_product_id) AS product_count "
+        "FROM vendor_account v "
+        "JOIN vendor_offer o ON o.vendor_id = v.id AND o.freshness_state='FRESH' "
+        "JOIN index_product p ON p.id = o.index_product_id AND p.review_status='PUBLISHED' "
+        "WHERE v.status='ACTIVE' "
+        "GROUP BY v.id, v.trade_name HAVING count(DISTINCT o.index_product_id) > 0 "
+        "ORDER BY 3 DESC, 2"
+    )).mappings().all()
+
+    categories = session.execute(text(
+        "SELECT p.category AS name, count(*) AS product_count, "
+        "       count(*) FILTER (WHERE EXISTS (SELECT 1 FROM vendor_offer o "
+        "           WHERE o.index_product_id = p.id AND o.freshness_state='FRESH')) "
+        "       AS offered_count "
+        "FROM index_product p "
+        "WHERE p.review_status='PUBLISHED' AND p.category IS NOT NULL "
+        "GROUP BY p.category ORDER BY 3 DESC, 2 DESC, 1"
+    )).mappings().all()
+
+    return {"vendors": [dict(v) for v in vendors],
+            "categories": [dict(c) for c in categories]}
+
+
 def _row(r) -> dict:
+    """Money leaves as a 2dp string (A2.4). `discount_pct` is an integer
+    percentage off the vendor's own published public price — the figure a
+    pharmacist reads as their margin — and is omitted entirely when the
+    vendor published no list price, rather than defaulting to zero, which
+    would read as "this vendor gives you nothing"."""
     d = dict(r)
-    if d.get("best_price") is not None:
-        d["best_price"] = str(d["best_price"])
+    price, listed = d.get("best_price"), d.get("list_price")
+    d["best_price"] = str(price) if price is not None else None
+    d["list_price"] = str(listed) if listed is not None else None
+    d["discount_pct"] = None
+    if price is not None and listed is not None and listed > 0 and listed >= price:
+        d["discount_pct"] = int(((listed - price) / listed) * 100)
     return d
 
 
@@ -147,12 +224,24 @@ def get_product(product_id: str, principal: Principal = Depends(require_roles(*_
     ))
     names = dict(session.execute(text(
         "SELECT id, trade_name FROM vendor_account")).all())
-    offers = [
-        {"vendor_id": c.vendor_id, "vendor_name": names.get(c.vendor_id, c.vendor_id),
-         "offer_id": c.offer_id, "price": str(c.price) if c.price is not None else None,
-         "qty_available": c.qty_available, "expiry_horizon_days": c.expiry_horizon_days}
-        for c in result.ordered
-    ]
+    listed = dict(session.execute(text(
+        "SELECT id, list_price FROM vendor_offer WHERE index_product_id = :p"),
+        {"p": product_id}).all())
+
+    def _line(c):
+        lp = listed.get(c.offer_id)
+        pct = None
+        if lp is not None and c.price is not None and lp > 0 and lp >= c.price:
+            pct = int(((lp - c.price) / lp) * 100)
+        return {"vendor_id": c.vendor_id, "vendor_name": names.get(c.vendor_id, c.vendor_id),
+                "offer_id": c.offer_id,
+                "price": str(c.price) if c.price is not None else None,
+                "list_price": str(lp) if lp is not None else None,
+                "discount_pct": pct,
+                "qty_available": c.qty_available,
+                "expiry_horizon_days": c.expiry_horizon_days}
+
+    offers = [_line(c) for c in result.ordered]
     text_pt = None
     if result.single_candidate:
         text_pt = "Único fornecedor disponível de momento para este produto — mais fornecedores a aderir."

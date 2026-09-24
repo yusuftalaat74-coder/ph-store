@@ -59,7 +59,7 @@ function step(n, msg){ console.log(`  ${String(n).padStart(2)}. ${msg}`); }
   // --- browse a shelf ---
   await page.click(".shelf");
   await page.waitForTimeout(1200);
-  const browsed = await page.$$eval(".card.tap .price", els => els.slice(0, 4).map(e => e.textContent.trim()));
+  const browsed = await page.$$eval(".p .pr", els => els.slice(0, 4).map(e => e.textContent.trim()));
   step(++n, "shelf prices: " + (browsed.join(" | ") || "(none)"));
   if (!browsed.length) errors.push("browsing a shelf produced no priced products");
 
@@ -69,12 +69,12 @@ function step(n, msg){ console.log(`  ${String(n).padStart(2)}. ${msg}`); }
   await page.fill("#q", "paracetamol");
   await page.click('[data-act="search"]');
   await page.waitForTimeout(1500);
-  const hits = await page.$$eval(".card.tap", els => els.length);
+  const hits = await page.$$eval(".p", els => els.length);
   step(++n, "search 'paracetamol' -> " + hits + " products");
   if (!hits) errors.push("search returned nothing");
 
   // --- open a product, read the vendor lines ---
-  await page.click(".card.tap");
+  await page.click('.p [data-act="openProduct"]');
   await page.waitForTimeout(1200);
   const productName = (await page.textContent("h1")).trim();
   const vendors = await page.$$eval(".vendorline", els =>
@@ -84,8 +84,10 @@ function step(n, msg){ console.log(`  ${String(n).padStart(2)}. ${msg}`); }
   if (!vendors.length) errors.push("the product page showed no vendor");
 
   // --- add to cart and order ---
+  const offs = await page.$$eval(".off", els => els.slice(0,4).map(e => e.textContent.trim()));
+  step("  ", "discount badges: " + (offs.join(" ") || "(none on this page)"));
   await page.click('[data-act="add"]');
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(600);
   await page.click('[data-act="goCart"]');
   await page.waitForTimeout(600);
   step(++n, "cart: " + (await page.textContent("h1")).trim());

@@ -9,6 +9,7 @@ GET,/v1/assistant/savings
 GET,/v1/assistant/stock-risks
 GET,/v1/assistant/summary
 GET,/v1/auth/me
+GET,/v1/catalogue/filters
 GET,/v1/catalogue/products/{product_id}
 GET,/v1/catalogue/search
 GET,/v1/catalogue/shelf

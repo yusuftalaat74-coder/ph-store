@@ -51,16 +51,20 @@ def fx(db_engine):
                 "false, 'PUBLISHED', 'test', :s) ON CONFLICT (id) DO NOTHING"),
                 {"id": pid, "b": brand, "m": maker, "s": (brand + " paracetamol").lower()})
 
-        for oid, ven, prod, price in (
-                ("ofr_1a_" + SUFFIX, "1", "idx_pa_", "838.00"),
-                ("ofr_2a_" + SUFFIX, "2", "idx_pa_", "812.00"),
-                ("ofr_1b_" + SUFFIX, "1", "idx_ac_", "704.00")):
+        # `listed` is the vendor's own published public price. The Medimport
+        # line deliberately has none, so the "no list price means no margin"
+        # path is covered as well as the happy one.
+        for oid, ven, prod, price, listed in (
+                ("ofr_1a_" + SUFFIX, "1", "idx_pa_", "838.00", None),
+                ("ofr_2a_" + SUFFIX, "2", "idx_pa_", "812.00", "1200.00"),
+                ("ofr_1b_" + SUFFIX, "1", "idx_ac_", "704.00", "1043.00")):
             c.execute(text(
                 "INSERT INTO vendor_offer (id, vendor_id, index_product_id, regulated_price, "
-                "qty_available, pack_size, expiry_horizon_days, price, stock_confirmed_at) "
-                f"VALUES (:id, 'ven_{ven}_{SUFFIX}', :p, false, 100, '1', 400, :price, now()) "
-                "ON CONFLICT (id) DO NOTHING"),
-                {"id": oid, "p": prod + SUFFIX, "price": price})
+                "qty_available, pack_size, expiry_horizon_days, price, list_price, "
+                "stock_confirmed_at) "
+                f"VALUES (:id, 'ven_{ven}_{SUFFIX}', :p, false, 100, '1', 400, :price, "
+                ":listed, now()) ON CONFLICT (id) DO NOTHING"),
+                {"id": oid, "p": prod + SUFFIX, "price": price, "listed": listed})
 
         c.execute(text(
             "INSERT INTO app_user (id, phone, name, password_hash) VALUES "
@@ -153,3 +157,122 @@ def test_a_product_nobody_offers_still_opens(client, h):
     r = client.get(f"/v1/catalogue/products/idx_no_{SUFFIX}", headers=h)
     assert r.status_code == 200, r.text
     assert r.json()["offers"] == []
+
+
+def test_the_margin_comes_from_the_same_offer_as_the_price(client, h):
+    """`best_price` and `list_price` must be the cheapest offer's own pair.
+    Taking the lowest price from one vendor and the highest list price from
+    another would manufacture a discount that nobody published."""
+    r = client.get("/v1/catalogue/search", headers=h,
+                   params={"q": "panado", "in_stock": True})
+    item = [x for x in r.json()["items"] if x["id"] == f"idx_pa_{SUFFIX}"][0]
+    assert item["best_price"] == "812.00"     # Medis
+    assert item["list_price"] == "1200.00"    # Medis' own PVP, not Medimport's
+    assert item["discount_pct"] == 32         # (1200 - 812) / 1200
+
+
+def test_no_published_list_price_means_no_discount_not_zero(client, h):
+    """Medimport publishes no public price for ACARBOSE in this fixture... but
+    it does. The case that matters is the offer that has none: the field is
+    null, so the card shows nothing rather than "-0%", which a pharmacist
+    reads as this vendor giving them nothing."""
+    r = client.get(f"/v1/catalogue/products/idx_pa_{SUFFIX}", headers=h)
+    by_vendor = {o["vendor_name"]: o for o in r.json()["offers"]}
+    assert by_vendor["Medimport"]["list_price"] is None
+    assert by_vendor["Medimport"]["discount_pct"] is None
+    assert by_vendor["Medis"]["discount_pct"] == 32
+
+
+def test_the_database_refuses_a_list_price_below_the_price(db_engine):
+    """A negative margin is a transcription error, not a discount, and the
+    CHECK makes it unrepresentable rather than leaving the API to notice."""
+    import pytest as _pytest
+    from sqlalchemy.exc import IntegrityError
+    with _pytest.raises(IntegrityError):
+        with db_engine.begin() as c:
+            c.execute(text(
+                "INSERT INTO vendor_offer (id, vendor_id, index_product_id, regulated_price, "
+                "qty_available, pack_size, expiry_horizon_days, price, list_price, "
+                "stock_confirmed_at) VALUES "
+                f"('ofr_bad_{SUFFIX}', 'ven_1_{SUFFIX}', 'idx_ac_{SUFFIX}', false, 1, '1', 10, "
+                "500.00, 100.00, now())"))
+
+
+def _ids(body):
+    return {x["id"] for x in body["items"]}
+
+
+def test_filters_offer_only_what_can_be_ordered(client, h, db_engine):
+    """A chip that comes back empty teaches the pharmacist not to trust the
+    chips, so a distributor with no live offer and a category with no offered
+    product are not offered as filters at all."""
+    r = client.get("/v1/catalogue/filters", headers=h)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    names = {v["trade_name"]: v["product_count"] for v in body["vendors"]}
+    assert names["Medimport"] == 2, "two distinct products, not three offer rows"
+    assert names["Medis"] == 1
+    assert all(v["product_count"] > 0 for v in body["vendors"])
+
+
+def test_a_distributor_shows_only_what_it_sells(client, h):
+    only = client.get("/v1/catalogue/search", headers=h,
+                      params={"vendor_id": f"ven_2_{SUFFIX}"}).json()
+    assert _ids(only) == {f"idx_pa_{SUFFIX}"}, "Medis carries the one product here"
+
+
+def test_a_distributor_filter_never_lists_what_it_does_not_offer(client, h):
+    """`vendor_id` implies in-stock: a distributor's shelf that listed a
+    product they do not carry would be a lie about who sells what."""
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"vendor_id": f"ven_1_{SUFFIX}"}).json()
+    assert f"idx_no_{SUFFIX}" not in _ids(body)
+
+
+def test_a_category_crosses_distributors(client, h, db_engine):
+    """The whole point of the category axis: it is asked regardless of who
+    sells it."""
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE index_product SET category='Comprimidos' "
+                       "WHERE id IN (:a, :b)"),
+                  {"a": f"idx_pa_{SUFFIX}", "b": f"idx_ac_{SUFFIX}"})
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"category": "Comprimidos", "in_stock": True}).json()
+    got = _ids(body)
+    assert f"idx_pa_{SUFFIX}" in got and f"idx_ac_{SUFFIX}" in got
+
+
+def test_the_two_filters_narrow_together(client, h, db_engine):
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE index_product SET category='Comprimidos' "
+                       "WHERE id IN (:a, :b)"),
+                  {"a": f"idx_pa_{SUFFIX}", "b": f"idx_ac_{SUFFIX}"})
+        c.execute(text("UPDATE index_product SET category='Tópicos' WHERE id=:a"),
+                  {"a": f"idx_ac_{SUFFIX}"})
+    both = client.get("/v1/catalogue/search", headers=h,
+                      params={"vendor_id": f"ven_1_{SUFFIX}",
+                              "category": "Comprimidos"}).json()
+    assert _ids(both) == {f"idx_pa_{SUFFIX}"}, \
+        "Medimport sells both, but only one of them is a tablet"
+
+
+def test_search_text_and_both_filters_compose(client, h, db_engine):
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE index_product SET category='Comprimidos' WHERE id=:a"),
+                  {"a": f"idx_pa_{SUFFIX}"})
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"q": "panado", "vendor_id": f"ven_2_{SUFFIX}",
+                              "category": "Comprimidos"}).json()
+    assert _ids(body) == {f"idx_pa_{SUFFIX}"}
+
+    none = client.get("/v1/catalogue/search", headers=h,
+                      params={"q": "panado", "vendor_id": f"ven_2_{SUFFIX}",
+                              "category": "Injectáveis"}).json()
+    assert none["items"] == [], "a category the product is not in must exclude it"
+
+
+def test_search_with_no_query_is_a_browse_not_an_error(client, h):
+    """The store opens on everything orderable; `q` is optional."""
+    r = client.get("/v1/catalogue/search", headers=h, params={"in_stock": True})
+    assert r.status_code == 200
+    assert len(r.json()["items"]) >= 2

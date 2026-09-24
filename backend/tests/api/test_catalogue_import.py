@@ -71,10 +71,14 @@ def test_nothing_is_loaded_as_price_regulated(session, source):
     claiming it falsely is worse than admitting we do not know."""
     run_import(session, str(source))
     n = session.execute(text(
-        "SELECT count(*) FROM index_product WHERE regulated_price")).scalar()
+        "SELECT count(*) FROM index_product WHERE regulated_price "
+        "AND reviewer_ref LIKE 'MZ-REGISTER:%'")).scalar()
     assert n == 0
+    # scoped to the two vendors this importer creates: the database is shared
+    # with other modules, which sell things too
     priced = session.execute(text(
-        "SELECT count(*) FROM vendor_offer WHERE price IS NOT NULL")).scalar()
+        "SELECT count(*) FROM vendor_offer WHERE price IS NOT NULL "
+        "AND vendor_id IN ('ven_medimport','ven_medis')")).scalar()
     assert priced == 3
 
 
@@ -145,3 +149,68 @@ def test_ids_are_stable_so_a_reimport_is_the_same_catalogue():
     a = stable_id("idx_", "MED", "OO/H/1", "PANADO", "500mg")
     b = stable_id("idx_", "MED", "OO/H/1", "PANADO", "500mg")
     assert a == b and a.startswith("idx_") and len(a) == 24
+
+
+# ── categories ────────────────────────────────────────────────────────────
+
+@pytest.mark.parametrize("form,name,expected", [
+    # the defect this table exists for: `gel` is inside `Angelic`, and the
+    # first version of the categoriser filed a box of 28 tablets under
+    # topicals because of it. Found on the live storefront.
+    ("", "Angelic Cx. 28 Comp.", "Comprimidos"),
+    ("", "Magnesium B Cxs X 30 Comp.", "Comprimidos"),
+    ("", "Acarbose Bluepharma 100 mg cx 50 comp", "Comprimidos"),
+    ("Comprimidos", "PANADO 500", "Comprimidos"),
+    ("", "Aciclovir Bluepharma 50 mg/g Créme, Bisnaga de 10 g", "Tópicos"),
+    ("", "AquaMaris, Spray Nasal, Frasco de 30 ml", "Tópicos"),
+    ("", "ACARILBIAL Sol. Cutânea 200 ml", "Tópicos"),
+    ("Xarope", "BENYLIN", "Orais líquidos"),
+    ("Solução Injectável", "CEFTRIAXONA", "Injectáveis"),
+    ("Comprimidos vaginais", "CLOTRIMAZOL", "Vaginais e supositórios"),
+    ("Colírio", "TOBRADEX", "Oftálmicos e óticos"),
+    ("Cápsulas", "OMEPRAZOL", "Cápsulas"),
+    # a powder that becomes a syrup is bought as a syrup — the liquid rule
+    # is ahead of the powder rule on purpose, and this pins that order
+    ("Pó para Suspensão Oral", "CLAVAMOX", "Orais líquidos"),
+    ("Granulado", "FOSFOMICINA", "Pós e granulados"),
+    ("", "ACUTIL Cxs X 20 Saquetas", "Pós e granulados"),
+])
+def test_a_product_is_filed_by_whole_words_not_fragments(form, name, expected):
+    from rova.catalogue.importer import categorise
+    assert categorise("", form, name) == expected
+
+
+def test_a_register_category_wins_over_a_guess():
+    """`Dispositivo Médico de Diagnóstico In-vitro` is what the register
+    says; no keyword rule should overrule it."""
+    from rova.catalogue.importer import categorise
+    stated = "Dispositivo Médico de Diagnóstico In-vitro"
+    assert categorise(stated, stated, "β-HCG Rapid Test Kit Spray") == stated
+
+
+def test_nothing_falls_out_of_every_filter():
+    """A product with nothing to go on is filed under `Outros`, never left
+    without a category — an uncategorised row is invisible to the whole
+    category filter and nobody would notice it was missing."""
+    from rova.catalogue.importer import categorise
+    assert categorise("", "", "") == "Outros"
+    assert categorise("", "", "XYZQ 17") == "Outros"
+
+
+def test_every_rule_in_the_table_is_reachable():
+    """Each label has at least one case above proving it fires, so a rule
+    cannot be shadowed into uselessness by one written earlier."""
+    from rova.catalogue.importer import CATEGORY_RULES, categorise
+    samples = {
+        "Vaginais e supositórios": ("Comprimidos vaginais", "X"),
+        "Oftálmicos e óticos": ("Colírio", "X"),
+        "Injectáveis": ("Solução Injectável", "X"),
+        "Tópicos": ("Creme", "X"),
+        "Orais líquidos": ("Xarope", "X"),
+        "Comprimidos": ("Comprimidos", "X"),
+        "Cápsulas": ("Cápsulas", "X"),
+        "Pós e granulados": ("Granulado", "X"),
+    }
+    for label, _ in CATEGORY_RULES:
+        form, name = samples[label]
+        assert categorise("", form, name) == label, f"{label} is unreachable"

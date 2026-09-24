@@ -44,6 +44,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
+from decimal import Decimal, InvalidOperation
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -100,6 +101,62 @@ def match_key(name: str) -> str:
     return re.sub(r"\s+", " ", s).strip()
 
 
+# ── categories ────────────────────────────────────────────────────────────
+#
+# The filter a pharmacist uses is "show me the syrups", not "show me the
+# ATC J01CA04 group". These rules read whatever the source gave us — the
+# register's own category, the dosage form, or the wording of the vendor's
+# own line ("cx 50 comp", "Sol. Cutânea", "Frs X 100ml") — because the 504
+# products that came from a price list have no dosage form at all and they
+# are precisely the ones with offers behind them.
+#
+# Order matters: a vaginal tablet is filed under the route, not under
+# tablets, because that is how it is asked for at a counter.
+# Patterns, not substrings. The first version matched `"gel" in text` and
+# filed `Angelic Cx. 28 Comp.` — a tablet — under topicals, because the word
+# gel is inside Angelic. Every needle here is anchored so it matches a word
+# or a unit, never a fragment of a longer one. Found by reading the live
+# storefront, not by a test, which is why the table is now data a test can
+# walk rather than a list of `in` checks.
+CATEGORY_RULES = [
+    ("Vaginais e supositórios", r"\bvagina\w*|\bsupositori\w*|\bovulos?\b|\bpessario\w*"),
+    ("Oftálmicos e óticos",     r"\bcolirio\w*|\boftalmic\w*|\botic[ao]s?\b|\bauricular\w*|"
+                                r"\bocular\w*|\bcolirios?\b"),
+    ("Injectáveis",             r"\binject\w*|\binjet\w*|\bampolas?\b|\bseringa\w*|\binfusao\b"),
+    ("Tópicos",                 r"\bcremes?\b|\bpomadas?\b|\bgeis?\b|\bgel\b|\blocao\b|"
+                                r"\blocoes\b|\bunguent\w*|\bcutane\w*|\btopic\w*|\bsprays?\b|"
+                                r"\bemulsao\b|\bsabonete\w*|\bsoap\b|\bshampoo\b|\bnasal\b|"
+                                r"\bbisnaga\w*"),
+    ("Orais líquidos",          r"\bxaropes?\b|\bsyrup\b|\bsuspensao\b|\bsolucao\s+oral\b|"
+                                r"\bsol\.?\s*oral\b|\bgotas\b|\belixir\b|\d\s*ml\b|"
+                                r"\bfrascos?\b|\bfrs?\b"),
+    ("Comprimidos",             r"\bcomprimid\w*|\bcomps?\b|\btablets?\b|\bdrageias?\b|"
+                                r"\beferv\w*|\bpastilhas?\b|\blozenges?\b|\bcx\b.*\bcomp"),
+    ("Cápsulas",                r"\bcapsul\w*|\bcaps\b|\bsoftgel\w*"),
+    ("Pós e granulados",        r"\bpo\s+para\b|\bgranulad\w*|\bsaquetas?\b|\bsache\w*"),
+]
+CATEGORY_PATTERNS = [(label, re.compile(pattern)) for label, pattern in CATEGORY_RULES]
+
+# Categories a register states outright are kept verbatim — they are better
+# than anything a keyword rule could infer.
+_EXPLICIT_PREFIXES = ("dispositivo", "desinfectante", "antisseptico", "antisséptico",
+                      "suplemento", "fitoterapico", "fitoterápico", "cosmetico",
+                      "cosmético", "reagente")
+
+
+def categorise(explicit: str, form: str, name: str) -> str:
+    """The shelf a product belongs on. Never empty: a product with nothing to
+    go on is filed under `Outros` rather than vanishing from every filter."""
+    stated = (explicit or "").strip()
+    if stated and fold(stated).startswith(_EXPLICIT_PREFIXES):
+        return stated
+    hay = fold(f"{form} {name}")
+    for label, pattern in CATEGORY_PATTERNS:
+        if pattern.search(hay):
+            return label
+    return stated or "Outros"
+
+
 def _lookup_keys(name: str, substance: str):
     """Keys to try against the register, most specific first.
 
@@ -127,6 +184,17 @@ def stable_id(prefix: str, *parts: str) -> str:
     return f"{prefix}{h}"
 
 
+def _money(s: str) -> Decimal:
+    """Money is compared as `Decimal`, never as a float — the same rule the
+    rest of the system keeps, and `tests/domain/test_money.py` enforces it
+    across the source tree. An unreadable value sorts as zero so it can never
+    look like the larger of the pair."""
+    try:
+        return Decimal(s)
+    except (InvalidOperation, TypeError):
+        return Decimal("0")
+
+
 def _rows(path: pathlib.Path) -> list[dict]:
     if not path.exists():
         return []
@@ -146,6 +214,7 @@ class Product:
     pack_size: str
     manufacturer: str
     therapeutic_class: str | None
+    category: str
     reviewer_ref: str
     search_text: str
 
@@ -187,6 +256,7 @@ def _product_from_medicine(r: dict) -> Product | None:
         id=stable_id("idx_", "MED", ref, brand, strength),
         inn=inn, brand_name=brand, form=form, strength=strength, pack_size=pack,
         manufacturer=manufacturer, therapeutic_class=None,
+        category=categorise("", form, f"{brand} {strength}"),
         reviewer_ref=f"{REVIEWER_REGISTER}:{ref}",
         search_text=fold(" ".join([brand, inn, strength, form])),
     )
@@ -204,6 +274,7 @@ def _product_from_authorised(r: dict) -> Product | None:
         strength="", pack_size="1",
         manufacturer=(r.get("manufacturer") or r.get("enterprise") or "—").strip() or "—",
         therapeutic_class=category or None,
+        category=categorise(category, category, name),
         reviewer_ref=f"{REVIEWER_REGISTER}:{ref}",
         search_text=fold(" ".join([name, category])),
     )
@@ -220,6 +291,7 @@ def _product_from_phyto(r: dict) -> Product | None:
         inn=name, brand_name=name, form=kind, strength="", pack_size="1",
         manufacturer=(r.get("manufacturer") or enterprise or "—").strip() or "—",
         therapeutic_class=kind,
+        category=categorise(kind, kind, name),
         reviewer_ref=f"{REVIEWER_REGISTER}:{kind}:{name}"[:200],
         search_text=fold(" ".join([name, kind, enterprise])),
     )
@@ -232,6 +304,7 @@ def _product_from_offer(vendor_key: str, name: str, substance: str,
         inn=substance or name, brand_name=name,
         form="Não especificado", strength="", pack_size="1",
         manufacturer=maker or "—", therapeutic_class=None,
+        category=categorise("", "", f"{name} {substance}"),
         reviewer_ref=f"{REVIEWER_VENDOR}:{vendor_key}",
         search_text=fold(" ".join([name, substance, maker])),
     )
@@ -241,26 +314,28 @@ def _product_from_offer(vendor_key: str, name: str, substance: str,
 
 _UPSERT_PRODUCT = text("""
 INSERT INTO index_product (id, inn, brand_name, form, strength, pack_size,
-                           manufacturer, therapeutic_class, aim_status,
+                           manufacturer, therapeutic_class, category, aim_status,
                            regulated_price, review_status, reviewer_ref, search_text)
-VALUES (:id, :inn, :brand, :form, :strength, :pack, :maker, :klass,
+VALUES (:id, :inn, :brand, :form, :strength, :pack, :maker, :klass, :category,
         'AUTHORISED', false, 'PUBLISHED', :ref, :search)
 ON CONFLICT (id) DO UPDATE SET
     inn = EXCLUDED.inn, brand_name = EXCLUDED.brand_name, form = EXCLUDED.form,
     strength = EXCLUDED.strength, pack_size = EXCLUDED.pack_size,
     manufacturer = EXCLUDED.manufacturer,
     therapeutic_class = EXCLUDED.therapeutic_class,
+    category = EXCLUDED.category,
     search_text = EXCLUDED.search_text, updated_at = now()
 """)
 
 _UPSERT_OFFER = text("""
 INSERT INTO vendor_offer (id, vendor_id, index_product_id, regulated_price,
                           qty_available, pack_size, expiry_horizon_days, price,
-                          stock_confirmed_at, freshness_state)
+                          list_price, stock_confirmed_at, freshness_state)
 VALUES (:id, :vendor, :product, false, :qty, :pack, :horizon, :price,
-        :confirmed, 'FRESH')
+        :list_price, :confirmed, 'FRESH')
 ON CONFLICT (id) DO UPDATE SET
-    price = EXCLUDED.price, qty_available = EXCLUDED.qty_available,
+    price = EXCLUDED.price, list_price = EXCLUDED.list_price,
+    qty_available = EXCLUDED.qty_available,
     expiry_horizon_days = EXCLUDED.expiry_horizon_days,
     stock_confirmed_at = EXCLUDED.stock_confirmed_at,
     freshness_state = 'FRESH', withdrawn_at = NULL, updated_at = now()
@@ -272,7 +347,8 @@ def _write_product(session: Session, p: Product) -> None:
         "id": p.id, "inn": p.inn[:400], "brand": p.brand_name[:400],
         "form": p.form[:200], "strength": p.strength[:200],
         "pack": p.pack_size[:200], "maker": p.manufacturer[:300],
-        "klass": (p.therapeutic_class or None), "ref": p.reviewer_ref[:200],
+        "klass": (p.therapeutic_class or None), "category": p.category[:120],
+        "ref": p.reviewer_ref[:200],
         "search": p.search_text[:1000],
     })
 
@@ -353,6 +429,13 @@ def run_import(session: Session, directory: str, *, assume_stock: int = 500,
 
             substance = (row.get("dci") or row.get("active_substance") or "").strip()
             maker = (row.get("family") or row.get("laboratory") or "").strip()
+            # The vendor's own published public price (PVP / Público c/IVA).
+            # Captured as printed; a value below what the pharmacy pays is a
+            # transcription error, not a margin, and is dropped rather than
+            # shown as a negative discount.
+            listed = (row.get("price_public") or row.get("price_public_inc_vat") or "").strip()
+            if listed and price and _money(listed) < _money(price):
+                listed = ""
 
             product_id = None
             for candidate in _lookup_keys(name, substance):
@@ -376,7 +459,7 @@ def run_import(session: Session, directory: str, *, assume_stock: int = 500,
                 "vendor": v["id"], "product": product_id,
                 "qty": assume_stock, "pack": "1",
                 "horizon": _horizon_days(row.get("min_validity", "")),
-                "price": price, "confirmed": now,
+                "price": price, "list_price": listed or None, "confirmed": now,
             })
             loaded += 1
         rep.offers[v["trade_name"]] = loaded
