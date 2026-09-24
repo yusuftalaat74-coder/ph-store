@@ -21,6 +21,7 @@ from rova.domain.fsm import Ctx
 from rova.domain.machines.registry import MACHINES
 from rova.domain.machines.sm20_eta_estimate import create_provisional
 from rova.fees.selection import active_schedules_for
+from rova.ordering.pricing import price_line
 from rova.ranking.engine import rank
 from rova.ranking.inputs import build_ranking_input
 
@@ -229,7 +230,55 @@ def allocate_remainder(session: Session, *, request_line_id: str, actor) -> dict
     return {"request_line_id": request_line_id, "match_status": "RESOLVED", "order": order_info}
 
 
-def checkout(session: Session, *, request_id: str, actor, payment_overrides: dict[str, str] | None = None) -> dict:
+def _enforce_prices(session: Session, *, req: dict, acknowledged: dict[str, str] | None) -> None:
+    """Refuse a checkout that would charge a price nobody agreed to.
+
+    The rule is about the claim, not about the route. A cart line records
+    `price_seen` — what was on the screen when it went in — and that is the
+    pharmacist's standing claim about what this costs. Sending
+    `acknowledged_prices` replaces that claim with a newer one, which is what
+    the "continue at the new prices" button does. Either way, checkout
+    compares the claim against what would actually be billed and refuses if
+    they differ.
+
+    A line with no `price_seen` made no claim: the WhatsApp lane creates
+    lines before any price exists, and a client that builds a request through
+    `POST /requests` + `/lines` never displayed one. There is nothing to
+    contradict, so there is nothing to enforce — inventing a requirement
+    there would reject honest callers to no end.
+
+    An unpriceable line is left alone here; `checkout()` refuses it a few
+    lines later under R-014, which is where that rule already lived.
+    """
+    lines = session.execute(
+        text("SELECT id, index_product_id, qty_requested, price_seen FROM request_line "
+             "WHERE request_id=:r AND price_seen IS NOT NULL"),
+        {"r": req["id"]},
+    ).mappings().all()
+    if not lines:
+        return
+
+    moved = []
+    for line in lines:
+        priced = price_line(session, index_product_id=line["index_product_id"],
+                            qty=line["qty_requested"], pharmacy_id=req["pharmacy_id"],
+                            strategy=req["allocation_strategy"])
+        if priced.unit_price is None:
+            continue                       # R-014 handles this below
+        claim = (acknowledged or {}).get(line["id"])
+        claimed = Decimal(claim) if claim is not None else line["price_seen"]
+        if claimed != priced.unit_price:
+            moved.append({"field": line["id"],
+                          "reason": f"shown {money_str(claimed)}, "
+                                    f"now {money_str(priced.unit_price)}"})
+
+    if moved:
+        raise ApiError("PRICE_MOVED", "the price changed since you looked",
+                       details=moved, rule="A2.4")
+
+
+def checkout(session: Session, *, request_id: str, actor, payment_overrides: dict[str, str] | None = None,
+             acknowledged_prices: dict[str, str] | None = None) -> dict:
     """`payment_overrides`: `{vendor_id: "UPFRONT"}` — the J-20 minimum this
     session adds (item 3, backend-review-r1.md): when the credit gate blocks
     a vendor's sub-basket, the pharmacy can force that vendor's order onto
@@ -259,6 +308,8 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
     # restricted to PharmacyBuyer/OpsReviewer), and checkout must not perform
     # it on their behalf — a PharmacyAdmin could otherwise buy a basket the
     # buyer never confirmed.
+    _enforce_prices(session, req=dict(req), acknowledged=acknowledged_prices)
+
     entry_status = req["status"]
     if entry_status not in ("DRAFT", "CONFIRMED"):
         raise ApiError(
@@ -279,13 +330,26 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
 
     by_vendor: dict[str, list[dict]] = {}
     chosen_offer: dict[str, dict] = {}
+    # Every unpriceable line, not just the first: the cart screen marks them
+    # all in one pass instead of the pharmacist removing one, retrying, and
+    # being told about the next.
+    unpriceable = []
+    ranked = {}
     for line in lines:
         result = rank(build_ranking_input(
             session, index_product_id=line["index_product_id"], qty_requested=line["qty_requested"],
             pharmacy_id=req["pharmacy_id"], strategy=req["allocation_strategy"],
         ))
         if not result.ordered:
-            raise ApiError("GUARD_FAILED", f"no fresh offer for line {line['id']}", rule="R-014")
+            unpriceable.append({"field": line["id"], "reason": "no fresh offer"})
+        else:
+            ranked[line["id"]] = result
+    if unpriceable:
+        raise ApiError("GUARD_FAILED",
+                       f"no fresh offer for {len(unpriceable)} line(s)",
+                       details=unpriceable, rule="R-014")
+    for line in lines:
+        result = ranked[line["id"]]
         top = result.ordered[0]
         by_vendor.setdefault(top.vendor_id, []).append(dict(line))
         chosen_offer[line["id"]] = {"offer_id": top.offer_id, "price": top.price, "snapshot": result.snapshot,

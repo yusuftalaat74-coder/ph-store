@@ -18,6 +18,7 @@ from rova.assistant.router import router as assistant_router
 from rova.auth.router import router as auth_router
 from rova.billing.router import router as billing_router
 from rova.catalogue.router import router as catalogue_router
+from rova.ordering.cart_router import router as cart_router
 from rova.config import get_settings
 from rova.core.errors import install_error_handlers
 from rova.core.json_encoding import install_decimal_string_encoder
@@ -61,6 +62,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(auth_router)
     app.include_router(ordering_router)
+    app.include_router(cart_router)
     app.include_router(catalogue_router)
     app.include_router(fulfilment_router)
     app.include_router(billing_router)

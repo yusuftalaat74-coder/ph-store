@@ -280,9 +280,17 @@ def summary(pharmacy_id: str | None = None,
     pharmacy can go and look at."""
     pid = _pharmacy_scope(principal, pharmacy_id, session)
     counts = session.execute(
+        # The cart is a DRAFT request, so it would otherwise be counted as an
+        # open request and the pharmacist would see "1 open request" for a
+        # basket they have not sent. It is reported separately as `cart_lines`.
         text('SELECT '
-             ' (SELECT count(*) FROM request WHERE pharmacy_id=:p AND status NOT IN (\'CLOSED\',\'CANCELLED\')) '
+             ' (SELECT count(*) FROM request WHERE pharmacy_id=:p '
+             "    AND status NOT IN ('CLOSED','CANCELLED') "
+             "    AND NOT (status = 'DRAFT' AND mode = 'CATALOGUE' AND channel = 'APP')) "
              '   AS open_requests,'
+             ' (SELECT count(*) FROM request_line rl JOIN request r ON r.id = rl.request_id '
+             "    WHERE r.pharmacy_id=:p AND r.status='DRAFT' AND r.mode='CATALOGUE' "
+             "    AND r.channel='APP' AND rl.line_kind='CATALOGUE') AS cart_lines,"
              ' (SELECT count(*) FROM "order" WHERE pharmacy_id=:p AND status NOT IN (\'CLOSED\',\'CANCELLED\',\'REJECTED\')) '
              '   AS open_orders,'
              ' (SELECT count(*) FROM dispute d JOIN "order" o ON o.id=d.order_id WHERE o.pharmacy_id=:p '

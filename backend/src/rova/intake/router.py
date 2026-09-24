@@ -468,6 +468,10 @@ def drop_line(line_id: str,
              "rc": region, "q": line["qty_requested"], "t": now()},
         )
     session.execute(text("DELETE FROM request_line WHERE id=:id"), {"id": line_id})
+    # Removing a line is touching the cart. Without this the idle-cart job
+    # would read a basket somebody just edited as one nobody has opened.
+    session.execute(text("UPDATE request SET updated_at = now() WHERE id=:r"),
+                    {"r": line["request_id"]})
     return {"deleted": line_id}
 
 
@@ -534,6 +538,7 @@ router.add_api_route("/requests/{request_id}/cancel",
 @router.get("/requests")
 def list_requests(status: str | None = None, channel: Channel | None = None,
                   pharmacy_id: str | None = None, limit: int = 50,
+                  include_cart: bool = True,
                   principal: Principal = Depends(require_roles(*(_PHARMACY_OR_OPS + _OPS))),
                   session: Session = Depends(get_session, scope="function")):
     scope_pharmacy = principal.pharmacy_id or pharmacy_id
@@ -542,8 +547,14 @@ def list_requests(status: str | None = None, channel: Channel | None = None,
              "FROM request r WHERE (CAST(:ph AS TEXT) IS NULL OR r.pharmacy_id=:ph) "
              "AND (CAST(:st AS TEXT) IS NULL OR r.status=:st) "
              "AND (CAST(:ch AS TEXT) IS NULL OR r.channel=:ch) "
+             # The cart is a DRAFT request. It belongs on the cart screen, not
+             # in the order history, where it would read as an order the
+             # pharmacist had sent. Default stays True so nothing that already
+             # calls this changes shape.
+             "AND (:cart OR NOT (r.status='DRAFT' AND r.mode='CATALOGUE' AND r.channel='APP')) "
              "ORDER BY r.created_at DESC LIMIT :lim"),
-        {"ph": scope_pharmacy, "st": status, "ch": channel, "lim": limit},
+        {"ph": scope_pharmacy, "st": status, "ch": channel, "lim": limit,
+         "cart": include_cart},
     ).mappings().all()
     return {"items": [dict(r) for r in rows], "next_cursor": None}
 

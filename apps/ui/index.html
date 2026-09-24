@@ -119,7 +119,7 @@ textarea{min-height:120px;resize:vertical}
          justify-content:space-between;gap:6px;flex-wrap:wrap;row-gap:8px}
 .p .cnt{margin-inline-start:auto}
 .p .pr{font-weight:800;font-size:15px;letter-spacing:-.3px;white-space:nowrap}
-.p .was{color:var(--muted);font-size:11px;text-decoration:line-through;display:block}
+.was{color:var(--muted);font-size:11px;text-decoration:line-through;display:block}
 .off{position:absolute;top:16px;left:16px;background:var(--red);color:#fff;
      font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;z-index:2}
 .p .noff{color:var(--muted);font-size:11px;font-weight:600}
@@ -254,6 +254,7 @@ const T = {
     store:"Store", store_sub:"Browse, search and order",
     search_ph:"Paracetamol, Amoxicilina…", search:"Search", searching:"Searching…",
     nothing:"Nothing found.", clear:"Clear",
+    price_up:"went up", price_down:"went down", no_offer_line:"no offer right now", prices_changed:"Some prices changed while the cart was sitting.", continue_new:"Continue at the new prices", remove:"Remove", cart_blocked:"line(s) cannot be ordered right now", was:"was", cart_empty_hint:"Add products from the store.",
     distributor:"Distributor", category:"Category", all:"All", catalogue_size:"products in the catalogue",
     with_offers:"available to order now",
     from:"from", offers:"offer(s)", no_offer:"no offer yet", regulated:"regulated price",
@@ -300,6 +301,7 @@ const T = {
     store:"Loja", store_sub:"Procure, veja e encomende",
     search_ph:"Paracetamol, Amoxicilina…", search:"Procurar", searching:"A procurar…",
     nothing:"Nada encontrado.", clear:"Limpar",
+    price_up:"subiu", price_down:"desceu", no_offer_line:"sem oferta de momento", prices_changed:"Alguns preços mudaram enquanto o carrinho esperava.", continue_new:"Continuar com os novos preços", remove:"Remover", cart_blocked:"linha(s) que não podem ser encomendadas agora", was:"era", cart_empty_hint:"Adicione produtos da loja.",
     distributor:"Distribuidor", category:"Categoria", all:"Todos", catalogue_size:"produtos no catálogo",
     with_offers:"disponíveis para encomendar",
     from:"desde", offers:"oferta(s)", no_offer:"sem oferta ainda", regulated:"preço regulado",
@@ -347,6 +349,7 @@ const T = {
     store:"المتجر", store_sub:"تصفّح وابحث واطلب",
     search_ph:"Paracetamol, Amoxicilina…", search:"بحث", searching:"جارٍ البحث…",
     nothing:"مفيش نتائج.", clear:"مسح",
+    price_up:"زاد", price_down:"نزل", no_offer_line:"لا يوجد عرض الآن", prices_changed:"في أسعار اتغيّرت والسلة واقفة.", continue_new:"كمّل بالأسعار الجديدة", remove:"حذف", cart_blocked:"سطر مش ممكن يتطلب دلوقتي", was:"كان", cart_empty_hint:"ضيف منتجات من المتجر.",
     distributor:"الموزّع", category:"الصنف", all:"الكل", catalogue_size:"منتج في الفهرس",
     with_offers:"متاح للطلب الآن",
     from:"من", offers:"عرض", no_offer:"لا يوجد عرض بعد", regulated:"سعر مقنّن",
@@ -415,7 +418,7 @@ const S = {
   busy: false,
   err: null,
   flash: null,
-  cart: [],            // [{product, qty}]
+  cart: null,          // the server's cart, replaced whole on every write
   search: "",
   results: null,       // the product grid, filtered and paged
   filters: null,        // {vendors, categories} with counts
@@ -654,14 +657,24 @@ function shot(p){
     CAPSULE + "</div>";
 }
 
+/* The cart lives on the server now, so these read from the last response
+   rather than from a local array. Nothing is guessed optimistically: a tap
+   waits for the server and then the whole cart is replaced, which is what
+   keeps two phones in the same pharmacy from drifting apart. */
+function cartLines(){ return (S.cart && S.cart.lines) || []; }
+function cartLineFor(productId){
+  return cartLines().find(l => l.index_product_id === productId);
+}
+function cartCount(){ return cartLines().reduce((n, l) => n + l.qty_requested, 0); }
+
 function qtyRound(p){
-  const inCart = S.cart.find(i => i.product.id === p.id);
-  if (!inCart)
+  const line = cartLineFor(p.id);
+  if (!line)
     return '<button class="rnd" data-act="add" data-id="' + esc(p.id) + '" ' +
            'aria-label="' + esc(t("add")) + '">+</button>';
   return '<span class="cnt">' +
     '<button class="rnd o" data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
-    '<span class="n">' + inCart.qty + "</span>" +
+    '<span class="n">' + line.qty_requested + "</span>" +
     '<button class="rnd" data-act="inc" data-id="' + esc(p.id) + '">+</button>' +
   "</span>";
 }
@@ -690,38 +703,51 @@ function productCard(p){
 }
 
 function cartBar(){
-  const n = S.cart.reduce((a,i) => a + i.qty, 0);
+  const n = cartCount();
   if (!n) return "";
   return '<div class="cartbar">' +
     '<button class="btn g" data-act="goCart">' + esc(t("cart")) + " · " + n + " " +
       esc(t("items")) + "</button></div>";
 }
 
-function chipRow(label, items, current, act){
-  /* `items`: [{value, text, count}]. The "all" chip is first and is what a
-     pharmacist taps to widen again — a filter you cannot switch off is a
-     trap, so it is always present even when something is selected. */
-  const chip = (value, text, count) =>
-    '<button class="chip' + (current === value ? " on" : "") + '" data-act="' + act +
-      '" data-value="' + esc(value) + '">' + esc(text) +
-      (count !== undefined && count !== null ? '<span class="c">' + count + "</span>" : "") +
-    "</button>";
-  return '<div class="flabel">' + esc(label) + "</div>" +
-    '<div class="chips">' + chip("", t("all")) +
-      items.map(i => chip(i.value, i.text, i.count)).join("") + "</div>";
-}
+/* The two filter rows.
 
+   They are separate questions on purpose: a pharmacist narrowing to
+   `Comprimidos` wants every distributor's tablets, not one distributor's.
+   So the category counts come from the whole catalogue and the two chips
+   combine rather than one resetting the other.
+
+   The counts are on the chips because a filter that leads to an empty
+   screen wastes a tap on a phone in a shop. */
 function filterBar(){
   const f = S.filters;
   if (!f) return "";
-  const vendors = f.vendors.map(v =>
-    ({ value: v.id, text: v.trade_name, count: v.product_count }));
-  // only categories something can actually be ordered from: a chip that
-  // returns an empty grid teaches the pharmacist not to trust the chips
-  const cats = f.categories.filter(c => c.offered_count > 0)
-    .map(c => ({ value: c.name, text: c.name, count: c.offered_count }));
-  return chipRow(t("distributor"), vendors, S.vendor, "setVendor") +
-         chipRow(t("category"), cats, S.category, "setCategory");
+  const chip = (act, value, label, count, active) =>
+    '<button class="chip bidi' + (active ? " on" : "") + '" data-act="' + act + '" ' +
+    'data-value="' + esc(value) + '">' + esc(label) +
+    (count === null || count === undefined ? "" : '<span class="c">' + count + "</span>") +
+    "</button>";
+
+  const vendors = f.vendors || [];
+  const cats = f.categories || [];
+  if (!vendors.length && !cats.length) return "";
+
+  return (vendors.length > 1
+    ? '<p class="s" style="margin:10px 0 4px">' + esc(t("distributor")) + "</p>" +
+      '<div class="chips">' +
+        chip("setVendor", "", t("all"), null, !S.vendor) +
+        vendors.map(v => chip("setVendor", v.id, v.trade_name, v.product_count,
+                              S.vendor === v.id)).join("") +
+      "</div>"
+    : "") +
+    (cats.length
+      ? '<p class="s" style="margin:6px 0 4px">' + esc(t("category")) + "</p>" +
+        '<div class="chips">' +
+          chip("setCategory", "", t("all"), null, !S.category) +
+          cats.map(c => chip("setCategory", c.name, c.name, c.offered_count,
+                             S.category === c.name)).join("") +
+        "</div>"
+      : "");
 }
 
 function storeView(){
@@ -806,43 +832,59 @@ function productView(){
   cartBar();
 }
 
-function qtyControl(p){
-  const inCart = S.cart.find(i => i.product.id === p.id);
-  if (!inCart)
-    return '<button class="btn g" data-act="add" data-id="' + esc(p.id) + '">' +
-           esc(t("add")) + "</button>";
-  return '<div class="row" style="margin:0;padding:0;border:0">' +
-    '<span class="t">' + esc(t("in_cart")) + "</span>" +
-    '<span class="qty">' +
-      '<button data-act="dec" data-id="' + esc(p.id) + '">−</button>' +
-      "<span>" + inCart.qty + "</span>" +
-      '<button data-act="inc" data-id="' + esc(p.id) + '">+</button>' +
-    "</span></div>";
+/* The price on a cart row. When the number moved while the cart was sitting,
+   both are shown: the one the pharmacist remembers, struck through, and the
+   one they would actually pay. Showing only the new number would be accurate
+   and would still feel like a switch. */
+function priceLine(l){
+  if (l.price_now === null || l.price_now === undefined)
+    return '<span class="s">' + esc(t("no_offer_line")) + "</span>";
+  const now = '<span class="price">' + esc(MT(l.price_now)) + "</span>";
+  if (l.price_state !== "UP" && l.price_state !== "DOWN") return now;
+  return '<span class="was bidi">' + esc(t("was") + " " + MT(l.price_seen)) + "</span>" +
+         now + ' <span class="s">' +
+         esc(l.price_state === "UP" ? t("price_up") : t("price_down")) + "</span>";
 }
 
 function cartView(){
+  const c = S.cart;
+  const lines = cartLines();
+  const blocked = (c && c.checkout_blocked_by) || [];
+  const moved = lines.some(l => l.price_state === "UP" || l.price_state === "DOWN");
   return '' +
   '<button class="btn ghost sm" data-act="goStore">← ' + esc(t("back")) + "</button>" +
   '<div style="height:12px"></div>' +
   "<h1>" + esc(t("cart")) + "</h1>" +
-  (S.cart.length === 0
-    ? '<div class="card empty">' + esc(t("empty_cart")) + "</div>"
-    : '<div class="card">' +
-        S.cart.map(i =>
+  (lines.length === 0
+    ? '<div class="card empty">' + esc(t("empty_cart")) + "<br>" +
+      '<span class="s">' + esc(t("cart_empty_hint")) + "</span></div>"
+    : (moved ? '<div class="err">' + esc(t("prices_changed")) + "</div>" : "") +
+      (blocked.length ? '<div class="err">' + blocked.length + " " +
+        esc(t("cart_blocked")) + "</div>" : "") +
+      '<div class="card">' +
+        lines.map(l =>
           '<div class="row">' +
-            "<span>" + name(i.product) +
-            (i.product.best_price
-              ? '<br><span class="s">' + money(i.product.best_price) + "</span>" : "") +
+            "<span>" + name(l) +
+              (l.vendor_name ? '<br><span class="s bidi">' + esc(l.vendor_name) + "</span>" : "") +
+              "<br>" + priceLine(l) +
             "</span>" +
-            '<span class="qty">' +
-              '<button data-act="dec" data-id="' + esc(i.product.id) + '">−</button>' +
-              "<span>" + i.qty + "</span>" +
-              '<button data-act="inc" data-id="' + esc(i.product.id) + '">+</button>' +
+            '<span style="text-align:end">' +
+              '<span class="cnt">' +
+                '<button class="rnd o" data-act="decLine" data-line="' + esc(l.id) + '">−</button>' +
+                '<span class="n">' + l.qty_requested + "</span>" +
+                '<button class="rnd" data-act="incLine" data-line="' + esc(l.id) + '">+</button>' +
+              "</span>" +
+              '<br><button class="chip" data-act="dropCartLine" data-line="' + esc(l.id) + '" ' +
+                'style="margin-top:6px">' + esc(t("remove")) + "</button>" +
             "</span>" +
           "</div>").join("") +
+        '<div class="row"><span class="t">' + esc(t("goods")) + "</span>" +
+          '<span class="price">' + money(c.totals.goods_total) + "</span></div>" +
         '<div style="height:14px"></div>' +
-        '<button class="btn g" data-act="checkout"' + (S.busy ? " disabled" : "") + ">" +
-          (S.busy ? '<span class="spin"></span>' : esc(t("place_order"))) + "</button>" +
+        '<button class="btn g" data-act="checkout"' +
+          ((S.busy || blocked.length) ? " disabled" : "") + ">" +
+          (S.busy ? '<span class="spin"></span>'
+                  : esc(moved ? t("continue_new") : t("place_order"))) + "</button>" +
       "</div>");
 }
 
@@ -1045,9 +1087,11 @@ async function loadProducts(reset){
 async function loadHome(){ S.assistant = await api("/v1/assistant/summary"); }
 async function loadOrders(){ S.requests = (await api("/v1/requests?limit=50")).items; }
 async function loadThread(){ S.thread = await api("/v1/support/threads/me"); }
+async function loadCart(){ S.cart = await api("/v1/cart"); }
+
 async function afterLogin(){
   S.me = await api("/v1/auth/me");
-  await loadFilters();
+  await Promise.all([loadFilters(), loadCart()]);
   await loadProducts(true);
 }
 
@@ -1083,7 +1127,7 @@ const ACT = {
   },
   async logout(){
     S.token = null; S.me = null; store.del("token");
-    S.cart = []; S.results = null; S.requests = null; S.thread = null;
+    S.cart = null; S.results = null; S.requests = null; S.thread = null;
     S.assistant = null; S.norm = null; S.order = null;
     S.filters = null; S.vendor = ""; S.category = "";
     S.product = null; S.form = {};
@@ -1113,42 +1157,70 @@ const ACT = {
     S.product = await api("/v1/catalogue/products/" + el.dataset.id);
   },
   async closeProduct(){ S.product = null; },
-  async goCart(){ S.tab = "cart"; S.product = null; },
+  async goCart(){ S.tab = "cart"; S.product = null; await loadCart(); },
   async goStore(){ S.tab = "store"; },
 
-  async add(el){
-    const p = S.product && S.product.id === el.dataset.id
-      ? S.product : (S.results || []).find(x => x.id === el.dataset.id);
-    if (p && !S.cart.find(i => i.product.id === p.id)) S.cart.push({ product: p, qty: 1 });
+  /* Every cart action sends the quantity the screen is showing, and the
+     server answers with the whole cart. A retry after a dropped connection
+     therefore lands on the same number instead of doubling it, and nothing
+     is guessed locally. */
+  async setQty(productId, qty){
+    if (qty <= 0){
+      const line = cartLineFor(productId);
+      if (!line) return;
+      await api("/v1/request-lines/" + line.id, { method:"DELETE" });
+      await loadCart();
+      return;
+    }
+    S.cart = await api("/v1/cart/lines", {
+      method:"POST",
+      body:{ lines:[{ index_product_id: productId, qty_requested: qty }] }
+    });
   },
+  async add(el){ await ACT.setQty(el.dataset.id, 1); },
   async inc(el){
-    const i = S.cart.find(x => x.product.id === el.dataset.id);
-    if (i) i.qty += 1;
+    const line = cartLineFor(el.dataset.id);
+    await ACT.setQty(el.dataset.id, (line ? line.qty_requested : 0) + 1);
   },
   async dec(el){
-    const i = S.cart.find(x => x.product.id === el.dataset.id);
-    if (!i) return;
-    i.qty -= 1;
-    if (i.qty <= 0) S.cart = S.cart.filter(x => x !== i);
+    const line = cartLineFor(el.dataset.id);
+    await ACT.setQty(el.dataset.id, (line ? line.qty_requested : 1) - 1);
   },
+
+  async incLine(el){
+    const line = cartLines().find(l => l.id === el.dataset.line);
+    if (!line) return;
+    S.cart = await api("/v1/request-lines/" + line.id, {
+      method:"PATCH", body:{ qty_requested: line.qty_requested + 1 } });
+  },
+  async decLine(el){
+    const line = cartLines().find(l => l.id === el.dataset.line);
+    if (!line) return;
+    if (line.qty_requested <= 1) return ACT.dropCartLine(el);
+    S.cart = await api("/v1/request-lines/" + line.id, {
+      method:"PATCH", body:{ qty_requested: line.qty_requested - 1 } });
+  },
+  async dropCartLine(el){
+    await api("/v1/request-lines/" + el.dataset.line, { method:"DELETE" });
+    await loadCart();
+  },
+
   async checkout(){
-    if (!S.cart.length) throw new Error(t("empty_cart"));
-    const req = await api("/v1/requests", {
-      method:"POST", body:{ mode:"CATALOGUE", allocation_strategy:"FEWEST_VENDORS" }
-    });
-    for (const item of S.cart){
-      await api("/v1/requests/" + req.id + "/lines", {
-        method:"POST", body:{ index_product_id: item.product.id, qty_requested: item.qty }
-      });
-    }
-    // the key is tied to this basket, so a retry replays instead of duplicating
-    const out = await api("/v1/requests/" + req.id + "/checkout", {
-      method:"POST", headers:{ "Idempotency-Key": "co-" + req.id }, body:{}
+    const c = S.cart;
+    if (!c || !cartLines().length) throw new Error(t("empty_cart"));
+    // Rule: the server is told what the screen was showing, and refuses if
+    // the two disagree. Sending `price_now` is exactly that — it is the
+    // number rendered in the row the pharmacist is looking at.
+    const acknowledged = {};
+    cartLines().forEach(l => { if (l.price_now) acknowledged[l.id] = l.price_now; });
+    const out = await api("/v1/requests/" + c.request_id + "/checkout", {
+      method:"POST", headers:{ "Idempotency-Key": "co-" + c.request_id },
+      body:{ acknowledged_prices: acknowledged }
     });
     const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
     S.flash = t("order_made") + " " + (out.orders || []).length + " " +
               t("order_count") + " · " + total;
-    S.cart = [];
+    await loadCart();
     await loadOrders();
     S.tab = "orders";
   },
@@ -1225,6 +1297,7 @@ document.addEventListener("click", function(ev){
     S.tab = tabBtn.dataset.tab;
     S.err = null; S.flash = null; S.order = null; S.product = null;
     render();
+    if (S.tab === "cart") guard(loadCart);
     if (S.tab === "store"  && S.filters  === null) guard(loadFilters);
     if (S.tab === "orders" && S.requests === null) guard(loadOrders);
     if (S.tab === "chat"   && S.thread   === null) guard(loadThread);

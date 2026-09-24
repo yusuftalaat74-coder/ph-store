@@ -213,6 +213,32 @@ def test_filters_offer_only_what_can_be_ordered(client, h, db_engine):
     assert names["Medimport"] == 2, "two distinct products, not three offer rows"
     assert names["Medis"] == 1
     assert all(v["product_count"] > 0 for v in body["vendors"])
+    assert all(c["offered_count"] > 0 for c in body["categories"])
+
+
+def test_a_category_nobody_stocks_is_not_offered_as_a_filter(client, h, db_engine):
+    """The same promise on the other axis, which the first version of this
+    endpoint did not keep: the live catalogue has five categories with no
+    orderable product in them -- 384 in-vitro diagnostics among them -- and
+    every one was offered as a chip that led to an empty screen.
+    """
+    with db_engine.begin() as c:
+        c.execute(text(
+            "INSERT INTO index_product (id, inn, brand_name, form, strength, pack_size, "
+            "manufacturer, category, aim_status, regulated_price, review_status, "
+            "reviewer_ref, search_text) VALUES "
+            f"('idx_unstocked_{SUFFIX}', 'Nadaol', 'NADAOL', 'Comprimido', '1mg', '1', 'M', "
+            "'Categoria Sem Stock', 'AUTHORISED', false, 'PUBLISHED', 'test', 'nadaol') "
+            "ON CONFLICT (id) DO NOTHING"))
+    body = client.get("/v1/catalogue/filters", headers=h).json()
+    offered = {c["name"] for c in body["categories"]}
+    assert "Categoria Sem Stock" not in offered
+
+    # and the chip is absent because the shelf really is empty, not because
+    # the category was filtered out by accident
+    found = client.get("/v1/catalogue/search", headers=h,
+                       params={"category": "Categoria Sem Stock", "in_stock": True}).json()
+    assert found["items"] == []
 
 
 def test_a_distributor_shows_only_what_it_sells(client, h):

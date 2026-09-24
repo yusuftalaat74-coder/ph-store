@@ -13,6 +13,11 @@ CODES = {
     "STALE_STATE": 409,
     "IDEMPOTENCY_CONFLICT": 409,
     "CONFLICT": 409,
+    # The cart is a DRAFT that can sit for days, so what it would bill is
+    # checked against what the pharmacist was shown. Its own code because the
+    # client reacts differently from any other guard: it reloads, shows the
+    # difference, and asks.
+    "PRICE_MOVED": 409,
     "NOT_IMPLEMENTED": 501,
     "INTERNAL": 500,
 }

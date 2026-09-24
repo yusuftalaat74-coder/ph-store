@@ -9,3 +9,11 @@ var/
 # secrets and local state
 .env
 var/
+
+# local snapshots and archives — `git add -A` after a `tar` in the worktree
+# put a 1.2MB .tgz into a commit once
+*.tgz
+*.tar.gz
+
+# files moved aside for the user to delete
+_to_delete/

@@ -9,6 +9,7 @@ GET,/v1/assistant/savings
 GET,/v1/assistant/stock-risks
 GET,/v1/assistant/summary
 GET,/v1/auth/me
+GET,/v1/cart
 GET,/v1/catalogue/filters
 GET,/v1/catalogue/products/{product_id}
 GET,/v1/catalogue/search
@@ -94,6 +95,7 @@ GET,/v1/verification-cases
 GET,/v1/verification-cases/{case_id}
 PATCH,/v1/credit-facilities/{facility_id}
 PATCH,/v1/pharmacies/{pharmacy_id}
+PATCH,/v1/request-lines/{line_id}
 PATCH,/v1/support/tickets/{ticket_id}
 PATCH,/v1/vendors/{vendor_id}
 POST,/v1/admin/jobs/tick
@@ -101,6 +103,7 @@ POST,/v1/assistant/ask
 POST,/v1/auth/login
 POST,/v1/auth/logout
 POST,/v1/auth/select-membership
+POST,/v1/cart/lines
 POST,/v1/consents/{consent_id}/withdraw
 POST,/v1/credit-facilities
 POST,/v1/credit-facilities/{facility_id}/adjustments

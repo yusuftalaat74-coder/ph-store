@@ -142,7 +142,10 @@ def test_the_substance_is_searchable_across_both_vendors(session, source):
         "SELECT DISTINCT o.vendor_id FROM vendor_offer o "
         "JOIN index_product p ON p.id = o.index_product_id "
         "WHERE p.search_text LIKE '%paracetamol%'")).scalars().all()
-    assert sorted(rows) == ["ven_medimport", "ven_medis"]
+    # a subset, not an equality: the database is shared across modules, and
+    # the claim under test is that both importers are reachable -- not that
+    # no other fixture anywhere seeded a paracetamol.
+    assert {"ven_medimport", "ven_medis"} <= set(rows)
 
 
 def test_ids_are_stable_so_a_reimport_is_the_same_catalogue():

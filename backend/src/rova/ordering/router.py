@@ -100,6 +100,10 @@ class CheckoutBody(BaseModel):
     # J-20 minimum (item 3, backend-review-r1.md): {vendor_id: "UPFRONT"} forces
     # that vendor's sub-basket onto UPFRONT terms, bypassing a blocked credit gate.
     payment_overrides: dict[str, str] = {}
+    # What the screen was showing, line id -> price as a 2dp string. Required
+    # for a cart checkout so a basket cannot reprice between looking and
+    # paying; ignored on the WhatsApp lane, which shows no prices at all.
+    acknowledged_prices: dict[str, str] | None = None
 
 
 @router.post("/requests/{request_id}/checkout")
@@ -124,7 +128,9 @@ def checkout_endpoint(
     if replay is not None:
         return replay["body"]
 
-    result = run_checkout(session, request_id=request_id, actor=principal, payment_overrides=body.payment_overrides)
+    result = run_checkout(session, request_id=request_id, actor=principal,
+                          payment_overrides=body.payment_overrides,
+                          acknowledged_prices=body.acknowledged_prices)
     store(session, key=idempotency_key, principal_id=principal_id, method="POST",
           path=f"/v1/requests/{request_id}/checkout", body=body_dict, status_code=200, response_body=result)
     return result

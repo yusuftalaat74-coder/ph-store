@@ -132,7 +132,14 @@ def filters(principal: Principal = Depends(require_roles(*_READERS)),
         "       AS offered_count "
         "FROM index_product p "
         "WHERE p.review_status='PUBLISHED' AND p.category IS NOT NULL "
-        "GROUP BY p.category ORDER BY 3 DESC, 2 DESC, 1"
+        "GROUP BY p.category "
+        # Without this, five categories of the real catalogue -- all 384
+        # in-vitro diagnostics among them -- were offered as filters that led
+        # to an empty screen, because the store only ever lists what can
+        # actually be ordered. Found by driving the app, not by reading it.
+        "HAVING count(*) FILTER (WHERE EXISTS (SELECT 1 FROM vendor_offer o "
+        "    WHERE o.index_product_id = p.id AND o.freshness_state='FRESH')) > 0 "
+        "ORDER BY 3 DESC, 2 DESC, 1"
     )).mappings().all()
 
     return {"vendors": [dict(v) for v in vendors],
