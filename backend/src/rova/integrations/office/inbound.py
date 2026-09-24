@@ -26,6 +26,7 @@ from rova.core.money import quantize
 from rova.domain.enums import RoleCode
 from rova.domain.fsm import transition_notes
 from rova.domain.machines.registry import MACHINES
+from rova.fulfilment.seals import check_seals_unique
 from rova.integrations.office.outbox import applying_office_event
 
 log = logging.getLogger("rova.office")
@@ -114,6 +115,11 @@ def order_picked(session, p):
         if line["picked_at"] is not None:
             continue
         seals = list(l.get("seal_ids") or [])
+        if len(set(seals)) != len(seals):
+            dup = sorted({x for x in seals if seals.count(x) > 1})
+            raise ApiError("VALIDATION_ERROR", f"R-057: seal id(s) repeated on line {line['id']}: {', '.join(dup)}",
+                           rule="R-057")
+        check_seals_unique(session, o["id"], line["id"], seals)       # REVIEW F-5: same check as the pick route
         session.execute(
             text("UPDATE order_line SET batch_number=:b, lot_number=:l, expiry_date=:e, seal_ids=:s, picked_at=:n, "
                  "updated_at=:n WHERE id=:id"),

@@ -19,6 +19,7 @@ from rova.config_params import service as cfg
 from rova.core.clock import now
 from rova.core.db import get_session
 from rova.core.errors import ApiError
+from rova.fulfilment.seals import check_seals_unique
 from rova.core.ids import new_id
 from rova.core.money import money_str
 from rova.domain.enums import RoleCode
@@ -222,32 +223,10 @@ def pick_order_line(line_id: str, body: PickBody,
     if is_near_expiry and not body.near_expiry_ack:
         raise ApiError("GUARD_FAILED", "near-expiry acknowledgement is required", rule="R-059")
 
-    # Defect 6 fix: `uq_traceability_seal_dispatched` (a seal is dispatched
-    # once, R-057) only fires when SM-03 DISPATCH later inserts
-    # traceability_event(DISPATCHED) rows — by then it is a bare
-    # IntegrityError with no ApiError handler for it, surfacing as 500
-    # INTERNAL instead of a 4xx naming the duplicate seal. Check at pick
-    # time instead, against both seals already DISPATCHED (the constraint
-    # itself) and seals already sitting on another line's seal_ids in this
-    # same order (a same-order duplicate would otherwise still 500 inside
-    # that order's own single DISPATCH transaction, before either seal is
-    # individually committed).
-    dispatched_dupes = session.execute(
-        text("SELECT DISTINCT seal_id FROM traceability_event WHERE event_type='DISPATCHED' "
-             "AND seal_id = ANY(:seals)"),
-        {"seals": body.seal_ids},
-    ).scalars().all()
-    picked_dupes = session.execute(
-        text("SELECT DISTINCT unnest(seal_ids) AS seal_id FROM order_line "
-             "WHERE order_id=:o AND id <> :line AND seal_ids && :seals"),
-        {"o": order["id"], "line": line_id, "seals": body.seal_ids},
-    ).scalars().all()
-    dupes = sorted(set(dispatched_dupes) | set(picked_dupes))
-    if dupes:
-        raise ApiError(
-            "VALIDATION_ERROR", f"seal id(s) already in use: {', '.join(dupes)}",
-            details=[{"field": "seal_ids", "reason": s} for s in dupes], rule="R-057",
-        )
+    # Defect 6 fix / R-057: a reused seal is refused here with a 4xx naming
+    # it, not as a bare IntegrityError at DISPATCH (rova/fulfilment/seals.py,
+    # shared with the PH Office order.picked applier).
+    check_seals_unique(session, order["id"], line_id, body.seal_ids)
 
     session.execute(
         text(

@@ -587,3 +587,48 @@ def test_payment_reversed_restores_the_ledger_and_reopens_the_invoice(client, db
     r, _ = _event(client, "payment.reversed", "customer_account", cid,
                   {"office_payment_id": "bo_pay_unknown", "amount": "1.00", "reason": "x"})
     assert r.json()["processing"] == "SKIPPED"
+
+
+# ------------------------------------------------------------------ REVIEW F-5: R-057 on order.picked
+
+def test_order_picked_refuses_a_seal_already_dispatched(client, db_engine, office_on):
+    """REVIEW F-5: order.picked runs the same R-057 check as the pick route —
+    a reused seal fails the event with a message naming the seal (not an
+    IntegrityError at DISPATCH), and nothing is written on the line."""
+    w = _world(db_engine)
+    o1, _ = _office_order_to_invoice(client, db_engine, w, qty_a=1, qty_b=1)
+    used = f"SEAL-{o1}-0"
+    assert _q(db_engine, "SELECT COUNT(*) AS n FROM traceability_event WHERE seal_id=:s AND event_type='DISPATCHED'",
+              s=used)[0]["n"] == 1
+    o2 = _checkout(client, w, qty_a=1, qty_b=1).json()["orders"][0]["id"]
+    la, lb = _order_lines(db_engine, o2)
+    assert _event(client, "order.accepted", "order", o2, {"store_order_id": o2, "lines": [
+        {"store_order_line_id": la["id"], "confirmed_qty": 1},
+        {"store_order_line_id": lb["id"], "confirmed_qty": 1}]})[0].json()["processing"] == "PROCESSED"
+
+    def picked(seals_a, seals_b):
+        return {"store_order_id": o2, "lines": [
+            {"store_order_line_id": la["id"], "picked_qty": 1, "lot_number": "L-A", "expiry_date": "2027-12-31",
+             "seal_ids": seals_a},
+            {"store_order_line_id": lb["id"], "picked_qty": 1, "lot_number": "L-B", "expiry_date": "2027-12-31",
+             "seal_ids": seals_b}]}
+
+    # 1. a seal already dispatched on another order
+    r, env = _event(client, "order.picked", "order", o2, picked([f"NEW-{o2}-A"], [used]), version=2)
+    assert r.status_code == 200 and r.json()["processing"] == "FAILED", r.text
+    ev = _q(db_engine, "SELECT status, error FROM integration_inbound_event WHERE event_id=:e", e=env["event_id"])[0]
+    assert ev["status"] == "FAILED" and used in ev["error"] and "already in use" in ev["error"]
+    assert all(l["picked_at"] is None and l["seal_ids"] in (None, []) for l in _order_lines(db_engine, o2))
+    assert _q(db_engine, "SELECT COUNT(*) AS n FROM traceability_event te JOIN order_line ol ON ol.id=te.order_line_id "
+                         "WHERE ol.order_id=:o", o=o2)[0]["n"] == 0
+    # 2. the same seal on two lines of this order
+    r, env = _event(client, "order.picked", "order", o2, picked([f"DUP-{o2}"], [f"DUP-{o2}"]), version=2)
+    assert r.json()["processing"] == "FAILED"
+    err = _q(db_engine, "SELECT error FROM integration_inbound_event WHERE event_id=:e", e=env["event_id"])[0]["error"]
+    assert f"DUP-{o2}" in err
+    # 3. a corrected event goes through, and DISPATCH then succeeds
+    r, _ = _event(client, "order.picked", "order", o2, picked([f"NEW-{o2}-A"], [f"NEW-{o2}-B"]), version=2)
+    assert r.json()["processing"] == "PROCESSED"
+    r, _ = _event(client, "order.dispatched", "order", o2, {"store_order_id": o2}, version=3)
+    assert r.json()["processing"] == "PROCESSED", r.text
+    assert _q(db_engine, 'SELECT status FROM "order" WHERE id=:o', o=o2)[0]["status"] == "DISPATCHED"
