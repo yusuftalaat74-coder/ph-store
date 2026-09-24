@@ -31,6 +31,7 @@ from rova.auth.principal import Principal, require_roles
 from rova.core.clock import now
 from rova.core.db import get_session
 from rova.core.errors import ApiError
+from rova.ordering.pricing import price_request
 from rova.core.idempotency import check_and_store, store
 from rova.core.ids import new_id
 from rova.core.storage import save_bytes
@@ -563,6 +564,39 @@ def list_requests(status: str | None = None, channel: Channel | None = None,
          "cart": include_cart},
     ).mappings().all()
     return {"items": [dict(r) for r in rows], "next_cursor": None}
+
+
+@router.get("/requests/{request_id}/priced")
+def request_priced(request_id: str,
+                   principal: Principal = Depends(require_roles(*(_PHARMACY_OR_OPS + _OPS))),
+                   session: Session = Depends(get_session, scope="function")):
+    """What this request would cost if it were paid for now.
+
+    The WhatsApp lane exists because a pharmacist would rather paste the list
+    he already typed than tap through a catalogue. What it did not have was
+    the one thing the catalogue lane was sent back twice to build: a price on
+    the screen before the money moves. `normalization-complete` then
+    `confirm` then `checkout` placed an order at ranked catalogue prices with
+    no figure ever shown, so this lane could commit a pharmacy's money blind.
+
+    Same body as `GET /v1/cart`, from the same function, because it is the
+    same question. The app shows it, he agrees to it, and the prices he
+    agreed to go back on `checkout` as `acknowledged_prices` — which is the
+    protection the cart already has, reaching the lane that needed it more.
+
+    Read-only: it records nothing. The claim is what the client sends back.
+    """
+    request = _request_or_404(session, request_id, principal)
+    priced = price_request(session, request)
+    touched = priced["last_touched_at"]
+    return {
+        "request_id": request["id"], "number": request["number"],
+        "status": request["status"], "channel": request["channel"],
+        "last_touched_at": touched.isoformat() if touched else None,
+        "lines": priced["lines"],
+        "totals": priced["totals"],
+        "checkout_blocked_by": priced["checkout_blocked_by"],
+    }
 
 
 @router.get("/requests/{request_id}/transitions")

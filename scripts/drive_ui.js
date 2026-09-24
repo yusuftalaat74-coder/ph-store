@@ -470,7 +470,10 @@ function runJobs() {
   check(ordersAfterReorder === ordersBeforeReorder,
         `"add all" created ${ordersAfterReorder - ordersBeforeReorder} order(s); it must only fill the basket`);
 
-  /* ---- the WhatsApp lane still works ---------------------------------- */
+  /* ---- the WhatsApp lane, and its price screen ------------------------
+     This lane used to go from "confirm" straight to a placed order with no
+     figure ever on screen — the one place in the app where a pharmacy's
+     money moved blind. */
   await page.click('[data-tab="list"]');
   await page.waitForTimeout(500);
   await page.fill("#paste", "Paracetamol 500\nAmoxicilina 500 mg 21");
@@ -480,6 +483,88 @@ function runJobs() {
     .$eval("#normblock", (e) => e.textContent.replace(/\s+/g, " ").slice(0, 120))
     .catch(() => "(no normalisation block)");
   step("paste -> " + normText);
+
+  // resolve whatever the matcher could not decide, then confirm the list
+  for (let i = 0; i < 8; i++) {
+    const choice = await page.$('#normblock [data-act="resolve"]');
+    if (!choice) break;
+    await choice.click();
+    await page.waitForTimeout(1200);
+  }
+  for (let i = 0; i < 8; i++) {
+    const drop = await page.$('#normblock [data-act="dropline"]');
+    const done = await page.$('#normblock [data-act="normdone"]');
+    if (done || !drop) break;
+    await drop.click();
+    await page.waitForTimeout(1200);
+  }
+  const canConfirm = await page.$('[data-act="normdone"]');
+  if (canConfirm) {
+    const ordersBeforeList = Number(sql('SELECT count(*) FROM "order"'));
+    await page.click('[data-act="normdone"]');
+    await page.waitForTimeout(2500);
+
+    const quote = await page.$eval("#quoteblock", (e) => e.textContent.replace(/\s+/g, " ").trim())
+      .catch(() => null);
+    step("confirming the list showed: " + (quote ? quote.slice(0, 110) : "(nothing)"));
+    check(!!quote, "confirming a pasted list showed no prices at all");
+    check(/\d[\d\s]*,\d{2}\s*MT/.test(quote || ""),
+          "the confirmation screen names no price");
+    check(Number(sql('SELECT count(*) FROM "order"')) === ordersBeforeList,
+          "confirming the list bought something before he had seen a price");
+
+    // a line nobody can supply has to have a way out, on this screen
+    for (let i = 0; i < 8; i++) {
+      const stuck = await page.$('#quoteblock [data-act="dropQuoteLine"]');
+      if (!stuck) break;
+      await stuck.click();
+      await page.waitForTimeout(1500);
+    }
+    const stillBlocked = await page.$('[data-act="quoteAccept"][disabled]');
+    step(`after clearing what cannot be supplied, the order button is ${stillBlocked ? "still disabled" : "live"}`);
+    check(!stillBlocked, "the price screen is a dead end: blocked, with no way to unblock it");
+
+    // Move a price out from under this screen too. The lane's whole defect
+    // was that it could bill a figure he had never seen; showing him one and
+    // then billing a different one would be the same defect wearing a
+    // confirmation screen.
+    const qLine = await page.getAttribute('#quoteblock [data-act="dropQuoteLine"], #quoteblock .row', "data-line")
+      .catch(() => null);
+    const qProd = sql("SELECT rl.index_product_id FROM request_line rl JOIN request r ON r.id = rl.request_id " +
+                      "WHERE r.status='AWAITING_CONFIRMATION' ORDER BY rl.created_at LIMIT 1");
+    const qOffer = qProd ? sql(`SELECT id FROM vendor_offer WHERE index_product_id='${qProd}' ` +
+                               "AND freshness_state='FRESH' ORDER BY price LIMIT 1") : "";
+    if (qOffer) {
+      const qWas = sql(`SELECT price FROM vendor_offer WHERE id='${qOffer}'`);
+      sql(`UPDATE vendor_offer SET price = price + 19 WHERE id='${qOffer}'`);
+      expectRefusal = true;
+      await page.click('[data-act="quoteAccept"]');
+      await page.waitForTimeout(3000);
+      const qBanner = await page.$("#quoteblock .err, .err");
+      const qBtn = (await page.textContent('[data-act="quoteAccept"]')).trim();
+      step(`price moved under the confirmation screen: refused=${!!qBanner}, button now "${qBtn}"`);
+      check(!!qBanner, "the pasted list was billed a price he had never been shown");
+      check(Number(sql('SELECT count(*) FROM "order"')) === ordersBeforeList,
+            "a moved price still produced an order");
+      sql(`UPDATE vendor_offer SET price = ${qWas} WHERE id='${qOffer}'`);
+      await page.waitForTimeout(500);
+      // the retry can refuse once more if the restore lands mid-flight, so
+      // the console stays forgiving until the screen settles
+      await page.click('[data-act="quoteAccept"]').catch(() => {});
+      await page.waitForTimeout(2500);
+      expectRefusal = false;
+    }
+
+    // and it is his tap, on the prices he was shown, that buys
+    await page.click('[data-act="quoteAccept"]').catch(() => {});
+    await page.waitForSelector(".ok", { timeout: 25000 });
+    const listFlash = (await page.textContent(".ok")).trim();
+    step("LIST ORDER: " + listFlash);
+    check(Number(sql('SELECT count(*) FROM "order"')) > ordersBeforeList,
+          "agreeing to the prices did not place the order");
+  } else {
+    step("the pasted list had nothing the matcher could resolve; price screen not driven");
+  }
 
   /* ---- every tab, in Arabic -------------------------------------------
      The language chips live on the account screen once signed in, so the

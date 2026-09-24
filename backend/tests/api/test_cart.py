@@ -511,3 +511,73 @@ def test_21b_adding_a_past_order_onto_a_basket_sets_rather_than_doubles(client, 
     line = next(l for l in cart["lines"] if l["index_product_id"] == P1)
     assert line["qty_requested"] == 5
     assert len([l for l in cart["lines"] if l["index_product_id"] == P1]) == 1
+
+
+# ── the WhatsApp lane gets the same protection ────────────────────────────
+
+def test_the_pasted_list_can_be_priced_before_it_is_paid_for(client, h, db_engine):
+    """The lane that needed this most had none of it: `normalization-complete`,
+    `confirm`, `checkout` placed an order at ranked catalogue prices with no
+    figure ever on the screen. The priced view is the cart's own body, from
+    the same function, so the two lanes cannot drift again."""
+    cart = _put(client, h, P1, 2)
+    rid = cart["request_id"]
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE request SET channel='WHATSAPP_TEXT', is_cart=false, "
+                       "status='CONFIRMED' WHERE id=:r"), {"r": rid})
+
+    r = client.get(f"/v1/requests/{rid}/priced", headers=h)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["status"] == "CONFIRMED" and body["channel"] == "WHATSAPP_TEXT"
+    line = next(l for l in body["lines"] if l["index_product_id"] == P1)
+    assert line["price_now"] == "120.00"
+    assert line["vendor_name"], "he is told who would supply it"
+    assert body["totals"]["goods_total"] == "240.00", "two of them"
+    assert re.fullmatch(r"\d+\.\d{2}", body["totals"]["goods_total"])
+
+
+def test_a_pasted_list_is_refused_if_it_moved_since_he_was_shown_it(client, h, db_engine):
+    """Same guarantee as the basket, reached the same way: he agrees to the
+    figures on his screen, and checkout refuses if they are not the figures
+    it is about to bill."""
+    cart = _put(client, h, P1, 1)
+    rid = cart["request_id"]
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE request SET channel='WHATSAPP_TEXT', is_cart=false, "
+                       "status='CONFIRMED' WHERE id=:r"), {"r": rid})
+        c.execute(text("UPDATE request_line SET price_seen=NULL WHERE request_id=:r"),
+                  {"r": rid})
+
+    shown = client.get(f"/v1/requests/{rid}/priced", headers=h).json()
+    agreed = {l["id"]: l["price_now"] for l in shown["lines"] if l["price_now"]}
+    assert agreed
+
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE vendor_offer SET price=137.00 WHERE id=:o"),
+                  {"o": f"ofr_p1_{SUFFIX}"})
+    try:
+        r = client.post(f"/v1/requests/{rid}/checkout",
+                        headers={**h, "Idempotency-Key": f"ck-wa-{rid}"},
+                        json={"acknowledged_prices": agreed})
+        assert r.status_code == 409, r.text
+        assert r.json()["error"]["code"] == "PRICE_MOVED"
+
+        # and agreeing to the new figure lets it through
+        again = client.get(f"/v1/requests/{rid}/priced", headers=h).json()
+        now_agreed = {l["id"]: l["price_now"] for l in again["lines"] if l["price_now"]}
+        ok = client.post(f"/v1/requests/{rid}/checkout",
+                         headers={**h, "Idempotency-Key": f"ck-wa2-{rid}"},
+                         json={"acknowledged_prices": now_agreed})
+        assert ok.status_code == 200, ok.text
+    finally:
+        with db_engine.begin() as c:
+            c.execute(text("UPDATE vendor_offer SET price=120.00 WHERE id=:o"),
+                      {"o": f"ofr_p1_{SUFFIX}"})
+
+
+def test_another_pharmacy_cannot_price_this_one_s_request(client, h, fx, db_engine):
+    cart = _put(client, h, P2, 1)
+    other = _h(client, fx["b1"])
+    r = client.get(f"/v1/requests/{cart['request_id']}/priced", headers=other)
+    assert r.status_code == 404

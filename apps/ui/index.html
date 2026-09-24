@@ -269,6 +269,7 @@ const T = {
     tab_store:"Store", tab_list:"List", tab_orders:"Orders", tab_chat:"Chat", tab_panel:"Account",
     notifs:"Notices", no_notifs:"Nothing new.", mark_all_read:"Mark all read", cart_waiting:"in your cart since", cart_idle_notice:"Your basket is still waiting.", open_cart:"Open cart", notice:"Notice", 
     usual:"What you usually buy", cheaper:"Cheaper now than you paid", best_off:"Biggest discount", running_low:"Running low", you_paid:"you paid", now_at:"now", reorder:"Add all to cart", reorder_done:"Added to your cart.", shelf_basis:"From your own orders",
+    quote_sub:"These are the prices you would pay. Nothing is ordered until you agree.", quote_accept:"Confirm and order", quote_back:"Not yet",
     reorder_partial:"Added {n} of {all}. The rest cannot be ordered right now.", nothing_to_reorder:"Nothing on this order can be added.",
     store:"Store", store_sub:"Browse, search and order",
     search_ph:"Paracetamol, Amoxicilina…", search:"Search", searching:"Searching…",
@@ -319,6 +320,7 @@ const T = {
     tab_store:"Loja", tab_list:"Lista", tab_orders:"Pedidos", tab_chat:"Conversa", tab_panel:"Conta",
     notifs:"Avisos", no_notifs:"Nada de novo.", mark_all_read:"Marcar tudo como lido", cart_waiting:"no seu carrinho desde", cart_idle_notice:"O seu carrinho continua à espera.", open_cart:"Abrir carrinho", notice:"Aviso", 
     usual:"O que costuma comprar", cheaper:"Mais barato agora do que pagou", best_off:"Maior desconto", running_low:"A acabar", you_paid:"pagou", now_at:"agora", reorder:"Adicionar tudo ao carrinho", reorder_done:"Adicionado ao seu carrinho.", shelf_basis:"Dos seus próprios pedidos",
+    quote_sub:"Estes são os preços que pagaria. Nada é encomendado até concordar.", quote_accept:"Confirmar e encomendar", quote_back:"Ainda não",
     reorder_partial:"Adicionados {n} de {all}. Os restantes não podem ser encomendados agora.", nothing_to_reorder:"Nada neste pedido pode ser adicionado.",
     store:"Loja", store_sub:"Procure, veja e encomende",
     search_ph:"Paracetamol, Amoxicilina…", search:"Procurar", searching:"A procurar…",
@@ -370,6 +372,7 @@ const T = {
     tab_store:"المتجر", tab_list:"قائمة", tab_orders:"الطلبات", tab_chat:"المحادثة", tab_panel:"الحساب",
     notifs:"التنبيهات", no_notifs:"مفيش جديد.", mark_all_read:"علّم الكل كمقروء", cart_waiting:"في سلتك من", cart_idle_notice:"سلتك لسه مستنية.", open_cart:"افتح السلة", notice:"تنبيه", 
     usual:"اللي بتشتريه عادةً", cheaper:"أرخص دلوقتي عن اللي دفعته", best_off:"أعلى خصم", running_low:"قرب يخلص", you_paid:"دفعت", now_at:"دلوقتي", reorder:"ضيف الكل للسلة", reorder_done:"اتضاف للسلة.", shelf_basis:"من طلباتك إنت",
+    quote_sub:"دي الأسعار اللي هتدفعها. مفيش حاجة هتتطلب غير لما توافق.", quote_accept:"أكّد واطلب", quote_back:"لسه",
     reorder_partial:"اتضاف {n} من {all}. الباقي مش ممكن يتطلب دلوقتي.", nothing_to_reorder:"مفيش حاجة في الطلب دا ممكن تتضاف.",
     store:"المتجر", store_sub:"تصفّح وابحث واطلب",
     search_ph:"Paracetamol, Amoxicilina…", search:"بحث", searching:"جارٍ البحث…",
@@ -453,6 +456,7 @@ const S = {
   requests: null,
   order: null,
   norm: null,          // normalisation view for a pasted list
+  quote: null,         // the same list, priced, before he agrees to pay it
   thread: null,
   assistant: null,
   notifs: null,        // the inbox, loaded on demand
@@ -607,12 +611,35 @@ async function guard(fn){
     // the rows show what changed and the button becomes "continue at the new
     // prices". The reload must not mask the original refusal if it fails.
     if (e && e.code === "PRICE_MOVED") {
-      // The reloaded cart raises its own "prices changed" banner and marks
-      // the rows, so clearing this one avoids saying the same sentence twice.
-      // If the reload fails the message stays, because then nothing else
-      // will say it.
+      // Reload whichever screen is showing the prices — the basket, or the
+      // pasted list's confirmation. Both then raise their own banner and
+      // mark the rows that moved, so clearing this message avoids saying the
+      // same sentence twice; if the reload fails it stays, because then
+      // nothing else will say it.
       S.err = t("prices_changed");
-      try { await loadCart(); S.err = null; } catch (_) { /* keep the message */ }
+      try {
+        if (S.quote) {
+          // A pasted list stores no `price_seen` — nothing displayed a price
+          // when those lines were created — so the reloaded screen would come
+          // back marked SAME and tell him nothing had changed, which is the
+          // opposite of true. What this client displayed is the claim, so it
+          // carries it across the reload itself.
+          const wasShowing = {};
+          (S.quote.lines || []).forEach(l => { wasShowing[l.id] = l.price_now; });
+          const fresh = await api("/v1/requests/" + S.quote.request_id + "/priced");
+          (fresh.lines || []).forEach(l => {
+            const before = wasShowing[l.id];
+            if (before == null || l.price_now == null) return;
+            l.price_seen = before;
+            l.price_state = Number(before) === Number(l.price_now) ? "SAME"
+                          : Number(l.price_now) > Number(before) ? "UP" : "DOWN";
+          });
+          S.quote = fresh;
+        } else {
+          await loadCart();
+        }
+        S.err = null;
+      } catch (_) { /* keep the message */ }
     }
   }
   finally { setBusy(false); }
@@ -654,7 +681,7 @@ function render(){
       (S.token ? VIEW[S.tab]() : loginView());
   } catch (e) {
     // rule 3: a broken screen still shows why, and the app stays alive
-    main.innerHTML = '<div class="err">' + esc(t("draw_error")) + "\n" + esc(e.message) + "</div>";
+    main.innerHTML = '<div class="err">' + sentence(t("draw_error")) + "\n" + esc(e.message) + "</div>";
   }
   restoreForm();
   renderTabs();
@@ -675,7 +702,7 @@ function langChips(){
 function loginView(){
   return '' +
   "<h1>" + esc(t("login_title")) + "</h1>" +
-  '<p class="sub">' + esc(t("login_sub")) + "</p>" +
+  '<p class="sub">' + sentence(t("login_sub")) + "</p>" +
   '<div class="card">' + langChips() + "</div>" +
   '<div class="card">' +
     '<label for="ph">' + esc(t("phone")) + "</label>" +
@@ -690,7 +717,7 @@ function loginView(){
   '<div class="card">' +
     '<label for="api">' + esc(t("server")) + "</label>" +
     '<input id="api" type="text" dir="ltr" value="' + esc(apiBase()) + '">' +
-    '<p class="s" style="margin:8px 0 0">' + esc(t("server_note")) + "</p>" +
+    '<p class="s" style="margin:8px 0 0">' + sentence(t("server_note")) + "</p>" +
     '<div style="height:12px"></div>' +
     '<button class="btn ghost sm" data-act="saveApi">' + esc(t("save_server")) + "</button> " +
     '<button class="btn ghost sm" data-act="ping">' + esc(t("test")) + "</button>" +
@@ -773,8 +800,8 @@ function priceBlock(p){
       (p.list_price && p.discount_pct ? '<span class="was">' + esc(MT(p.list_price)) + "</span>" : "") +
       '<span class="pr bidi">' + esc(MT(p.best_price)) + "</span></span>";
   if (p.regulated_price)
-    return '<span class="noff">' + esc(t("regulated")) + "</span>";
-  return '<span class="noff">' + esc(t("no_offer")) + "</span>";
+    return '<span class="noff">' + sentence(t("regulated")) + "</span>";
+  return '<span class="noff">' + sentence(t("no_offer")) + "</span>";
 }
 
 function productCard(p){
@@ -856,7 +883,7 @@ function storeView(){
       (S.unread ? '<span class="badge">' + (S.unread > 9 ? "9+" : S.unread) + "</span>" : "") +
     "</button>" +
   "</div>" +
-  '<p class="sub">' + esc(t("store_sub")) + "</p>" +
+  '<p class="sub">' + sentence(t("store_sub")) + "</p>" +
   cartReminder() +
   '<div class="card">' +
     '<input id="q" type="search" placeholder="' + esc(t("search_ph")) + '" dir="ltr" ' +
@@ -882,7 +909,7 @@ function storeView(){
     ? '<div class="card empty">' +
         (S.busy ? '<span class="spin"></span>' : esc(t("loading"))) + "</div>"
     : results.length === 0
-      ? '<div class="card empty">' + esc(t("nothing")) + "</div>"
+      ? '<div class="card empty">' + sentence(t("nothing")) + "</div>"
       : '<div class="grid">' + results.map(productCard).join("") + "</div>" +
         (S.nextOffset !== null && S.nextOffset !== undefined
           ? '<button class="btn ghost" data-act="more">+</button>' : "")) +
@@ -904,7 +931,7 @@ function productView(){
   '<div class="card">' +
     '<span class="t">' + esc(t("vendors")) + "</span>" +
     (offers.length === 0
-      ? '<p class="s" style="margin:10px 0 0">' + esc(t("no_offer")) + "</p>"
+      ? '<p class="s" style="margin:10px 0 0">' + sentence(t("no_offer")) + "</p>"
       : offers.map((o,i) =>
           '<div class="vendorline' + (i === 0 ? " best" : "") + '">' +
             "<span><span class='t bidi'>" + esc(o.vendor_name || o.vendor_id) + "</span>" +
@@ -922,7 +949,7 @@ function productView(){
             "</span>" +
           "</div>").join("")) +
     (p.single_candidate ? '<p class="s" style="margin:10px 0 0">' +
-        esc(t("single_vendor")) + "</p>" : "") +
+        sentence(t("single_vendor")) + "</p>" : "") +
   "</div>" +
 
   '<div class="card">' +
@@ -939,7 +966,7 @@ function productView(){
    and would still feel like a switch. */
 function priceLine(l){
   if (l.price_now === null || l.price_now === undefined)
-    return '<span class="s">' + esc(t("no_offer_line")) + "</span>";
+    return '<span class="s">' + sentence(t("no_offer_line")) + "</span>";
   const now = '<span class="price">' + esc(MT(l.price_now)) + "</span>";
   if (l.price_state !== "UP" && l.price_state !== "DOWN") return now;
   return '<span class="was">' + sentence(t("was") + " " + MT(l.price_seen)) + "</span>" +
@@ -1026,7 +1053,7 @@ function notifView(){
     ? '<div class="card empty">' +
         (S.busy ? '<span class="spin"></span>' : esc(t("loading"))) + "</div>"
     : rows.length === 0
-      ? '<div class="card empty">' + esc(t("no_notifs")) + "</div>"
+      ? '<div class="card empty">' + sentence(t("no_notifs")) + "</div>"
       : (S.unread
           ? '<button class="chip" data-act="readAll">' + esc(t("mark_all_read")) + "</button>" +
             '<div style="height:10px"></div>'
@@ -1105,9 +1132,9 @@ function cartView(){
   '<div style="height:12px"></div>' +
   "<h1>" + esc(t("cart")) + "</h1>" +
   (lines.length === 0
-    ? '<div class="card empty">' + esc(t("empty_cart")) + "<br>" +
-      '<span class="s">' + esc(t("cart_empty_hint")) + "</span></div>"
-    : (moved ? '<div class="err">' + esc(t("prices_changed")) + "</div>" : "") +
+    ? '<div class="card empty">' + sentence(t("empty_cart")) + "<br>" +
+      '<span class="s">' + sentence(t("cart_empty_hint")) + "</span></div>"
+    : (moved ? '<div class="err">' + sentence(t("prices_changed")) + "</div>" : "") +
       (blocked.length ? '<div class="err">' +
         sentence(blocked.length + " " + t("cart_blocked")) + "</div>" : "") +
       '<div class="card">' +
@@ -1141,14 +1168,70 @@ function cartView(){
 function listView(){
   return '' +
   "<h1>" + esc(t("list_title")) + "</h1>" +
-  '<p class="sub">' + esc(t("list_sub")) + "</p>" +
+  '<p class="sub">' + sentence(t("list_sub")) + "</p>" +
   '<div class="card">' +
     '<textarea id="paste" dir="ltr" placeholder="Amoxicilina 500 mg 21&#10;Paracetamol 500&#10;..."></textarea>' +
     '<div style="height:10px"></div>' +
     '<button class="btn" data-act="paste"' + (S.busy ? " disabled" : "") + ">" +
       (S.busy ? '<span class="spin"></span>' : esc(t("send_list"))) + "</button>" +
   "</div>" +
-  (S.norm ? normBlock() : "");
+  (S.quote ? quoteBlock() : S.norm ? normBlock() : "");
+}
+
+/* The pasted list, priced, before a metical moves.
+
+   This is the screen the WhatsApp lane did not have. It used to go
+   "confirm" -> `checkout` in one tap, so a pharmacist could place an order
+   at prices he had never been shown — the exact thing the basket was sent
+   back twice to prevent, on the lane where it matters more, because he
+   pastes a list he wrote for a person and does not expect it to become a
+   purchase by itself.
+
+   Deliberately the same rows as the cart, from the same server function.
+   Two screens answering "what will this cost" in two ways is how the two
+   lanes came to behave differently in the first place. */
+function quoteBlock(){
+  const q = S.quote;
+  const blocked = q.checkout_blocked_by || [];
+  const moved = (q.lines || []).some(l => l.price_state === "UP" || l.price_state === "DOWN");
+  return '<div class="card" id="quoteblock">' +
+    '<div class="row" style="margin:0;padding:0;border:0">' +
+      '<span class="t bidi">' + esc(q.number) + "</span>" + statusPill(q.status) +
+    "</div>" +
+    '<p class="s">' + sentence(t("quote_sub")) + "</p>" +
+    (moved ? '<div class="err">' + sentence(t("prices_changed")) + "</div>" : "") +
+    (blocked.length ? '<div class="err">' +
+      sentence(blocked.length + " " + t("cart_blocked")) + "</div>" : "") +
+    (q.lines || []).map(l => {
+      const stuck = blocked.some(b => b.line_id === l.id);
+      return '<div class="row"><span>' + name(l) +
+        (l.vendor_name ? '<br><span class="s bidi">' + esc(l.vendor_name) + "</span>" : "") +
+        "<br>" + priceLine(l) +
+      "</span>" +
+      '<span style="text-align:end">' +
+        '<span class="t">×' + l.qty_requested + "</span>" +
+        (stuck && q.status === "AWAITING_CONFIRMATION"
+          ? '<br><button class="chip" data-act="dropQuoteLine" data-line="' + esc(l.id) +
+            '" style="margin-top:6px">' + esc(t("remove")) + "</button>"
+          : "") +
+      "</span></div>";
+    }).join("") +
+    '<div class="row"><span class="t">' + esc(t("goods")) + "</span>" +
+      '<span class="price">' + money(q.totals.goods_total) + "</span></div>" +
+    (q.totals.by_vendor.length > 1
+      ? q.totals.by_vendor.map(v => '<div class="row"><span class="s bidi">' +
+          esc(v.vendor_name || "—") + '</span><span class="s">' +
+          esc(MT(v.goods_total)) + "</span></div>").join("")
+      : "") +
+    '<div style="height:14px"></div>' +
+    '<button class="btn g" data-act="quoteAccept"' +
+      ((S.busy || blocked.length) ? " disabled" : "") + ">" +
+      (S.busy ? '<span class="spin"></span>'
+              : esc(moved ? t("continue_new") : t("quote_accept"))) + "</button>" +
+    '<div style="height:8px"></div>' +
+    '<button class="btn ghost" data-act="quoteCancel"' + (S.busy ? " disabled" : "") + ">" +
+      esc(t("quote_back")) + "</button>" +
+  "</div>";
 }
 
 function normBlock(){
@@ -1156,7 +1239,7 @@ function normBlock(){
   const lines = n.lines.map(l => {
     if (l.match_status === "AUTO" || l.match_status === "RESOLVED")
       return '<div class="row"><span><span class="t bidi">' + esc(l.source_span || "") + "</span>" +
-             '<br><span class="s">' + esc(t("identified")) + "</span></span>" +
+             '<br><span class="s">' + sentence(t("identified")) + "</span></span>" +
              '<span class="pill g">OK</span></div>';
     const cands = (l.candidates || []).map(c =>
       '<button class="chip bidi" data-act="resolve" data-line="' + esc(l.id) + '" data-prod="' + esc(c.id) + '">' +
@@ -1179,11 +1262,11 @@ function normBlock(){
     '<div class="row" style="margin:0;padding:0;border:0">' +
       '<span class="t bidi">' + esc(n.request.number) + "</span>" + statusPill(n.request.status) +
     "</div>" +
-    '<p class="s">' + esc(t("nothing_moves")) + "</p>" +
+    '<p class="s">' + sentence(t("nothing_moves")) + "</p>" +
     lines +
     '<div style="height:12px"></div>' +
     (n.can_complete_normalisation
-      ? '<button class="btn g" data-act="normdone">' + esc(t("confirm_list")) + "</button>"
+      ? '<button class="btn g" data-act="normdone">' + sentence(t("confirm_list")) + "</button>"
       : '<button class="btn" disabled>' +
         sentence(n.blocking_line_ids.length + " " + t("lines_left")) + "</button>") +
   "</div>";
@@ -1195,11 +1278,11 @@ function ordersView(){
   const rs = S.requests;
   return '' +
   "<h1>" + esc(t("orders")) + "</h1>" +
-  '<p class="sub">' + esc(t("orders_sub")) + "</p>" +
+  '<p class="sub">' + sentence(t("orders_sub")) + "</p>" +
   '<button class="btn ghost sm" data-act="reloadOrders">' + esc(t("refresh")) + "</button>" +
   '<div style="height:12px"></div>' +
   (rs === null ? '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "—") + "</div>"
-   : rs.length === 0 ? '<div class="card empty">' + esc(t("no_orders")) + "</div>"
+   : rs.length === 0 ? '<div class="card empty">' + sentence(t("no_orders")) + "</div>"
    : rs.map(r => '<div class="card tap" data-act="openReq" data-id="' + esc(r.id) + '">' +
         '<div class="row" style="margin:0;padding:0;border:0">' +
           '<span><span class="t bidi">' + esc(r.number) + "</span><br>" +
@@ -1233,7 +1316,7 @@ function orderDetail(){
       '<div class="row"><span class="s">' + esc(t("goods")) + '</span><span class="t">' +
         money(x.goods_total) + "</span></div>" +
     "</div>").join("")
-   : '<div class="card empty">' + esc(t("no_orders_made")) + "</div>");
+   : '<div class="card empty">' + sentence(t("no_orders_made")) + "</div>");
 }
 
 /* ---------------- chat ---------------- */
@@ -1252,7 +1335,7 @@ function chatView(){
             '<span class="w">' + esc(m.sender_type === "PHARMACY" ? "•" :
                                      m.sender_type === "AGENT" ? "PH Store" : "—") + "</span>" +
             esc(m.body) + "</div>").join("")
-         : '<div class="empty">' + esc(t("no_messages")) + "</div>") +
+         : '<div class="empty">' + sentence(t("no_messages")) + "</div>") +
       "</div>" +
       '<div class="composer">' +
         '<textarea id="msg" placeholder="' + esc(t("write_here")) + '"></textarea>' +
@@ -1270,7 +1353,7 @@ function panelView(){
   const a = S.assistant;
   return '' +
   "<h1>" + esc(t("panel")) + "</h1>" +
-  '<p class="sub">' + esc(t("panel_sub")) + "</p>" +
+  '<p class="sub">' + sentence(t("panel_sub")) + "</p>" +
   '<div class="card">' +
     '<span class="t">' + esc(t("language")) + "</span>" +
     '<div style="height:10px"></div>' + langChips() +
@@ -1288,10 +1371,10 @@ function panelView(){
       '<p class="s" style="margin:12px 0 0">' + esc(t("computed_from")) + " " +
         '<span class="bidi">' + esc(a.basis.source) + "</span></p>" +
     "</div>"
-   : '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : esc(t("no_data"))) + "</div>") +
+   : '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : sentence(t("no_data"))) + "</div>") +
   '<div class="card">' +
     '<span class="t">' + esc(t("ask")) + "</span>" +
-    '<p class="s">' + esc(t("ask_eg")) + "</p>" +
+    '<p class="s">' + sentence(t("ask_eg")) + "</p>" +
     '<input id="ask" type="text" placeholder="' + esc(t("ask_ph")) + '">' +
     '<div style="height:10px"></div>' +
     '<button class="btn" data-act="ask"' + (S.busy ? " disabled" : "") + ">" +
@@ -1521,7 +1604,7 @@ const ACT = {
   async logout(){
     S.token = null; S.me = null; store.del("token");
     S.cart = null; S.results = null; S.requests = null; S.thread = null;
-    S.assistant = null; S.norm = null; S.order = null;
+    S.assistant = null; S.norm = null; S.quote = null; S.order = null;
     // The inbox too: on a shared counter phone the next person tapped the
     // bell and saw the last person's notices until the call came back.
     S.notifs = null; S.unread = 0;
@@ -1697,16 +1780,55 @@ const ACT = {
     S.scrollTo = "normblock";
   },
   async normdone(){
+    // Settling what he meant, and then showing what it costs. Confirming is
+    // deliberately NOT done here: SM-01 says a line can only be dropped
+    // before `CONFIRM`, so a price screen shown after it would be a dead end
+    // for a line nobody can supply — he would be looking at a blocked basket
+    // with no way to unblock it. `CONFIRM` is the pharmacist agreeing, and
+    // he should be agreeing to a number.
     await api("/v1/requests/" + S.lastRequestId + "/normalization-complete", { method:"POST" });
-    await api("/v1/requests/" + S.lastRequestId + "/confirm", { method:"POST" });
-    // the intake lane can buy now: confirmed is a valid checkout entry state
-    const out = await api("/v1/requests/" + S.lastRequestId + "/checkout", {
-      method:"POST", headers:{ "Idempotency-Key": "co-" + S.lastRequestId }, body:{}
+    S.quote = await api("/v1/requests/" + S.lastRequestId + "/priced");
+    S.norm = null;
+    S.scrollTo = "quoteblock";
+  },
+  async quoteCancel(){
+    // Back to deciding what the list meant. `REQUEST_CHANGES` is SM-01's own
+    // way back from AWAITING_CONFIRMATION, so the request is left where the
+    // normalisation screen can edit it rather than stranded one state along.
+    const rid = S.quote.request_id;
+    if (S.quote.status === "AWAITING_CONFIRMATION")
+      await api("/v1/requests/" + rid + "/request-changes", { method:"POST" }).catch(() => {});
+    S.quote = null;
+    S.norm = await api("/v1/intake/" + rid).catch(() => null);
+    S.scrollTo = "normblock";
+  },
+  async dropQuoteLine(el){
+    // Still AWAITING_CONFIRMATION, so a line nobody can supply can still be
+    // taken out — which is the whole reason the prices are shown before the
+    // confirmation rather than after it.
+    await api("/v1/request-lines/" + el.dataset.line, { method:"DELETE" });
+    S.quote = await api("/v1/requests/" + S.quote.request_id + "/priced");
+    S.scrollTo = "quoteblock";
+  },
+  async quoteAccept(){
+    const q = S.quote;
+    // The prices on this screen, sent back as the claim — the same
+    // mechanism the basket uses, so the server refuses if any of them is
+    // not what it is about to bill.
+    const acknowledged = {};
+    (q.lines || []).forEach(l => { if (l.price_now) acknowledged[l.id] = l.price_now; });
+    // His agreement, in one act: the SM-01 CONFIRM and the purchase at the
+    // prices on this screen.
+    if (q.status === "AWAITING_CONFIRMATION")
+      await api("/v1/requests/" + q.request_id + "/confirm", { method:"POST" });
+    const out = await api("/v1/requests/" + q.request_id + "/checkout", {
+      method:"POST", headers:{ "Idempotency-Key": "co-" + q.request_id },
+      body:{ acknowledged_prices: acknowledged }
     });
     const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
     S.flash = t("list_confirmed") + " " + (out.orders || []).length + " " +
               t("order_count") + " · " + total;
-    S.norm = null;
+    S.quote = null;
     await loadOrders();
     S.tab = "orders";
   },
