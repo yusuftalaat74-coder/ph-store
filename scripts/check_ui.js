@@ -43,6 +43,29 @@ for (const m of code.matchAll(/function\s+([A-Za-z_$][\w$]*)/g)) defined.add(m[1
 for (const m of code.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/g)) defined.add(m[1]);
 // object shorthand methods, which is how every ACT handler is written
 for (const m of code.matchAll(/^\s+(?:async\s+)?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/gm)) defined.add(m[1]);
+// Parameters, including arrow-function ones. A parameter that holds a
+// callback is called like any other function, and without this the checker
+// reported every one of them as undefined -- the kind of noise that gets a
+// checker switched off.
+//
+// Be honest about the cost: this scan has no notion of scope, so every
+// parameter name in the file joins one global whitelist. Short ones -- `p`,
+// `e`, `l`, `x` -- are now names this checker will never report, anywhere.
+// It still catches what it was written for (a helper called and never
+// defined, which is how `priceLine` and `filterBar` shipped broken), and
+// real scope analysis means a parser, which is a different tool.
+for (const m of code.matchAll(/(?:function\s*[A-Za-z_$\w]*|^\s+(?:async\s+)?[A-Za-z_$][\w$]*)\s*\(([^)]*)\)\s*\{/gm)) {
+  for (const part of m[1].split(",")) {
+    const name = part.trim().split(/[\s=]/)[0].replace(/^\.\.\./, "");
+    if (/^[A-Za-z_$][\w$]*$/.test(name)) defined.add(name);
+  }
+}
+for (const m of code.matchAll(/\(([^()]*)\)\s*=>/g)) {
+  for (const part of m[1].split(",")) {
+    const name = part.trim().split(/[\s=]/)[0].replace(/^\.\.\./, "");
+    if (/^[A-Za-z_$][\w$]*$/.test(name)) defined.add(name);
+  }
+}
 
 const KNOWN = new Set([
   "if", "for", "while", "switch", "catch", "return", "typeof", "function",

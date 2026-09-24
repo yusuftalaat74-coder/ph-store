@@ -231,15 +231,32 @@ def savings(pharmacy_id: str | None = None,
     A regulated product is excluded from the comparison entirely, with its
     count reported. Suggesting a "saving" on a state-priced medicine would be
     suggesting an illegal transaction.
+
+    One entry per product, not per order line: a product bought three times
+    was three entries, and the screen showing them all as separate cards was
+    the visible half of the problem. The invisible half is worse — see the
+    comment on the query.
     """
     pid = _pharmacy_scope(principal, pharmacy_id, session)
     since = now() - timedelta(days=90)
+    # One row per product, carrying the *most recent* price paid for it.
+    #
+    # Per line was wrong in a way that only shows on a pharmacy with some
+    # history: this endpoint emits a line only where today's best beats that
+    # line's own price, so the line that contradicts the card is the one the
+    # caller never sees. Paid 120 in July, 95 last week, 100 today — the July
+    # line qualifies, the card says "you paid 120, now 100", and he paid 95
+    # nine days ago. The newest price is the one a comparison is worth making
+    # against, and `ordered_at` travels with it so the screen can say when.
     rows = session.execute(
-        text("SELECT ol.index_product_id, ol.regulated_price, ol.unit_price, ol.confirmed_qty, "
+        text("SELECT DISTINCT ON (ol.index_product_id) "
+             "       ol.index_product_id, ol.regulated_price, ol.unit_price, ol.confirmed_qty, "
+             "       o.created_at AS ordered_at, "
              "(SELECT MIN(vo.price) FROM vendor_offer vo WHERE vo.index_product_id = ol.index_product_id "
              " AND vo.freshness_state='FRESH' AND vo.price IS NOT NULL) AS best_fresh_price "
              'FROM order_line ol JOIN "order" o ON o.id = ol.order_id '
-             "WHERE o.pharmacy_id=:p AND o.created_at >= :s AND ol.confirmed_qty > 0"),
+             "WHERE o.pharmacy_id=:p AND o.created_at >= :s AND ol.confirmed_qty > 0 "
+             "ORDER BY ol.index_product_id, o.created_at DESC"),
         {"p": pid, "s": since},
     ).mappings().all()
 
@@ -256,6 +273,7 @@ def savings(pharmacy_id: str | None = None,
                                   "unit_price_paid": money_str(paid),
                                   "best_fresh_price": money_str(best),
                                   "qty": r["confirmed_qty"],
+                                  "ordered_at": r["ordered_at"].isoformat(),
                                   "difference": money_str(delta)})
     opportunities.sort(key=lambda o: Decimal(o["difference"]), reverse=True)
     return {

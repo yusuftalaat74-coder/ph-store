@@ -49,17 +49,25 @@ _LIST_COLUMNS = (
 
 @router.get("/search")
 def search(q: str = "", vendor_id: str = "", category: str = "",
+           ids: str = "", sort: str = "",
            offset: int = 0, limit: int = 50, in_stock: bool = False,
            principal: Principal = Depends(require_roles(*_READERS)),
            session: Session = Depends(get_session, scope="function")):
-    """Text, distributor and category, in any combination.
+    """Text, distributor, category and a list of ids, in any combination.
 
-    The three narrow the same result set rather than being three separate
-    screens: a pharmacist looking for syrups from one distributor is asking
-    one question, not two. `vendor_id` implies in-stock — a distributor's
-    shelf that listed products they do not offer would be a lie about who
-    sells what — while `category` alone still shows the whole catalogue
-    unless `in_stock` says otherwise.
+    They narrow the same result set rather than being separate screens: a
+    pharmacist looking for syrups from one distributor is asking one
+    question, not two. `vendor_id` implies in-stock — a distributor's shelf
+    that listed products they do not offer would be a lie about who sells
+    what — while `category` alone still shows the whole catalogue unless
+    `in_stock` says otherwise.
+
+    `sort=discount` is the exception and the caller should know it: it is a
+    filter wearing a sort's name. It drops every row whose best offer has no
+    published list price above its price, because the shelf it exists for
+    promises a discount on every card. `?q=amox&sort=discount` therefore
+    returns fewer amoxicillins than `?q=amox`, which is right for a shelf and
+    a trap for anything else.
 
     A shelf is useless without a price, so each row carries the cheapest
     fresh offer and how many vendors have it. `best_price` is a string like
@@ -77,6 +85,20 @@ def search(q: str = "", vendor_id: str = "", category: str = "",
         where.append("p.category = :category")
         params["category"] = category.strip()
 
+    # `ids` is how the home shelves get their cards. "What you usually buy"
+    # and "cheaper now than you paid" are computed from this pharmacy's own
+    # orders by `assistant/*`, which answer in product ids and nothing else;
+    # the card — picture, name, current price, discount, the add button — is
+    # this endpoint's shape, and there is no reason to grow a second one that
+    # drifts from it. The caller keeps its own ordering: a shelf sorted by
+    # how often he reorders something is not a property of the catalogue.
+    if ids.strip():
+        wanted = [i.strip() for i in ids.split(",") if i.strip()][:100]
+        if not wanted:
+            return {"items": [], "next_offset": None, "next_cursor": None}
+        where.append("p.id = ANY(:ids)")
+        params["ids"] = wanted
+
     if vendor_id.strip():
         where.append("EXISTS (SELECT 1 FROM vendor_offer o WHERE o.index_product_id = p.id "
                      "AND o.freshness_state='FRESH' AND o.vendor_id = :vendor)")
@@ -84,6 +106,27 @@ def search(q: str = "", vendor_id: str = "", category: str = "",
     elif in_stock:
         where.append("EXISTS (SELECT 1 FROM vendor_offer o WHERE o.index_product_id = p.id "
                      "AND o.freshness_state='FRESH')")
+
+    # Biggest discount first, and only rows that have one: a "biggest
+    # discount" shelf whose tail is products with no published list price
+    # would be padding a promise with rows that do not keep it. The figure is
+    # the vendor's own published public price against what the pharmacy pays,
+    # and `ck_vendor_offer_list_price_above_price` (migration 0003) makes a
+    # negative one impossible in the database.
+    if sort == "discount":
+        # `> price`, not merely `IS NOT NULL`: a vendor publishing a list
+        # price equal to what it charges has published no discount, and a row
+        # at 0% with no badge on it is exactly the padding this excludes.
+        where.append(
+            "(SELECT o.list_price FROM vendor_offer o WHERE o.id = " + _BEST_OFFER + ") > "
+            "(SELECT o.price FROM vendor_offer o WHERE o.id = " + _BEST_OFFER + ")")
+        # NULLS LAST on purpose: PostgreSQL sorts NULLs first under DESC, so a
+        # zero-priced, zero-listed offer — both of which the constraints allow
+        # — would otherwise head the shelf with no discount at all.
+        order_by = ("((x.list_price - x.best_price) / NULLIF(x.list_price, 0)) DESC NULLS LAST, "
+                    "x.brand_name")
+    else:
+        order_by = "(x.best_price IS NULL), x.brand_name"
 
     rows = session.execute(
         text(
@@ -94,7 +137,7 @@ def search(q: str = "", vendor_id: str = "", category: str = "",
             # return as a bare 500.
             "SELECT * FROM ("
             f"  SELECT {_LIST_COLUMNS} FROM index_product p WHERE " + " AND ".join(where) +
-            ") x ORDER BY (x.best_price IS NULL), x.brand_name "
+            ") x ORDER BY " + order_by + " "
             "LIMIT :limit OFFSET :offset"
         ),
         params,

@@ -302,3 +302,162 @@ def test_search_with_no_query_is_a_browse_not_an_error(client, h):
     r = client.get("/v1/catalogue/search", headers=h, params={"in_stock": True})
     assert r.status_code == 200
     assert len(r.json()["items"]) >= 2
+
+
+# ── slice C: the shelves' own rules ───────────────────────────────────────
+
+def test_23_discount_sort_is_biggest_first(client, h, db_engine):
+    """Acceptance 23. The figure is the vendor's own published public price
+    against what the pharmacy pays — not a number we invented — and
+    `ck_vendor_offer_list_price_above_price` (migration 0003) makes a
+    negative one impossible at the database level.
+
+    Three discounts far enough apart to prove an order. Asserting that the
+    whole list is descending proves nothing when every row in the fixture
+    happens to sit at the same percentage, which is what this test did
+    before: it passed against 32%, 32%.
+    """
+    with db_engine.begin() as c:
+        for tag, price, listed in (("lo", "90.00", "100.00"),    # 10%
+                                   ("mid", "50.00", "100.00"),   # 50%
+                                   ("hi", "20.00", "100.00")):   # 80%
+            c.execute(text(
+                "INSERT INTO index_product (id, inn, brand_name, form, strength, pack_size, "
+                "manufacturer, aim_status, regulated_price, review_status, reviewer_ref, "
+                f"search_text) VALUES ('idx_d{tag}_{SUFFIX}', 'Descontol', :b, 'Comprimido', "
+                "'1mg', '1', 'M', 'AUTHORISED', false, 'PUBLISHED', 'test', 'descontol') "
+                "ON CONFLICT (id) DO NOTHING"), {"b": f"DESCONTOL {tag.upper()}"})
+            c.execute(text(
+                "INSERT INTO vendor_offer (id, vendor_id, index_product_id, regulated_price, "
+                "qty_available, pack_size, expiry_horizon_days, price, list_price, "
+                f"stock_confirmed_at) VALUES ('ofr_d{tag}_{SUFFIX}', 'ven_1_{SUFFIX}', "
+                f"'idx_d{tag}_{SUFFIX}', false, 100, '1', 300, :p, :l, now()) "
+                "ON CONFLICT (id) DO NOTHING"), {"p": price, "l": listed})
+
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"sort": "discount", "in_stock": True, "limit": 100}).json()
+    pcts = [i["discount_pct"] for i in body["items"]]
+    assert pcts == sorted(pcts, reverse=True), pcts
+
+    order = [i["id"] for i in body["items"]]
+    hi, mid, lo = (order.index(f"idx_d{t}_{SUFFIX}") for t in ("hi", "mid", "lo"))
+    assert hi < mid < lo, "80% must come before 50% before 10%"
+
+
+def test_a_list_price_equal_to_the_price_is_not_a_discount(client, h, db_engine):
+    """A vendor publishing a public price equal to what it charges has
+    published no discount. Keeping that row would put a card with no badge on
+    a shelf whose whole promise is the badge — the padding the filter exists
+    to prevent, arriving through the other door."""
+    with db_engine.begin() as c:
+        c.execute(text(
+            "INSERT INTO index_product (id, inn, brand_name, form, strength, pack_size, "
+            "manufacturer, aim_status, regulated_price, review_status, reviewer_ref, "
+            f"search_text) VALUES ('idx_dzero_{SUFFIX}', 'Zerol', 'ZEROL', 'Comprimido', "
+            "'1mg', '1', 'M', 'AUTHORISED', false, 'PUBLISHED', 'test', 'zerol') "
+            "ON CONFLICT (id) DO NOTHING"))
+        c.execute(text(
+            "INSERT INTO vendor_offer (id, vendor_id, index_product_id, regulated_price, "
+            "qty_available, pack_size, expiry_horizon_days, price, list_price, "
+            f"stock_confirmed_at) VALUES ('ofr_dzero_{SUFFIX}', 'ven_1_{SUFFIX}', "
+            f"'idx_dzero_{SUFFIX}', false, 100, '1', 300, 70.00, 70.00, now()) "
+            "ON CONFLICT (id) DO NOTHING"))
+
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"sort": "discount", "in_stock": True, "limit": 100}).json()
+    assert f"idx_dzero_{SUFFIX}" not in [i["id"] for i in body["items"]]
+    # and it is still an ordinary product everywhere else
+    plain = client.get("/v1/catalogue/search", headers=h,
+                       params={"q": "zerol", "limit": 10}).json()
+    assert f"idx_dzero_{SUFFIX}" in [i["id"] for i in plain["items"]]
+
+
+def test_24_no_row_on_the_discount_shelf_has_a_discount_without_a_list_price(client, h):
+    """Acceptance 24. A "biggest discount" shelf whose tail is products with
+    no published list price would be padding a promise with rows that do not
+    keep it."""
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"sort": "discount", "in_stock": True, "limit": 50}).json()
+    assert body["items"], "nothing to check"
+    for i in body["items"]:
+        assert i["list_price"] is not None, i["id"]
+        assert i["discount_pct"] is not None, i["id"]
+
+
+def test_the_shelves_fetch_their_cards_by_id_and_keep_the_caller_s_order(client, h):
+    """`assistant/*` answers in product ids; the card is this endpoint's
+    shape. The rows come back as a set, so the *caller* orders them — how
+    often a pharmacy reorders something is not a property of the catalogue.
+    """
+    everything = client.get("/v1/catalogue/search", headers=h,
+                            params={"in_stock": True, "limit": 3}).json()["items"]
+    ids = [i["id"] for i in everything]
+    assert len(ids) >= 2, "the fixture needs at least two offered products"
+
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"ids": ",".join(reversed(ids)), "limit": 50}).json()
+    assert {i["id"] for i in body["items"]} == set(ids)
+    # same row shape as a search result, so the store renders both with one
+    # piece of code
+    assert set(body["items"][0]) == set(everything[0])
+
+
+def test_an_unknown_id_is_simply_absent_rather_than_an_error(client, h):
+    body = client.get("/v1/catalogue/search", headers=h,
+                      params={"ids": "idx_not_a_real_product", "limit": 10}).json()
+    assert body["items"] == []
+
+
+def test_savings_reports_a_product_once_at_the_price_he_paid_most_recently(client, h, db_engine):
+    """Per order line, this endpoint emitted a product as many times as it
+    had been bought — and, worse, emitted only the lines that its own filter
+    liked, so the line that contradicted the card was the one the caller
+    never saw: paid 120 in July, 95 last week, 100 today, and the card said
+    "you paid 120, now 100"."""
+    with db_engine.begin() as c:
+        c.execute(text(
+            "INSERT INTO index_product (id, inn, brand_name, form, strength, pack_size, "
+            "manufacturer, aim_status, regulated_price, review_status, reviewer_ref, "
+            f"search_text) VALUES ('idx_sv_{SUFFIX}', 'Savol', 'SAVOL', 'Comprimido', '1mg', "
+            "'1', 'M', 'AUTHORISED', false, 'PUBLISHED', 'test', 'savol') "
+            "ON CONFLICT (id) DO NOTHING"))
+        # today's cheapest fresh offer: 100
+        c.execute(text(
+            "INSERT INTO vendor_offer (id, vendor_id, index_product_id, regulated_price, "
+            "qty_available, pack_size, expiry_horizon_days, price, stock_confirmed_at) VALUES "
+            f"('ofr_sv_{SUFFIX}', 'ven_1_{SUFFIX}', 'idx_sv_{SUFFIX}', false, 50, '1', 300, "
+            "100.00, now()) ON CONFLICT (id) DO NOTHING"))
+        c.execute(text(
+            "INSERT INTO request (id, number, pharmacy_id, mode, channel, status, "
+            "allocation_strategy) VALUES "
+            f"('req_sv_{SUFFIX}', 'RQ-2026-880001', 'pha_{SUFFIX}', 'CATALOGUE', 'APP', "
+            "'IN_FULFILMENT', 'FEWEST_VENDORS') ON CONFLICT (id) DO NOTHING"))
+        for tag, price, days in (("old", "120.00", 60), ("new", "95.00", 9)):
+            c.execute(text(
+                'INSERT INTO "order" (id, number, request_id, pharmacy_id, vendor_id, status, '
+                "payment_terms, delivery_mode, goods_total, created_at) VALUES "
+                f"(:o, :n, 'req_sv_{SUFFIX}', 'pha_{SUFFIX}', 'ven_1_{SUFFIX}', 'CLOSED', "
+                "'UPFRONT', 'VENDOR_OWN_FLEET', 0, now() - make_interval(days => :d)) "
+                "ON CONFLICT (id) DO NOTHING"),
+                {"o": f"ord_sv_{tag}_{SUFFIX}", "n": f"OR-2026-88{days:03d}", "d": days})
+            c.execute(text(
+                "INSERT INTO request_line (id, request_id, index_product_id, qty_requested, "
+                "line_kind, match_status) VALUES "
+                f"(:rl, 'req_sv_{SUFFIX}', 'idx_sv_{SUFFIX}', 1, 'CATALOGUE', 'RESOLVED') "
+                "ON CONFLICT (id) DO NOTHING"),
+                {"rl": f"rql_sv_{tag}_{SUFFIX}"})
+            c.execute(text(
+                "INSERT INTO order_line (id, order_id, request_line_id, index_product_id, "
+                "regulated_price, ordered_qty, confirmed_qty, unit_price, price_source, "
+                "price_source_id) VALUES "
+                f"(:l, :o, :rl, 'idx_sv_{SUFFIX}', false, 1, 1, :p, 'VENDOR_OFFER', "
+                f"'ofr_sv_{SUFFIX}') "
+                "ON CONFLICT (id) DO NOTHING"),
+                {"l": f"orl_sv_{tag}_{SUFFIX}", "o": f"ord_sv_{tag}_{SUFFIX}",
+                 "rl": f"rql_sv_{tag}_{SUFFIX}", "p": price})
+
+    body = client.get("/v1/assistant/savings", headers=h).json()
+    mine = [i for i in body["items"] if i["index_product_id"] == f"idx_sv_{SUFFIX}"]
+    # 95 is the most recent price and it is *below* today's 100, so there is
+    # no saving to report at all — the July line must not resurrect one
+    assert mine == [], mine

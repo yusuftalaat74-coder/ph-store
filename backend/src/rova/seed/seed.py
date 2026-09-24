@@ -104,6 +104,12 @@ def seed_config_only(session: Session) -> None:
         # gives this key a real source and value, 72 (already matched, only
         # the false "no source" tag was wrong).
         ("CFG-INVOICE-UPLOAD-SLA-HOURS", "72", "INT", "design target A-143"),
+        # How long a basket sits untouched before the app says something about
+        # it. No spec row behind this one: it comes from the cart sprint, and
+        # the number is a judgement about a pharmacist's day, not a target.
+        # A cart edited in the morning and left is worth mentioning the next
+        # morning; anything shorter nags a man who is serving customers.
+        ("CFG-CART-IDLE-HOURS", "24", "INT", "cart sprint §3"),
         # SM-08 licence/expiry-warning window, shared by VendorAccount and
         # PharmacyAccount (§6 SM-08, §16).
         ("CFG-LICENCE-EXPIRY-WARNING-DAYS", "30", "INT", "design target A-94"),

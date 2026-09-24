@@ -18,6 +18,7 @@ def wire() -> None:
         return
     from rova.fees import accrual as fees_accrual
     from rova.eta import service as eta_service
+    from rova.ordering import cart as cart_service
     from rova.ordering import request_lifecycle
 
     register_hook("SM-03", "RECEIPT_ACCEPTED", fees_accrual.on_receipt_accepted)
@@ -46,4 +47,10 @@ def wire() -> None:
     register_hook("SM-03", "CANCELLED", request_lifecycle.on_order_terminal_close_request)
     register_hook("SM-03", "REJECTED", request_lifecycle.on_order_terminal_close_request)
     register_hook("SM-03", "CLOSED", request_lifecycle.on_order_terminal_close_request)
+
+    # A cart that is no longer a cart must stop being advertised as one. Every
+    # SM-01 state DRAFT can leave for is here, so no route out of the basket
+    # can leave an idle-cart notice pointing at it.
+    for left_draft in ("CONFIRMED", "AWAITING_ADMIN_APPROVAL", "CANCELLED"):
+        register_hook("SM-01", left_draft, cart_service.on_cart_left_draft)
     _wired = True

@@ -4,7 +4,9 @@ Every state machine in this codebase already names the events that deserve a
 notification; what was missing was somewhere for them to land and a way for a
 person to read them. `emit()` is that landing place, and it is deliberately
 the only writer — a notification is created from a domain event, never typed
-in by hand through an endpoint.
+in by hand through an endpoint. The job engine writes through it too: it
+briefly kept a second INSERT of its own, which drifted immediately (it could
+not address a user or an organisation) and is now gone.
 
 A notification is `QUEUED` when created and `SENT` when a channel adapter has
 actually handed it off. There is no adapter for `SMS` or `WHATSAPP` in this
@@ -119,6 +121,13 @@ def get_notification(notification_id: str,
     return _notification_or_404(session, notification_id, principal)
 
 
+# `read_at` is one column on a row that can be addressed to a person and to
+# their organisation at once, so "read" is shared: if the pharmacy admin opens
+# a notice out of curiosity, the buyer who has to act on it never sees a
+# badge for it. Known and accepted for now — the idle-basket case is also
+# carried by the reminder line at the top of the store, which is per-screen
+# and not per-row. Per-recipient read state needs its own table, and that is
+# a sprint with a name, not a column added quietly here.
 @router.post("/notifications/{notification_id}/read")
 def mark_read(notification_id: str,
               principal: Principal = Depends(require_roles(*_ALL_ROLES)),

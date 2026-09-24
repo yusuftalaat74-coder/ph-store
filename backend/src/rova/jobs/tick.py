@@ -53,10 +53,19 @@ machine transition is attempted (mirrors `uq_sla_timer_running`'s own
 at-most-one-active-timer guarantee), and the notification-only scans key off
 `NOT EXISTS` / precise cutoffs so a re-run before the next real event finds
 nothing new to queue.
+
+"Safe concurrently" means the database enforces it, not that the read and the
+write happen to be close together: `cart_idle`'s once-per-basket rule is
+`uq_one_idle_notice_per_cart` (migration 0007), so two overlapping ticks
+produce one notice however the check-then-insert interleaves. The older scans
+above still rely on their `NOT EXISTS` alone and would double-write under a
+genuinely concurrent tick; nothing schedules one today, and that is a gap
+worth naming rather than a claim worth repeating.
 """
 from datetime import timedelta
 
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from rova.config_params import service as cfg
@@ -65,6 +74,7 @@ from rova.core.db import get_sessionmaker
 from rova.core.errors import ApiError
 from rova.core.ids import new_id
 from rova.domain.hooks import wire as wire_hooks
+from rova.notifications.router import emit as _emit
 from rova.domain.machines.registry import MACHINES
 
 
@@ -220,18 +230,6 @@ def dispute_assignment() -> int:
         session.close()
 
 
-def _queue_notification(session: Session, *, event_code: str, recipient_role: str, payload: dict) -> None:
-    import json
-
-    session.execute(
-        text(
-            "INSERT INTO notification (id, event_code, recipient_role, channel, payload, status) "
-            "VALUES (:id, :ec, :role, 'IN_APP', CAST(:payload AS JSONB), 'QUEUED')"
-        ),
-        {"id": new_id("ntf"), "ec": event_code, "role": recipient_role, "payload": json.dumps(payload, default=str)},
-    )
-
-
 def verification_sla() -> int:
     """CFG-VERIFICATION-SLA-HOURS (A-140): a vendor_account/pharmacy_account
     stuck ONBOARDING past this many hours since it entered that state gets an
@@ -265,10 +263,11 @@ def verification_sla() -> int:
                 ).first()
                 if already:
                     continue
-                _queue_notification(
-                    session, event_code="N-VERIFICATION_SLA_BREACHED", recipient_role="ComplianceOfficer",
+                _emit(
+                    session, event_code="N-VERIFICATION_SLA_BREACHED",
+                    recipient_role="ComplianceOfficer",
                     payload={"holder_type": holder_type, "holder_id": row["id"],
-                             "onboarding_since": row["created_at"]},
+                             "onboarding_since": row["created_at"].isoformat()},
                 )
                 queued += 1
         session.commit()
@@ -311,8 +310,9 @@ def invoice_upload_sla() -> int:
             ).first()
             if already:
                 continue
-            _queue_notification(
-                session, event_code="N-INVOICE_UPLOAD_SLA_BREACHED", recipient_role="VendorFinance",
+            _emit(
+                session, event_code="N-INVOICE_UPLOAD_SLA_BREACHED",
+                recipient_role="VendorFinance",
                 payload={"order_id": row["order_id"], "vendor_id": row["vendor_id"]},
             )
             queued += 1
@@ -320,6 +320,108 @@ def invoice_upload_sla() -> int:
         return queued
     finally:
         session.close()
+
+
+def cart_idle() -> int:
+    """CFG-CART-IDLE-HOURS: a basket left untouched gets one notice, once.
+
+    "Untouched" is the later of `request.updated_at` and the newest
+    `request_line.updated_at`. Every cart write moves one or the other and a
+    read moves neither, so this measures when the basket last *changed* —
+    not when it was last looked at, which is a weaker reason to interrupt
+    somebody.
+
+    Addressed to the person who built the cart and to the pharmacy's
+    organisation, because the basket belongs to the shop: the buyer who
+    filled it should hear about it, and the admin who would have to approve
+    it should be able to see it.
+
+    Four things are deliberately not notified. An empty cart, because there
+    is nothing to come back to. A cart that has already had its notice —
+    `uq_one_idle_notice_per_cart` makes that the database's rule rather than
+    this function's, so two overlapping ticks still produce one notice.
+    Anything that is no longer an open cart, which is `is_cart AND
+    status='DRAFT'` and nothing looser: a checked-out request keeps `is_cart`
+    as provenance and must never be nagged about. And nothing at all on a
+    channel this build cannot deliver — `emit` defaults to IN_APP and a
+    WhatsApp row queued "for later" would sit QUEUED for ever while reading
+    as a backlog somebody is working through.
+
+    A notice also stops being true when the basket stops being one, which is
+    not this job's business: `on_cart_left_draft` in `ordering/cart.py` marks
+    it read on every SM-01 route out of DRAFT.
+    """
+    wire_hooks()
+    session = get_sessionmaker()()
+    try:
+        hours = cfg.get(session, "CFG-CART-IDLE-HOURS", default=24)
+        cutoff = now() - timedelta(hours=float(hours))
+        rows = session.execute(
+            text(
+                "SELECT r.id AS request_id, r.number, r.pharmacy_id, r.created_by_user_id, "
+                "       p.organisation_id, "
+                "       GREATEST(r.updated_at, COALESCE(max(rl.updated_at), r.updated_at)) "
+                "           AS last_touched_at, "
+                "       count(*) AS line_count "
+                "FROM request r "
+                "JOIN pharmacy_account p ON p.id = r.pharmacy_id "
+                "JOIN request_line rl ON rl.request_id = r.id "
+                "WHERE r.is_cart AND r.status = 'DRAFT' "
+                "GROUP BY r.id, r.number, r.pharmacy_id, r.created_by_user_id, p.organisation_id "
+                "HAVING GREATEST(r.updated_at, COALESCE(max(rl.updated_at), r.updated_at)) <= :cutoff"
+            ),
+            {"cutoff": cutoff},
+        ).mappings().all()
+
+        queued = 0
+        for row in rows:
+            already = session.execute(
+                text("SELECT 1 FROM notification WHERE event_code='N-CART-IDLE' "
+                     "AND payload->>'request_id' = :rid"),
+                {"rid": row["request_id"]},
+            ).first()
+            if already:
+                continue
+
+            # The first few product names, so the notice says what is in the
+            # basket rather than only how much of it there is. Portuguese as
+            # the catalogue holds it — a medicine name is not translated.
+            names = session.execute(
+                text("SELECT COALESCE(p.brand_name, p.inn) AS name FROM request_line rl "
+                     "JOIN index_product p ON p.id = rl.index_product_id "
+                     "WHERE rl.request_id = :r ORDER BY rl.created_at LIMIT 3"),
+                {"r": row["request_id"]},
+            ).scalars().all()
+
+            # A SAVEPOINT around the insert: if a concurrent tick got there
+            # between the check above and here, the unique index refuses this
+            # one and the loop moves on instead of losing the whole run.
+            try:
+                with session.begin_nested():
+                    _queue_idle_notice(session, row, names)
+            except IntegrityError:
+                continue
+            queued += 1
+        session.commit()
+        return queued
+    finally:
+        session.close()
+
+
+def _queue_idle_notice(session: Session, row, names: list[str]) -> None:
+    _emit(
+        session, event_code="N-CART-IDLE",
+        recipient_user_id=row["created_by_user_id"],
+        recipient_org_id=row["organisation_id"],
+        payload={"request_id": row["request_id"], "number": row["number"],
+                 "pharmacy_id": row["pharmacy_id"],
+                 "line_count": row["line_count"],
+                 "first_items": names,
+                 # ISO, not str(datetime): the app parses this, and Python's
+                 # default rendering ("… 10:00:00+00:00", with a space) is
+                 # accepted by Chrome and rejected by Safari.
+                 "last_touched_at": row["last_touched_at"].isoformat()},
+    )
 
 
 def close_orders() -> int:
@@ -368,6 +470,7 @@ JOBS = {
     "dispute_resolution_sla": dispute_resolution_sla,
     "verification_sla": verification_sla,
     "invoice_upload_sla": invoice_upload_sla,
+    "cart_idle": cart_idle,
     "close_orders": close_orders,
 }
 

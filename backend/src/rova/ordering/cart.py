@@ -16,12 +16,15 @@ Two rules this module exists to keep:
 """
 from __future__ import annotations
 
+from datetime import timedelta
 from decimal import Decimal
 
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from rova.config_params import service as cfg
+from rova.core.clock import now
 from rova.core.errors import ApiError
 from rova.core.ids import new_id
 from rova.core.money import money_str
@@ -211,7 +214,8 @@ def read_cart(session: Session, pharmacy_id: str) -> dict:
     cart = find_cart(session, pharmacy_id)
     if cart is None:
         return {"request_id": None, "number": None, "status": None,
-                "last_touched_at": None, "lines": [],
+                "last_touched_at": None, "idle": False, "idle_hours": None,
+                "lines": [], "skipped": [],
                 "totals": {"goods_total": "0.00", "by_vendor": []},
                 "checkout_blocked_by": []}
 
@@ -274,10 +278,23 @@ def read_cart(session: Session, pharmacy_id: str) -> dict:
             "regulated_price": bool(r["regulated_price"]),
         })
 
+    # `idle` is answered here, by the same config value the job reads, so the
+    # app never has to invent a third notion of it. It did: the store's
+    # reminder line was keyed on "touched on an earlier calendar day", which
+    # fires at midnight for a basket forty minutes old and stays quiet for one
+    # that has been sitting twenty-three hours.
+    idle_hours = float(cfg.get(session, "CFG-CART-IDLE-HOURS", default=24))
+    idle = bool(lines) and last_touched is not None \
+        and last_touched <= now() - timedelta(hours=idle_hours)
+
     return {
         "request_id": cart["id"], "number": cart["number"], "status": cart["status"],
         "last_touched_at": last_touched.isoformat() if last_touched else None,
-        "lines": lines,
+        "idle": idle, "idle_hours": idle_hours,
+        # Filled in by the batch endpoint when it could not add something.
+        # Present and empty everywhere else, so the phone can replace the
+        # whole cart on every write without a key appearing and vanishing.
+        "lines": lines, "skipped": [],
         "totals": {
             "goods_total": money_str(total),
             "by_vendor": [{"vendor_id": v,
@@ -287,3 +304,28 @@ def read_cart(session: Session, pharmacy_id: str) -> dict:
         },
         "checkout_blocked_by": blocked,
     }
+
+
+def on_cart_left_draft(ctx) -> None:
+    """A notice about a basket stops being true the moment the basket stops
+    being one.
+
+    Without this the sequence is: Monday he fills a cart, Wednesday the idle
+    job writes a notice, Wednesday afternoon he checks out from the reminder
+    line at the top of the store, and Thursday he opens the bell — which is
+    still showing "your basket is still waiting" — taps it, and lands on an
+    empty cart, or on a different basket he started that morning. Two such
+    notices read identically, so he cannot even tell which is stale.
+
+    Registered on every SM-01 state the cart can leave DRAFT for, so no route
+    out of the basket can skip it. The row is marked read rather than
+    deleted: `notification` is somebody's inbox history, and a notice that
+    was true when it was written stays in it.
+    """
+    request_id = ctx.subject_row["id"]
+    ctx.session.execute(
+        text("UPDATE notification SET status='READ', read_at=now(), updated_at=now() "
+             "WHERE event_code='N-CART-IDLE' AND read_at IS NULL "
+             "AND payload->>'request_id' = :r"),
+        {"r": request_id},
+    )

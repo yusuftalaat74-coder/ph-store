@@ -39,6 +39,45 @@ function sql(q) {
                       { env: { ...process.env, PGPASSWORD: "postgres" } }).toString().trim();
 }
 
+/* The real job, not a hand-written INSERT. A notice this walk conjured into
+   the table would prove the screen renders and nothing about whether the
+   thing that is supposed to produce it does. */
+/* Abandon any open basket the way the app does, so SM-01 runs and slice B's
+   hook closes the notices with it. Anything the hook misses shows up as a
+   stale badge in the steps below, which is the point. */
+async function resetState() {
+  const carts = sql("SELECT r.id FROM request r JOIN pharmacy_account p ON p.id = r.pharmacy_id " +
+                    "WHERE r.is_cart AND r.status='DRAFT'").split("\n").filter(Boolean);
+  for (const id of carts) {
+    execFileSync("python", ["-c",
+      "import sys;sys.path.insert(0,'src');" +
+      "from rova.core.db import get_sessionmaker;from rova.domain.hooks import wire;" +
+      "from rova.domain.machines.registry import MACHINES;from rova.auth.principal import Principal;" +
+      "from sqlalchemy import text;wire();s=get_sessionmaker()();" +
+      `r=s.execute(text("SELECT pharmacy_id, created_by_user_id FROM request WHERE id='${id}'")).mappings().one();` +
+      "p=Principal(user_id=r['created_by_user_id'], membership_id='x', organisation_id='x'," +
+      " surface='PH', roles=frozenset({'PharmacyBuyer'}), pharmacy_id=r['pharmacy_id']," +
+      " vendor_id=None, transporter_id=None);" +
+      `MACHINES['SM-01'].apply(s, '${id}', 'ABANDON', p);s.commit()`],
+      { cwd: "/home/claude/phstore/backend",
+        env: { ...process.env,
+               ROVA_DATABASE_URL: `postgresql+psycopg://postgres:postgres@localhost:5432/${DB}`,
+               ROVA_JWT_SECRET: "dev-secret-please-be-32-characters-min", ROVA_ENV: "dev" } });
+  }
+}
+
+function runJobs() {
+  execFileSync("python", ["-m", "rova.cli", "jobs", "tick"], {
+    cwd: "/home/claude/phstore/backend",
+    env: {
+      ...process.env,
+      ROVA_DATABASE_URL: `postgresql+psycopg://postgres:postgres@localhost:5432/${DB}`,
+      ROVA_JWT_SECRET: "dev-secret-please-be-32-characters-min",
+      ROVA_ENV: "dev",
+    },
+  });
+}
+
 (async () => {
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: { width: 420, height: 880 } });
@@ -51,6 +90,19 @@ function sql(q) {
     errors.push("console: " + m.text());
   });
   page.on("request", (r) => { if (r.url().includes("/v1/")) calls.push(r.method() + " " + r.url().replace(/^.*8099/, "")); });
+
+  // Start from a known basket. The walk is meant to be repeatable, and a
+  // cart or an unread notice left behind by the previous run changed what
+  // several of these steps were actually testing — a card already in the
+  // basket shows the dial instead of the `+`, and a second line makes the
+  // checkout flash carry a sum rather than one total.
+  // Through the machine, not around it: an `UPDATE request SET status` here
+  // skipped SM-01 and the `on_cart_left_draft` hook, and then had to mark the
+  // notices read by hand to cover for what it had skipped — which is the
+  // hook's own job and exactly what this walk is supposed to be exercising.
+  sql("SELECT 1");
+  await resetState();
+  step("cleared the previous walk's basket, through the app's own route out");
 
   await page.goto(BASE, { waitUntil: "networkidle" });
   step("loaded, default language = " + (await page.getAttribute("html", "lang")));
@@ -150,6 +202,15 @@ function sql(q) {
   /* ---- the cart screen ------------------------------------------------ */
   await page.click('[data-act="goCart"]');
   await page.waitForTimeout(1200);
+  // One line, so the checkout flash carries one total and can be compared
+  // against the price that was agreed. A leftover line from an earlier step
+  // made that assertion compare a unit price against a two-line sum.
+  for (let i = 0; i < 6; i++) {
+    const extra = await page.$$('[data-act="dropCartLine"]');
+    if (extra.length <= 1) break;
+    await extra[extra.length - 1].click();
+    await page.waitForTimeout(900);
+  }
   const row = await page.$eval(".card .row", (e) => e.textContent.replace(/\s+/g, " ").trim());
   step("cart row: " + row.slice(0, 90));
   const btn = (await page.textContent('[data-act="checkout"]')).trim();
@@ -196,8 +257,11 @@ function sql(q) {
     const flash = (await page.textContent(".ok")).trim();
     step("ORDER: " + flash);
     check(/\d/.test(flash), "checkout produced no order line");
-    // the agreed figure, formatted the way the app formats money
-    const agreed = (Number(original) + 25).toFixed(2).replace(".", ",");
+    // The agreed unit price times the quantity, formatted the way the app
+    // formats money. Comparing the unit price alone passed only because the
+    // basket happened to hold one of everything.
+    const qty = Number(sql(`SELECT qty_requested FROM request_line WHERE id='${lineId}'`)) || 1;
+    const agreed = ((Number(original) + 25) * qty).toFixed(2).replace(".", ",");
     check(flash.replace(/\s/g, "").includes(agreed.replace(/\s/g, "")),
           `the order total is not the agreed price: expected ${agreed} in "${flash}"`);
   } finally {
@@ -224,6 +288,187 @@ function sql(q) {
   check(orderRows.length > 0, "the order he just placed is not in the orders tab");
   check(!orderRows.some((t) => /Draft|Rascunho/i.test(t)),
         "a draft cart is showing in the order history");
+
+  /* ---- the basket he walked away from --------------------------------
+     Put something in the cart, age it past CFG-CART-IDLE-HOURS in the
+     database, run the real tick, and see what the app does with it. */
+  await page.click('[data-tab="store"]');
+  await page.waitForTimeout(1200);
+  await page.click('.p [data-act="add"]');
+  await page.waitForTimeout(1000);
+  const idleCart = sql("SELECT id FROM request WHERE is_cart AND status='DRAFT' " +
+                       "ORDER BY created_at DESC LIMIT 1");
+  sql(`UPDATE request SET updated_at = now() - interval '30 hours' WHERE id='${idleCart}'`);
+  sql(`UPDATE request_line SET updated_at = now() - interval '30 hours', ` +
+      `created_at = now() - interval '30 hours' WHERE request_id='${idleCart}'`);
+  runJobs();
+  step("ran the tick against a 30-hour-old basket");
+
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(2000);
+  const badge = await page.$eval(".bell .badge", (e) => e.textContent.trim()).catch(() => null);
+  const reminder = await page.$eval(".reminder", (e) => e.textContent.replace(/\s+/g, " ").trim())
+    .catch(() => null);
+  step(`badge on the bell: ${badge || "(none)"}`);
+  step(`reminder line: ${reminder || "(none)"}`);
+  check(badge === "1", `the idle-basket notice never reached the app (badge=${badge})`);
+  check(reminder !== null, "the store does not mention the basket he left");
+  // An amount, not merely "some digit" — a day-of-month satisfied that. The
+  // app writes money as `1 044,00 MT`, so that is what is looked for.
+  check(/\d[\d\s]*,\d{2}\s*MT/.test(reminder || ""),
+        `the reminder does not show what the basket comes to: "${reminder}"`);
+
+  await page.click('[data-act="goNotifs"]');
+  await page.waitForTimeout(1500);
+  const notice = await page.$eval(".card .row", (e) => e.textContent.replace(/\s+/g, " ").trim())
+    .catch(() => null);
+  step(`notice reads: ${notice}`);
+  check(notice !== null && !/N-CART-IDLE/.test(notice),
+        "the notice shows a raw event code instead of a sentence");
+  const noticed = sql("SELECT payload->'first_items'->>0 FROM notification " +
+                      `WHERE event_code='N-CART-IDLE' AND payload->>'request_id'='${idleCart}'`);
+  check(noticed && (notice || "").includes(noticed),
+        `the notice does not name what is in the basket (expected "${noticed}")`);
+  check(/\d/.test(notice || "") && /·/.test(notice || ""),
+        "the notice does not say how many, or when");
+
+  // tapping it opens the basket, and the badge is gone afterwards
+  await page.click(".card .row[data-act='readNotice']");
+  await page.waitForTimeout(1800);
+  const landedOn = (await page.textContent("h1")).trim();
+  step(`tapping the notice landed on: "${landedOn}"`);
+  const cartTitles = ["Cart", "Carrinho", "السلة"];
+  check(cartTitles.includes(landedOn),
+        `tapping the notice did not open the basket, it opened "${landedOn}"`);
+  await page.click('[data-act="goStore"]');
+  await page.waitForTimeout(1200);
+  const badgeOnStore = await page.$eval(".bell .badge", (e) => e.textContent.trim()).catch(() => null);
+  step(`badge after reading: ${badgeOnStore || "(gone)"}`);
+  check(badgeOnStore === null, "the notice stayed unread after he opened it");
+
+  // and a basket touched just now gets no reminder: the line is for one he
+  // walked away from, not a restatement of the bar at the bottom
+  await page.click('.p [data-act="inc"], .p [data-act="add"]');
+  await page.waitForTimeout(1200);
+  const freshReminder = await page.$(".reminder");
+  step(`reminder for a basket touched just now: ${freshReminder ? "shown" : "none"}`);
+  check(!freshReminder, "a basket he is using right now is being 'reminded' about");
+
+  /* ---- the shelves, and ordering something again ----------------------
+     The pilot pharmacies have one or two orders, so "what you usually buy"
+     is deliberately hidden and only the discount shelf is expected. That is
+     the sprint's own rule, not a gap — a shelf that claims to know his
+     habits after one purchase is a lie with a friendly face. */
+  await page.click('[data-tab="store"]');
+  await page.waitForTimeout(2500);
+  const shelfTitles = await page.$$eval(".shelf-h", (e) => e.map((x) => x.textContent.trim()));
+  const railCards = await page.$$eval(".rail .p.mini", (e) => e.length);
+  step(`shelves: ${shelfTitles.join(" | ") || "(none)"} — ${railCards} card(s)`);
+  check(shelfTitles.length > 0, "no shelf appeared on the store home");
+  check(railCards > 0, "a shelf is showing with nothing on it");
+  // Every card on the *discount* shelf has to carry the discount it
+  // promises. The other shelves are about his habits and his past prices, so
+  // a card without a badge there is not padding.
+  const offShelf = await page.evaluate(() => {
+    const heads = [...document.querySelectorAll(".shelf-h")];
+    const head = heads[heads.length - 1 - [...heads].reverse()
+      .findIndex((h) => /discount|desconto|خصم/i.test(h.textContent))];
+    if (!head || !head.nextElementSibling) return null;
+    return [...head.nextElementSibling.querySelectorAll(".p.mini")]
+      .map((x) => !!x.querySelector(".off"));
+  });
+  step(`discount badges on that shelf: ${(offShelf || []).filter(Boolean).length}/${(offShelf || []).length}`);
+  check(offShelf && offShelf.length > 0, "the biggest-discount shelf did not render");
+  check((offShelf || []).every(Boolean),
+        "the biggest-discount shelf is padded with rows that have none");
+
+  // the reminder must keep its place above them
+  const order = await page.evaluate(() => {
+    const el = (sel) => document.querySelector(sel);
+    const rem = el(".reminder"), sh = el(".shelf-h");
+    if (!rem || !sh) return "n/a";
+    return rem.compareDocumentPosition(sh) & Node.DOCUMENT_POSITION_FOLLOWING ? "above" : "below";
+  });
+  step(`the basket reminder sits ${order} the shelves`);
+  check(order !== "below", "the shelves pushed the basket reminder out of sight");
+
+  // and adding from a shelf goes into the same basket
+  const beforeAdd = await page.textContent(".cartbar").catch(() => "");
+  // The same card as the button — reading `.pr` from the first mini card and
+  // clicking the first `add` picked two different products whenever the
+  // first was already in the basket and showing its dial instead.
+  //
+  // And specifically a shelf card that is NOT in the grid. That is the whole
+  // point: the lookup that recorded the price he saw searched the grid and
+  // the product page only, so it found nothing for a shelf card and the
+  // server stored its own number instead. A card that happens to appear in
+  // both passes either way and proves nothing.
+  const shelfCard = await page.evaluate(() => {
+    const inGrid = new Set([...document.querySelectorAll(".grid .p [data-act]")]
+      .map((b) => b.dataset.id).filter(Boolean));
+    const cards = [...document.querySelectorAll(".rail .p.mini")]
+      .filter((c) => c.querySelector('[data-act="add"]'));
+    const pick = cards.find((c) => !inGrid.has(c.querySelector('[data-act="add"]').dataset.id))
+              || cards[0];
+    if (!pick) return null;
+    return { id: pick.querySelector('[data-act="add"]').dataset.id,
+             price: (pick.querySelector(".pr") || {}).textContent.trim(),
+             offGrid: !inGrid.has(pick.querySelector('[data-act="add"]').dataset.id) };
+  });
+  check(!!shelfCard, "no shelf card offers a way to add it");
+  check(shelfCard && shelfCard.offGrid,
+        "every shelf card is also in the grid, so this step cannot see the defect it is for");
+  const shelfPrice = shelfCard.price, shelfId = shelfCard.id;
+  // Move the price out from under the shelf before tapping. Without this the
+  // step cannot fail: the server's own figure equals the card's on this data,
+  // so a cart that recorded the server's number instead of the pharmacist's
+  // would look identical. The gap this guards is time, not ranking.
+  const shelfOffer = sql(`SELECT id FROM vendor_offer WHERE index_product_id='${shelfId}' ` +
+                         "AND freshness_state='FRESH' ORDER BY price LIMIT 1");
+  const shelfOriginal = sql(`SELECT price FROM vendor_offer WHERE id='${shelfOffer}'`);
+  sql(`UPDATE vendor_offer SET price = price + 37 WHERE id='${shelfOffer}'`);
+  await page.click(`.rail .p.mini [data-act="add"][data-id="${shelfId}"]`);
+  await page.waitForTimeout(1400);
+  const afterAdd = await page.textContent(".cartbar").catch(() => "");
+  step(`cart bar: "${beforeAdd.trim()}" -> "${afterAdd.trim()}"`);
+  check(afterAdd !== beforeAdd, "adding from a shelf did not reach the cart");
+
+  // The claim, not just the line. A shelf card is almost never in the grid,
+  // so `+` here used to send no price at all and the server recorded its own
+  // as though it were the one on screen — the defect the whole price
+  // mechanism exists to prevent, arriving through a new door.
+  const storedSeen = sql("SELECT price_seen FROM request_line rl JOIN request r ON r.id = rl.request_id " +
+                         `WHERE r.is_cart AND r.status='DRAFT' AND rl.index_product_id='${shelfId}'`);
+  sql(`UPDATE vendor_offer SET price = ${shelfOriginal} WHERE id='${shelfOffer}'`);
+  step(`shelf showed ${shelfPrice}; the server would have said ` +
+       `${(Number(shelfOriginal) + 37).toFixed(2)}; the basket recorded ${storedSeen || "(nothing)"}`);
+  check(!!storedSeen, "adding from a shelf recorded no price the pharmacist was shown");
+  check(Number(storedSeen) === Number(shelfOriginal),
+        `the basket recorded ${storedSeen} — the server's own figure — rather than the ` +
+        `${shelfOriginal} the shelf was showing him`);
+
+  /* order it all again */
+  const ordersBeforeReorder = Number(sql("SELECT count(*) FROM \"order\""));
+  await page.click('[data-tab="orders"]');
+  await page.waitForTimeout(1600);
+  await page.click(".card.tap");
+  await page.waitForTimeout(1400);
+  const hasReorder = await page.$('[data-act="reorder"]');
+  check(!!hasReorder, "a past order has no way to be ordered again");
+  await page.click('[data-act="reorder"]');
+  await page.waitForTimeout(2000);
+  const afterReorder = (await page.textContent("h1")).trim();
+  const reorderRows = await page.$$eval(".card .row .cnt .n", (e) => e.map((x) => x.textContent.trim()));
+  step(`"add all" landed on "${afterReorder}" with quantities [${reorderRows.join(", ")}]`);
+  check(["Cart", "Carrinho", "السلة"].includes(afterReorder),
+        "adding a past order did not open the basket");
+  check(reorderRows.length > 0, "the basket is empty after adding a whole order to it");
+  // The real question is whether an order row appeared, not what the flash
+  // says. Greping the flash for "RQ-" could never match the sentence the app
+  // actually writes, so it was a check that could not fail.
+  const ordersAfterReorder = Number(sql("SELECT count(*) FROM \"order\""));
+  check(ordersAfterReorder === ordersBeforeReorder,
+        `"add all" created ${ordersAfterReorder - ordersBeforeReorder} order(s); it must only fill the basket`);
 
   /* ---- the WhatsApp lane still works ---------------------------------- */
   await page.click('[data-tab="list"]');

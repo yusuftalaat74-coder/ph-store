@@ -167,6 +167,22 @@ textarea{min-height:120px;resize:vertical}
 .chip .c{opacity:.55;font-weight:700;margin-inline-start:4px;font-size:11px}
 .flabel{font-size:12px;font-weight:700;color:var(--muted);margin:2px 0 4px}
 .chip.on{border-color:var(--green);background:rgba(23,163,74,.08);color:#0C6B31}
+.bell{position:relative;flex:0 0 auto;width:40px;height:40px;display:flex;align-items:center;
+      justify-content:center;border-radius:12px;color:var(--ink)}
+.bell svg{width:22px;height:22px}
+.bell:active{background:rgba(0,0,0,.05)}
+.bell .badge{position:absolute;top:3px;inset-inline-end:3px;min-width:16px;height:16px;padding:0 4px;
+      border-radius:999px;background:var(--red);color:#fff;font-size:10px;font-weight:800;
+      display:flex;align-items:center;justify-content:center}
+.reminder{display:block;border:1.5px solid var(--green);background:rgba(23,163,74,.06)}
+.shelf-h{font-weight:700;color:var(--ink);margin:14px 0 6px}
+.shelf-note{margin:-4px 0 10px;opacity:.85}
+.rail{display:flex;gap:10px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail .p.mini{flex:0 0 150px;margin:0}
+.p .paid{margin:2px 0 0}
+.row.unread .t::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+      background:var(--green);margin-inline-end:6px;vertical-align:middle}
 code{background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px;font-size:12px;
      font-family:ui-monospace,Menlo,monospace}
 
@@ -251,6 +267,9 @@ const T = {
     save_server:"Save server", test:"Test connection", server_ok:"Server OK",
     server_saved:"Server saved.",
     tab_store:"Store", tab_list:"List", tab_orders:"Orders", tab_chat:"Chat", tab_panel:"Account",
+    notifs:"Notices", no_notifs:"Nothing new.", mark_all_read:"Mark all read", cart_waiting:"in your cart since", cart_idle_notice:"Your basket is still waiting.", open_cart:"Open cart", notice:"Notice", 
+    usual:"What you usually buy", cheaper:"Cheaper now than you paid", best_off:"Biggest discount", running_low:"Running low", you_paid:"you paid", now_at:"now", reorder:"Add all to cart", reorder_done:"Added to your cart.", shelf_basis:"From your own orders",
+    reorder_partial:"Added {n} of {all}. The rest cannot be ordered right now.", nothing_to_reorder:"Nothing on this order can be added.",
     store:"Store", store_sub:"Browse, search and order",
     search_ph:"Paracetamol, Amoxicilina…", search:"Search", searching:"Searching…",
     nothing:"Nothing found.", clear:"Clear",
@@ -298,6 +317,9 @@ const T = {
     save_server:"Guardar servidor", test:"Testar ligação", server_ok:"Servidor OK",
     server_saved:"Servidor guardado.",
     tab_store:"Loja", tab_list:"Lista", tab_orders:"Pedidos", tab_chat:"Conversa", tab_panel:"Conta",
+    notifs:"Avisos", no_notifs:"Nada de novo.", mark_all_read:"Marcar tudo como lido", cart_waiting:"no seu carrinho desde", cart_idle_notice:"O seu carrinho continua à espera.", open_cart:"Abrir carrinho", notice:"Aviso", 
+    usual:"O que costuma comprar", cheaper:"Mais barato agora do que pagou", best_off:"Maior desconto", running_low:"A acabar", you_paid:"pagou", now_at:"agora", reorder:"Adicionar tudo ao carrinho", reorder_done:"Adicionado ao seu carrinho.", shelf_basis:"Dos seus próprios pedidos",
+    reorder_partial:"Adicionados {n} de {all}. Os restantes não podem ser encomendados agora.", nothing_to_reorder:"Nada neste pedido pode ser adicionado.",
     store:"Loja", store_sub:"Procure, veja e encomende",
     search_ph:"Paracetamol, Amoxicilina…", search:"Procurar", searching:"A procurar…",
     nothing:"Nada encontrado.", clear:"Limpar",
@@ -346,6 +368,9 @@ const T = {
     save_server:"حفظ الخادم", test:"اختبار الاتصال", server_ok:"الخادم يعمل",
     server_saved:"الخادم اتحفظ.",
     tab_store:"المتجر", tab_list:"قائمة", tab_orders:"الطلبات", tab_chat:"المحادثة", tab_panel:"الحساب",
+    notifs:"التنبيهات", no_notifs:"مفيش جديد.", mark_all_read:"علّم الكل كمقروء", cart_waiting:"في سلتك من", cart_idle_notice:"سلتك لسه مستنية.", open_cart:"افتح السلة", notice:"تنبيه", 
+    usual:"اللي بتشتريه عادةً", cheaper:"أرخص دلوقتي عن اللي دفعته", best_off:"أعلى خصم", running_low:"قرب يخلص", you_paid:"دفعت", now_at:"دلوقتي", reorder:"ضيف الكل للسلة", reorder_done:"اتضاف للسلة.", shelf_basis:"من طلباتك إنت",
+    reorder_partial:"اتضاف {n} من {all}. الباقي مش ممكن يتطلب دلوقتي.", nothing_to_reorder:"مفيش حاجة في الطلب دا ممكن تتضاف.",
     store:"المتجر", store_sub:"تصفّح وابحث واطلب",
     search_ph:"Paracetamol, Amoxicilina…", search:"بحث", searching:"جارٍ البحث…",
     nothing:"مفيش نتائج.", clear:"مسح",
@@ -430,6 +455,10 @@ const S = {
   norm: null,          // normalisation view for a pasted list
   thread: null,
   assistant: null,
+  notifs: null,        // the inbox, loaded on demand
+  shelves: null,       // the home shelves, computed from his own orders
+  shelvesLoading: false,
+  unread: 0,           // the badge on the bell
   askResult: null,
   lastRequestId: null
 };
@@ -491,6 +520,26 @@ function MT(v){
    isolated exactly like a product name. Rule 1 still holds: the value itself
    is never parsed, only wrapped. */
 function money(v){ return '<span class="bidi">' + esc(MT(v)) + "</span>"; }
+
+/* The rule for mixed text, so it is decided once rather than per screen:
+   `sentence()` for anything with words in it, `.bidi` only for pure data —
+   a price, a product name, an id, a date on its own. `.bidi` forces LTR,
+   which is right for `1 044,00 MT` and wrong for `كان 1 044,00 MT`, where it
+   puts the Arabic word on the left of the number.
+
+   A run of text that resolves its own direction.
+
+   The page layout is deliberately LTR in all three languages — that is the
+   owner's instruction and it holds. But *inside* a label, a sentence has to
+   be laid out in its own direction or the browser puts the full stop at the
+   wrong end and drags any number or Latin word to the wrong side of the
+   words around it: `سلتك لسه مستنية.` rendered as `.سلتك لسه مستنية`, and
+   `2 صنف · ACARILBIAL` came out with the parts in the wrong order.
+
+   `dir="auto"` takes the direction from the first strong character of the
+   run, so the Arabic reads right and the Portuguese and English are
+   untouched. It changes nothing about where the box sits on the screen. */
+function sentence(str){ return '<span dir="auto">' + esc(str) + "</span>"; }
 
 function name(p){
   const label = p.brand_name || p.inn || "—";
@@ -598,8 +647,10 @@ function render(){
   if (!main) return;
   try {
     main.innerHTML =
-      (S.err   ? '<div class="err">'  + esc(S.err)   + "</div>" : "") +
-      (S.flash ? '<div class="ok">'   + esc(S.flash) + "</div>" : "") +
+      // `sentence()`, not `esc()`: both banners routinely carry a count or an
+      // amount inside a sentence, and an LTR box reorders the Arabic ones.
+      (S.err   ? '<div class="err">'  + sentence(S.err)   + "</div>" : "") +
+      (S.flash ? '<div class="ok">'   + sentence(S.flash) + "</div>" : "") +
       (S.token ? VIEW[S.tab]() : loginView());
   } catch (e) {
     // rule 3: a broken screen still shows why, and the app stays alive
@@ -680,7 +731,25 @@ function cartLines(){ return (S.cart && S.cart.lines) || []; }
 function cartLineFor(productId){
   return cartLines().find(l => l.index_product_id === productId);
 }
-function cartCount(){ return cartLines().reduce((n, l) => n + l.qty_requested, 0); }
+/* Lines, not units. "4 items in your cart" has to mean the same thing on the
+   bar, on the reminder and in the notice; the notice carries `line_count`,
+   and the summary's `cart_lines` counts lines too. Summing quantities made
+   three products at two each read as "6 items" on two screens and "3 items"
+   on the third. */
+function cartCount(){ return cartLines().length; }
+
+/* Every card currently on screen, by product id — the grid and all four home
+   shelves. One lookup, so a new shelf cannot quietly become a place where
+   the price he saw is not recorded. */
+function shownCard(productId){
+  const pools = [S.results || []];
+  if (S.shelves) ["usual", "cheaper", "best_off", "low"].forEach(k => pools.push(S.shelves[k] || []));
+  for (const pool of pools) {
+    const hit = pool.find(x => x && x.id === productId);
+    if (hit) return hit;
+  }
+  return null;
+}
 
 function qtyRound(p){
   const line = cartLineFor(p.id);
@@ -725,8 +794,8 @@ function cartBar(){
   const n = cartCount();
   if (!n) return "";
   return '<div class="cartbar">' +
-    '<button class="btn g" data-act="goCart">' + esc(t("cart")) + " · " + n + " " +
-      esc(t("items")) + "</button></div>";
+    '<button class="btn g" data-act="goCart">' +
+      sentence(t("cart") + " · " + n + " " + t("items")) + "</button></div>";
 }
 
 /* The two filter rows.
@@ -772,12 +841,23 @@ function filterBar(){
 function storeView(){
   if (S.product) return productView();
   if (S.tab === "cart") return cartView();
+  if (S.tab === "notifs") return notifView();
   const f = S.filters;
   const results = S.results;
   const filtered = !!(S.vendor || S.category || (S.search || "").trim());
   return '' +
-  "<h1>" + esc(t("store")) + "</h1>" +
+  '<div class="row" style="margin:0 0 2px;padding:0;border:0;align-items:flex-start">' +
+    "<h1 style='margin:0'>" + esc(t("store")) + "</h1>" +
+    '<button class="bell" data-act="goNotifs" aria-label="' + esc(t("notifs")) + '">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+      'stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/>' +
+      '<path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>' +
+      (S.unread ? '<span class="badge">' + (S.unread > 9 ? "9+" : S.unread) + "</span>" : "") +
+    "</button>" +
+  "</div>" +
   '<p class="sub">' + esc(t("store_sub")) + "</p>" +
+  cartReminder() +
   '<div class="card">' +
     '<input id="q" type="search" placeholder="' + esc(t("search_ph")) + '" dir="ltr" ' +
       'value="' + esc(S.search) + '">' +
@@ -790,12 +870,13 @@ function storeView(){
     ? '<div class="hero">' +
         '<div class="v">' + f.catalogue_size + "</div>" +
         '<div class="k">' + esc(t("catalogue_size")) + "</div>" +
-        '<div class="k" style="margin-top:6px">' + f.products_with_offers + " " +
-          esc(t("with_offers")) + "</div>" +
+        '<div class="k" style="margin-top:6px">' +
+          sentence(f.products_with_offers + " " + t("with_offers")) + "</div>" +
       "</div>"
     : "") +
 
   filterBar() +
+  (filtered ? "" : shelves()) +
 
   (results === null
     ? '<div class="card empty">' +
@@ -828,8 +909,9 @@ function productView(){
           '<div class="vendorline' + (i === 0 ? " best" : "") + '">' +
             "<span><span class='t bidi'>" + esc(o.vendor_name || o.vendor_id) + "</span>" +
             (i === 0 ? ' <span class="pill g">' + esc(t("best")) + "</span>" : "") +
-            '<br><span class="s">' + o.qty_available + " " + esc(t("stock")) +
-            " · " + esc(t("expires_in")) + " " + o.expiry_horizon_days + " " + esc(t("days")) +
+            '<br><span class="s">' +
+            sentence(o.qty_available + " " + t("stock") + " · " +
+                     t("expires_in") + " " + o.expiry_horizon_days + " " + t("days")) +
             "</span></span>" +
             "<span style='text-align:end'>" +
               (o.discount_pct ? '<span class="pill r" style="margin-bottom:3px;display:inline-block">-' +
@@ -860,9 +942,157 @@ function priceLine(l){
     return '<span class="s">' + esc(t("no_offer_line")) + "</span>";
   const now = '<span class="price">' + esc(MT(l.price_now)) + "</span>";
   if (l.price_state !== "UP" && l.price_state !== "DOWN") return now;
-  return '<span class="was bidi">' + esc(t("was") + " " + MT(l.price_seen)) + "</span>" +
+  return '<span class="was">' + sentence(t("was") + " " + MT(l.price_seen)) + "</span>" +
          now + ' <span class="s">' +
-         esc(l.price_state === "UP" ? t("price_up") : t("price_down")) + "</span>";
+         sentence(l.price_state === "UP" ? t("price_up") : t("price_down")) + "</span>";
+}
+
+/* ---------------- notices ---------------- */
+
+/* The line at the top of the store when a basket has been sitting.
+
+   Not shown for a cart he touched today: the floating bar at the bottom
+   already says how many items are in it, and repeating that as a "reminder"
+   on every visit teaches him to ignore reminders. What this adds is the
+   part he has forgotten — how long it has been there, and what it comes to.
+*/
+function cartReminder(){
+  const c = S.cart;
+  const lines = cartLines();
+  if (!lines.length || !c || !c.last_touched_at) return "";
+  // `idle` comes from the server, computed from the same CFG-CART-IDLE-HOURS
+  // the reminder job reads. Deciding it here on the phone's calendar day
+  // meant a basket forty minutes old got a "since yesterday" line at
+  // midnight, while one sitting twenty-three hours got nothing.
+  if (!c.idle) return "";
+  const touched = new Date(c.last_touched_at);
+  if (isNaN(touched)) return "";
+  const when = dayLabel(c.last_touched_at);
+  // One sentence, resolved in its own direction, then the numbers on their
+  // own line. Mixing "2 items in your cart since" with an Arabic date inside
+  // one LTR line is what scrambled it.
+  return '<button class="card tap reminder" data-act="goCart" style="width:100%;text-align:start">' +
+    '<span class="t">' +
+      sentence(cartCount() + " " + t("items") + " " + t("cart_waiting") + " " + when) +
+    "</span>" +
+    '<br><span class="s bidi">' + esc(MT(c.totals.goods_total)) + "</span>" +
+  "</button>";
+}
+
+/* What a notice says, in the pharmacist's language.
+
+   Every code this app knows how to phrase gets a sentence; anything else
+   falls back to the code itself rather than rendering nothing. A notice
+   that arrives from a part of the system this screen has not been taught
+   about should still be visible — an empty row would look like a bug, and
+   an invisible one would hide something that mattered.
+*/
+function noticeText(n){
+  const p = n.payload || {};
+  if (n.event_code === "N-CART-IDLE") {
+    const items = (p.first_items || []).join(" · ");
+    // A notice is about one basket. The server marks it read the moment that
+    // basket is ordered or abandoned, but a row already on this screen can
+    // still be stale, and sending him to "the cart" would open a different
+    // one — or an empty one — with no hint that anything had changed.
+    const current = S.cart && S.cart.request_id === p.request_id;
+    const when = p.last_touched_at ? dayLabel(p.last_touched_at) : null;
+    return { title: t("cart_idle_notice"),
+             body: (p.line_count || 0) + " " + t("items") +
+                   (when ? " · " + when : "") + (items ? " · " + items : ""),
+             act: current ? "goCart" : null,
+             cta: current ? t("open_cart") : null };
+  }
+  return { title: t("notice"), body: n.event_code, act: null, cta: null };
+}
+
+/* A date a pharmacist reads, in his own language, with the same digits as
+   the rest of the sentence — `ar-EG` alone renders Arabic-Indic numerals
+   next to the ASCII ones the counts use. */
+function dayLabel(iso){
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  const loc = lang() === "ar" ? "ar-EG-u-nu-latn" : lang();
+  return d.toLocaleDateString(loc, { weekday: "long", day: "numeric", month: "short" });
+}
+
+function notifView(){
+  const rows = S.notifs;
+  return '' +
+  '<button class="btn ghost sm" data-act="goStore">← ' + esc(t("back")) + "</button>" +
+  '<div style="height:12px"></div>' +
+  "<h1>" + esc(t("notifs")) + "</h1>" +
+  (rows === null
+    ? '<div class="card empty">' +
+        (S.busy ? '<span class="spin"></span>' : esc(t("loading"))) + "</div>"
+    : rows.length === 0
+      ? '<div class="card empty">' + esc(t("no_notifs")) + "</div>"
+      : (S.unread
+          ? '<button class="chip" data-act="readAll">' + esc(t("mark_all_read")) + "</button>" +
+            '<div style="height:10px"></div>'
+          : "") +
+        '<div class="card">' +
+          rows.map(n => {
+            const x = noticeText(n);
+            const unread = !n.read_at;
+            return '<div class="row' + (unread ? " unread" : "") + '" ' +
+              'data-act="readNotice" data-id="' + esc(n.id) + '">' +
+              "<span><span class='t'>" + sentence(x.title) + "</span>" +
+                '<br><span class="s">' + sentence(x.body) + "</span></span>" +
+              (x.cta ? '<span class="chip">' + esc(x.cta) + "</span>" : "") +
+            "</div>";
+          }).join("") +
+        "</div>") +
+  cartBar();
+}
+
+/* A shelf: a title and a row of cards that scrolls sideways.
+
+   Deliberately the same card as the grid, shrunk — picture, name, price,
+   discount, the same quantity dial. A second card design would be a second
+   place for the price to be wrong, and the whole point of these rows is
+   that he can add from them without going anywhere. */
+function shelf(key, items, extra){
+  if (!items || !items.length) return "";
+  return '<p class="s shelf-h">' + esc(t(key)) + "</p>" +
+    '<div class="rail">' +
+      items.map(p => '<div class="p mini">' +
+        (p.discount_pct ? '<span class="off">-' + p.discount_pct + "%</span>" : "") +
+        '<div data-act="openProduct" data-id="' + esc(p.id) + '">' +
+          shot(p) +
+          '<div class="nm bidi">' + esc(p.brand_name || p.inn || "—") + "</div>" +
+        "</div>" +
+        (extra ? extra(p) : "") +
+        '<div class="foot">' + priceBlock(p) + qtyRound(p) + "</div>" +
+      "</div>").join("") +
+    "</div>";
+}
+
+/* The three shelves, plus the one that only exists for a pharmacy with a
+   linked stock system. Shown on the unfiltered store only: once he has
+   searched or picked a distributor, the screen is answering a question and
+   these are not part of the answer. */
+function shelves(){
+  const sh = S.shelves;
+  if (!sh) return "";
+  return shelf("usual", sh.usual) +
+    // "paid 331, now 290" is a sentence with two amounts in it, so it goes
+    // through `sentence()` and not `.bidi`
+    shelf("cheaper", sh.cheaper, p => '<div class="s paid">' +
+      sentence(t("you_paid") + " " + MT(p.paid) +
+               (p.paid_when ? " (" + dayLabel(p.paid_when) + ")" : "") +
+               " · " + t("now_at") + " " + MT(p.best_price)) +
+      "</div>") +
+    // The caveat travels with the shelf it qualifies: the comparison is
+    // against today's offers, not the ones live when he ordered, and
+    // regulated medicines are out of it entirely. Both come from the
+    // endpoint, and the Portuguese note is shown as it was written.
+    (sh.cheaper.length && sh.caveat
+      ? '<p class="s shelf-note bidi">' + esc(sh.caveat) + "</p>" : "") +
+    (sh.cheaper.length && sh.regulated_note
+      ? '<p class="s shelf-note bidi">' + esc(sh.regulated_note) + "</p>" : "") +
+    shelf("best_off", sh.best_off) +
+    shelf("running_low", sh.low);
 }
 
 function cartView(){
@@ -878,8 +1108,8 @@ function cartView(){
     ? '<div class="card empty">' + esc(t("empty_cart")) + "<br>" +
       '<span class="s">' + esc(t("cart_empty_hint")) + "</span></div>"
     : (moved ? '<div class="err">' + esc(t("prices_changed")) + "</div>" : "") +
-      (blocked.length ? '<div class="err">' + blocked.length + " " +
-        esc(t("cart_blocked")) + "</div>" : "") +
+      (blocked.length ? '<div class="err">' +
+        sentence(blocked.length + " " + t("cart_blocked")) + "</div>" : "") +
       '<div class="card">' +
         lines.map(l =>
           '<div class="row">' +
@@ -954,8 +1184,8 @@ function normBlock(){
     '<div style="height:12px"></div>' +
     (n.can_complete_normalisation
       ? '<button class="btn g" data-act="normdone">' + esc(t("confirm_list")) + "</button>"
-      : '<button class="btn" disabled>' + n.blocking_line_ids.length + " " +
-        esc(t("lines_left")) + "</button>") +
+      : '<button class="btn" disabled>' +
+        sentence(n.blocking_line_ids.length + " " + t("lines_left")) + "</button>") +
   "</div>";
 }
 
@@ -993,6 +1223,9 @@ function orderDetail(){
       esc(l.source_span || l.index_product_id || "—") + "</span><span>" +
       l.qty_requested + "</span></div>").join("") +
   "</div>" +
+  '<button class="btn" data-act="reorder"' + (S.busy ? " disabled" : "") + ">" +
+    (S.busy ? '<span class="spin"></span>' : esc(t("reorder"))) + "</button>" +
+  '<div style="height:12px"></div>' +
   (orders.length ? orders.map(x => '<div class="card">' +
       '<div class="row" style="margin:0;padding:0;border:0">' +
         '<span class="t bidi">' + esc(x.number || x.id) + "</span>" + statusPill(x.status) +
@@ -1075,8 +1308,11 @@ function panelView(){
   "</div>";
 }
 
-const VIEW = { store:storeView, cart:storeView, list:listView, orders:ordersView,
-               chat:chatView, panel:panelView };
+// `cart` and `notifs` are screens reached from the store rather than tabs of
+// their own: the bar has five already, and a sixth on a phone is a target
+// nobody hits. `storeView` routes to them before it draws anything.
+const VIEW = { store:storeView, cart:storeView, notifs:storeView, list:listView,
+               orders:ordersView, chat:chatView, panel:panelView };
 
 /* ---------------- loaders ---------------- */
 async function loadFilters(){
@@ -1104,6 +1340,137 @@ async function loadProducts(reset){
   S.nextOffset = out.next_offset;
 }
 async function loadHome(){ S.assistant = await api("/v1/assistant/summary"); }
+
+/* The home shelves.
+
+   Each one is his own data or it is not shown. "What you usually buy" and
+   "cheaper now than you paid" come from this pharmacy's own orders;
+   "biggest discount" is the vendor's own published price against what the
+   pharmacy pays; "running low" needs a linked pharmacy system and returns
+   nothing without one. None of them is padded, and a shelf with nothing
+   honest to put on it is left out rather than filled with a guess — the
+   pilot pharmacies have an order or two, so two of these will stay hidden
+   for weeks, and that is right rather than a fault.
+
+   One load per session, like the filters. Four calls plus one to turn ids
+   into cards is not something to pay for on every tap. */
+async function loadShelves(){
+  // One burst, however many taps arrive while it is in flight. Without this
+  // a tap on the store tab during the first load ran five more calls with
+  // every `+` disabled until they came back.
+  if (S.shelvesLoading) return;
+  S.shelvesLoading = true;
+  // The token this load belongs to. It is fired un-awaited from `afterLogin`,
+  // so a logout while it is in flight would otherwise land the previous
+  // person's shelves on the next person's screen — the same class of thing
+  // the inbox was fixed for, on a phone two people share.
+  const forToken = S.token;
+  try {
+    const out = await _loadShelves();
+    if (S.token === forToken) S.shelves = out;
+  } finally { S.shelvesLoading = false; }
+}
+
+async function _loadShelves(){
+  const out = emptyShelves();
+  const [patterns, savings, discounted, replen] = await Promise.all([
+    api("/v1/assistant/order-patterns").catch(() => null),
+    api("/v1/assistant/savings").catch(() => null),
+    api("/v1/catalogue/search?sort=discount&in_stock=true&limit=12").catch(() => null),
+    api("/v1/assistant/replenishment").catch(() => null),
+  ]);
+
+  out.best_off = (discounted && discounted.items) || [];
+  out.caveat = (savings && savings.basis && savings.basis.caveat) || null;
+  out.regulated_note = (savings && savings.regulated_note_pt) || null;
+
+  // The sprint's rule, kept where it can be read: below three orders there
+  // is no pattern, only a coincidence, and a shelf that says "what you
+  // usually buy" about one purchase is a lie with a friendly face.
+  const hasPattern = patterns && patterns.items && patterns.items.length &&
+                     patterns.confidence !== "NONE" && patterns.confidence !== "LOW";
+
+  // One entry per product, at the price he paid most recently — the server
+  // decides that now. Picking the highest here was the wrong number and
+  // could not be made right from this side: the endpoint emits a line only
+  // where today's best beats that line's own price, so the purchase that
+  // contradicts the card is the one the client never receives.
+  const paidBy = {};
+  ((savings && savings.items) || []).forEach(i => {
+    paidBy[i.index_product_id] = { paid: i.unit_price_paid, when: i.ordered_at };
+  });
+  const savingIds = Object.keys(paidBy).slice(0, 12);
+
+  // "Running low" is a shelf of products, and the endpoint answers in
+  // dispensing rows — ids, rates and days of cover, with no name, picture or
+  // price on them. They have to become cards like everything else. The
+  // threshold exists because the endpoint returns the whole dispensed range
+  // sorted by cover: without it a linked pharmacy would see every product it
+  // has ever sold under "running low", a year of stock included.
+  //
+  // It is a constant here and it should not stay one. This page ships inside
+  // an APK, so changing 21 means a release, while a `CFG-REPLENISH-DAYS` row
+  // — or a `max_days_of_cover` parameter defaulting from one — changes
+  // without one. No pharmacy is linked yet, so moving it now would be
+  // guessing at a number for a shelf nobody can see; move it with the first
+  // `pms_link`.
+  const lowIds = ((replen && replen.items) || [])
+    .filter(i => i.estimated_days_of_cover !== null && i.estimated_days_of_cover <= 21)
+    .slice(0, 12)
+    .map(i => i.index_product_id);
+
+  const wanted = [];
+  if (hasPattern) patterns.items.slice(0, 12).forEach(i => wanted.push(i.index_product_id));
+  savingIds.forEach(id => wanted.push(id));
+  lowIds.forEach(id => wanted.push(id));
+
+  if (wanted.length) {
+    const cards = (await api("/v1/catalogue/search?limit=100&ids=" +
+                             encodeURIComponent([...new Set(wanted)].join(","))
+                            ).catch(() => ({ items: [] }))).items || [];
+    const byId = {};
+    cards.forEach(c => { byId[c.id] = c; });
+    // the caller's order, not the catalogue's: how often he reorders
+    // something is not a property of the product
+    if (hasPattern)
+      out.usual = patterns.items.map(i => byId[i.index_product_id]).filter(Boolean);
+    out.cheaper = savingIds.map(id => {
+      const card = byId[id];
+      return card ? Object.assign({}, card, { paid: paidBy[id].paid,
+                                              paid_when: paidBy[id].when }) : null;
+    }).filter(Boolean);
+    out.low = lowIds.map(id => byId[id]).filter(Boolean);
+  }
+  return out;
+}
+
+function emptyShelves(){ return { usual: [], cheaper: [], best_off: [], low: [], caveat: null,
+                                  regulated_note: null }; }
+
+/* Redraw, unless he is in the middle of something.
+
+   `render()` rebuilds the whole of `#main`, and the search box and the
+   WhatsApp paste box are not state-bound — so a late arrival used to wipe a
+   list he was halfway through typing, two to ten seconds after he started.
+   It also used to shove the grid down by four rails while he was reading it.
+   Deferring to the next tap costs nothing: every tap re-renders anyway. */
+function renderIfIdle(){
+  const el = document.activeElement;
+  const typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
+  if (typing || S.tab !== "store" || S.busy) return;
+  render();
+}
+
+async function loadUnread(){
+  // Its own call, and a cheap one: the badge has to be right on every screen,
+  // and pulling the whole inbox to count it would be paid for on every load.
+  try { S.unread = (await api("/v1/notifications/unread-count")).unread || 0; }
+  catch (e) { S.unread = 0; }   // a badge is not worth failing a screen over
+}
+async function loadNotifications(){
+  S.notifs = (await api("/v1/notifications?limit=30")).items;
+  await loadUnread();
+}
 /* `include_cart=false`: the cart is a DRAFT request, and without this it
    shows up in the order history as a draft the pharmacist never sent. */
 async function loadOrders(){
@@ -1114,8 +1481,11 @@ async function loadCart(){ S.cart = await api("/v1/cart"); }
 
 async function afterLogin(){
   S.me = await api("/v1/auth/me");
-  await Promise.all([loadFilters(), loadCart()]);
+  await Promise.all([loadFilters(), loadCart(), loadUnread()]);
   await loadProducts(true);
+  // After the grid, not with it: the shelves are five more calls and the
+  // pharmacist should be looking at products before they land.
+  loadShelves().catch(() => { S.shelves = emptyShelves(); }).then(renderIfIdle);
 }
 
 /* ---------------- actions ---------------- */
@@ -1152,7 +1522,10 @@ const ACT = {
     S.token = null; S.me = null; store.del("token");
     S.cart = null; S.results = null; S.requests = null; S.thread = null;
     S.assistant = null; S.norm = null; S.order = null;
-    S.filters = null; S.vendor = ""; S.category = "";
+    // The inbox too: on a shared counter phone the next person tapped the
+    // bell and saw the last person's notices until the call came back.
+    S.notifs = null; S.unread = 0;
+    S.filters = null; S.shelves = null; S.vendor = ""; S.category = "";
     S.product = null; S.form = {};
   },
 
@@ -1180,6 +1553,29 @@ const ACT = {
     S.product = await api("/v1/catalogue/products/" + el.dataset.id);
   },
   async closeProduct(){ S.product = null; },
+  async goNotifs(){
+    S.tab = "notifs";
+    await loadNotifications();
+  },
+  async readNotice(el){
+    const n = (S.notifs || []).find(x => x.id === el.dataset.id);
+    if (!n) return;
+    if (!n.read_at) {
+      await api("/v1/notifications/" + n.id + "/read", { method:"POST" });
+      n.read_at = "now";
+      // The count, before going anywhere. Leaving on the tap without it left
+      // the badge showing a notice he had just read, on every screen, until
+      // something else happened to reload it.
+      await loadUnread();
+    }
+    // Read first, then act: tapping a notice about a basket should open the
+    // basket, not leave him on a list to find it himself.
+    if (noticeText(n).act === "goCart") return ACT.goCart();
+  },
+  async readAll(){
+    await api("/v1/notifications/read-all", { method:"POST" });
+    await loadNotifications();
+  },
   async goCart(){ S.tab = "cart"; S.product = null; await loadCart(); },
   async goStore(){ S.tab = "store"; },
 
@@ -1202,18 +1598,23 @@ const ACT = {
     // and prefers one that can cover the quantity, so the two can differ.
     // When they do, the pharmacist sees "was X, now Y" instead of quietly
     // being charged Y.
-    // The open product page first, the grid second. The detail page shows the
-    // ranked price from its own offer list, the grid shows the cheapest fresh
-    // offer; taking the grid's number while he is looking at the detail page
-    // would make the cart announce a change he never saw. The product
-    // endpoint carries no `best_price`, so its own top offer is the number
-    // that was on that screen.
+    // The price on the screen he tapped, wherever that screen was.
+    //
+    // The open product page first: it shows the ranked price from its own
+    // offer list, and taking the grid's number while he is looking at it
+    // would make the cart announce a change he never saw. Then the grid, then
+    // the home shelves — which is the case this missed. A shelf card is
+    // almost never in the grid (the grid is the first thirty of three
+    // thousand by name; the discount shelf is the top twelve by margin), so
+    // `+` on a shelf sent no claim at all and the server stored its own
+    // price as if it were the one he had been shown. That is precisely the
+    // defect this mechanism exists to prevent, arriving through a new door.
     let seen = null;
     if (S.product && S.product.id === productId) {
       const best = (S.product.offers || [])[0];
       seen = best ? best.price : null;
     } else {
-      const card = (S.results || []).find(x => x.id === productId);
+      const card = shownCard(productId);
       seen = card ? card.best_price : null;
     }
     const line = { index_product_id: productId, qty_requested: qty };
@@ -1261,6 +1662,9 @@ const ACT = {
       body:{ acknowledged_prices: acknowledged }
     });
     const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
+    // Held as one string and rendered through `sentence()` where the flash is
+    // drawn: "تم الطلب: 1 طلب · 1 069,00 MT" has words, a count and an amount
+    // in one line, which is exactly what an LTR box reorders.
     S.flash = t("order_made") + " " + (out.orders || []).length + " " +
               t("order_count") + " · " + total;
     await loadCart();
@@ -1310,6 +1714,31 @@ const ACT = {
   /* ---- orders ---- */
   async reloadOrders(){ await loadOrders(); },
   async openReq(el){ S.order = await api("/v1/requests/" + el.dataset.id); },
+  async reorder(){
+    const o = S.order;
+    const all = (o.lines || []).length;
+    // Only lines that resolved to a product. A WhatsApp line nobody decided
+    // has no product to add, and inventing one would be the app choosing a
+    // medicine on his behalf.
+    const lines = (o.lines || [])
+      .filter(l => l.index_product_id)
+      .map(l => ({ index_product_id: l.index_product_id,
+                   qty_requested: l.qty_requested }));
+    if (!lines.length) throw new Error(t("nothing_to_reorder"));
+    // One call, not one per line: this is a single act. Nothing is bought —
+    // it goes into the basket and he looks at it, which is the rule for
+    // every card on this screen too.
+    S.cart = await api("/v1/cart/lines", { method:"POST", body:{ lines: lines } });
+    S.order = null;
+    S.tab = "cart";
+    // Say what happened. Dropping two of nine and reporting "added to your
+    // cart" is the app deciding what he meant; the products it could not add
+    // are the ones he is most likely to go looking for.
+    const missing = (all - lines.length) + ((S.cart.skipped || []).length);
+    S.flash = missing
+      ? t("reorder_partial").replace("{n}", all - missing).replace("{all}", all)
+      : t("reorder_done");
+  },
   async backOrders(){ S.order = null; },
 
   /* ---- chat ---- */
@@ -1342,6 +1771,7 @@ document.addEventListener("click", function(ev){
     render();
     if (S.tab === "cart") guard(loadCart);
     if (S.tab === "store"  && S.filters  === null) guard(loadFilters);
+    if (S.tab === "store"  && S.shelves  === null && !S.shelvesLoading) guard(loadShelves);
     if (S.tab === "orders" && S.requests === null) guard(loadOrders);
     if (S.tab === "chat"   && S.thread   === null) guard(loadThread);
     if (S.tab === "panel"  && S.assistant=== null) guard(loadHome);
@@ -1355,6 +1785,25 @@ document.addEventListener("click", function(ev){
   snapshotForm();          // before guard() re-renders and destroys the inputs
   S.flash = null;
   guard(() => fn(el));
+});
+
+/* Coming back to the app is the moment to re-read what the server has.
+
+   The sprint asks for it in those words, and in the APK it is the only
+   moment that exists: the page is a WebView that is never reloaded, so a
+   notice written while the phone was in somebody's pocket, or a basket a
+   colleague edited from the back office, would otherwise appear only after
+   a cold start. The cart goes with it because the two are the same fact —
+   the reminder line at the top of the store is drawn from `GET /v1/cart`.
+
+   Failures are swallowed on purpose: this fires on every tab switch and on
+   every unlock, and a red banner because the shop's connection dropped for
+   a second is worse than a slightly stale badge. */
+document.addEventListener("visibilitychange", function(){
+  if (document.visibilityState !== "visible" || !S.token) return;
+  Promise.all([loadCart().catch(() => {}), loadUnread().catch(() => {})])
+    .then(() => { if (S.tab === "notifs") return loadNotifications().catch(() => {}); })
+    .then(render);
 });
 
 document.addEventListener("keydown", function(ev){

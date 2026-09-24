@@ -389,6 +389,22 @@ def test_12f_a_product_that_cannot_be_shown_cannot_be_added(client, h):
     assert r.status_code == 404, r.text
 
 
+def test_12g_a_batch_adds_what_it_can_and_names_what_it_could_not(client, h):
+    """"Order this again" is why this takes a batch. A nine-line order with
+    one product unpublished since should put eight in the basket and say so,
+    not refuse all nine with the name of the missing one."""
+    r = client.post("/v1/cart/lines", headers=h, json={"lines": [
+        {"index_product_id": P1, "qty_requested": 2},
+        {"index_product_id": "idx_gone_since", "qty_requested": 1},
+        {"index_product_id": P2, "qty_requested": 3},
+    ]})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert {(l["index_product_id"], l["qty_requested"]) for l in body["lines"]} == \
+           {(P1, 2), (P2, 3)}
+    assert [s["index_product_id"] for s in body["skipped"]] == ["idx_gone_since"]
+
+
 def test_13_a_line_with_no_offer_is_marked_and_kept(client, h):
     cart = _put(client, h, P3, 1)
     line = next(l for l in cart["lines"] if l["index_product_id"] == P3)
@@ -447,3 +463,51 @@ def test_16_the_order_list_can_still_ask_for_it(client, h):
     cart = _put(client, h, P1, 1)
     listed = client.get("/v1/requests", headers=h).json()
     assert cart["request_id"] in [x["id"] for x in listed["items"]]
+
+
+# ── slice C: putting a past order back in the basket ──────────────────────
+
+def _order_count(client, h):
+    """Orders this pharmacy has, however the list endpoint is shaped."""
+    return client.get("/v1/assistant/summary", headers=h).json()["open_orders"]
+
+def test_21_add_all_puts_the_same_quantities_in_the_cart_and_buys_nothing(client, h):
+    """Acceptance 21. "Order this again" is an act of filling a basket, not
+    of buying: the pharmacist reviews it and decides. Nothing here creates an
+    order, and a product whose price has moved since he last bought it shows
+    that on the cart screen like any other line."""
+    first = client.post("/v1/cart/lines", headers=h, json={"lines": [
+        {"index_product_id": P1, "qty_requested": 4},
+        {"index_product_id": P2, "qty_requested": 7},
+    ]}).json()
+    rid = first["request_id"]
+    out = client.post(f"/v1/requests/{rid}/checkout",
+                      headers={**h, "Idempotency-Key": f"ck-{rid}"}, json={})
+    assert out.status_code == 200, out.text
+    orders_before = _order_count(client, h)
+
+    past = client.get(f"/v1/requests/{rid}", headers=h).json()
+    lines = [{"index_product_id": l["index_product_id"], "qty_requested": l["qty_requested"]}
+             for l in past["lines"] if l["index_product_id"]]
+    assert len(lines) == 2
+
+    again = client.post("/v1/cart/lines", headers=h, json={"lines": lines})
+    assert again.status_code == 200, again.text
+    cart = again.json()
+    assert cart["request_id"] != rid, "a new basket, not the order he already placed"
+    assert {(l["index_product_id"], l["qty_requested"]) for l in cart["lines"]} == \
+           {(P1, 4), (P2, 7)}
+    assert _order_count(client, h) == orders_before, "adding to a basket bought something"
+
+
+def test_21b_adding_a_past_order_onto_a_basket_sets_rather_than_doubles(client, h):
+    """`set_line` sets, which is what makes a retry safe — and it is also
+    what "add all" means onto a basket that already holds one of them: the
+    quantity becomes the one he ordered last time, not the sum of two
+    unrelated decisions."""
+    _put(client, h, P1, 2)
+    cart = client.post("/v1/cart/lines", headers=h, json={"lines": [
+        {"index_product_id": P1, "qty_requested": 5}]}).json()
+    line = next(l for l in cart["lines"] if l["index_product_id"] == P1)
+    assert line["qty_requested"] == 5
+    assert len([l for l in cart["lines"] if l["index_product_id"] == P1]) == 1

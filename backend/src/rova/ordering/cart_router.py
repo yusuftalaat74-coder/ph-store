@@ -72,11 +72,31 @@ def put_cart_lines(body: CartLinesBody,
                    principal: Principal = Depends(require_roles(*_PHARMACY)),
                    session: Session = Depends(get_session, scope="function")):
     pharmacy_id = _pharmacy(principal)
+    # "Order this again" is the reason this takes a batch, and a nine-line
+    # order containing one product that has since been unpublished should put
+    # eight in the basket and say so — not refuse all nine with the name of
+    # the missing one. A line that cannot be added is reported instead.
+    skipped = []
     for line in body.lines:
-        set_line(session, pharmacy_id=pharmacy_id, user_id=principal.user_id,
-                 index_product_id=line.index_product_id, qty=line.qty_requested,
-                 price_shown=line.price_seen)
-    return read_cart(session, pharmacy_id)
+        try:
+            set_line(session, pharmacy_id=pharmacy_id, user_id=principal.user_id,
+                     index_product_id=line.index_product_id, qty=line.qty_requested,
+                     price_shown=line.price_seen)
+        except ApiError as e:
+            if e.code != "NOT_FOUND":
+                raise
+            skipped.append({"index_product_id": line.index_product_id, "reason": e.message})
+
+    # Nothing added and everything skipped is not a partial success, it is the
+    # caller being wrong about every id it sent.
+    if skipped and len(skipped) == len(body.lines):
+        raise ApiError("NOT_FOUND", "none of these products can be ordered",
+                       details=[{"field": s["index_product_id"], "reason": s["reason"]}
+                                for s in skipped])
+
+    cart = read_cart(session, pharmacy_id)
+    cart["skipped"] = skipped
+    return cart
 
 
 @router.patch("/request-lines/{line_id}")
