@@ -447,3 +447,143 @@ def test_returns_stay_in_store_when_linked_and_emit_received(client, db_engine, 
     assert ev == ["return.approved", "return.received"]
     assert client.post("/v1/credit-notes", headers=vfin, json={"order_id": oid, "amount": "1.00",
                        "return_id": f"rtn_{sx}"}).status_code == 409
+
+
+# ------------------------------------------------------------------ REVIEW F-1: credit_note.issued / payment.reversed
+
+def _office_order_to_invoice(client, db_engine, w, qty_a=4, qty_b=2):
+    """Drive one order Office-side up to an invoice mirror (AWAITING_PAYMENT)."""
+    oid = _checkout(client, w, qty_a=qty_a, qty_b=qty_b).json()["orders"][0]["id"]
+    la, lb = _order_lines(db_engine, oid)
+    assert _event(client, "order.accepted", "order", oid, {"store_order_id": oid, "lines": [
+        {"store_order_line_id": la["id"], "confirmed_qty": qty_a},
+        {"store_order_line_id": lb["id"], "confirmed_qty": qty_b}]})[0].json()["processing"] == "PROCESSED"
+    picked = {"store_order_id": oid, "lines": [
+        {"store_order_line_id": l["id"], "picked_qty": l["confirmed_qty"], "lot_number": f"LOT-{i}",
+         "expiry_date": "2027-12-31", "seal_ids": [f"SEAL-{oid}-{i}"]} for i, l in enumerate(_order_lines(db_engine, oid))]}
+    assert _event(client, "order.picked", "order", oid, picked)[0].json()["processing"] == "PROCESSED"
+    assert _event(client, "order.dispatched", "order", oid, {"store_order_id": oid})[0].json()["processing"] == "PROCESSED"
+    assert _event(client, "delivery.attempted", "order", oid, {"store_order_id": oid, "outcome": "DELIVERED"}
+                  )[0].json()["processing"] == "PROCESSED"
+    lines = _order_lines(db_engine, oid)
+    r = client.post(f"/v1/orders/{oid}/receipt", headers=_login(client, w["users"]["ph"]), json={"lines": [
+        {"order_line_id": l["id"], "accepted_qty": l["confirmed_qty"], "rejected_qty": 0} for l in lines]})
+    assert r.status_code == 200, r.text
+    total = sum(l["confirmed_qty"] for l in lines) * Decimal("8.50")
+    inv = {"store_order_id": oid, "office_invoice_id": f"bo_inv_{oid}", "number": f"FT T/2026/{oid}",
+           "issue_date": "2026-09-25", "due_date": "2026-10-25", "net_total": str(total), "tax_total": "0.00",
+           "gross_total": str(total), "lines": [{"store_order_line_id": l["id"], "qty": l["confirmed_qty"],
+                                                  "unit_price": "8.50", "tax_amount": "0.00", "line_total": "0"}
+                                                 for l in lines]}
+    assert _event(client, "invoice.issued", "order", oid, inv)[0].json()["processing"] == "PROCESSED"
+    invoice = _q(db_engine, "SELECT * FROM invoice WHERE office_invoice_id=:i", i=inv["office_invoice_id"])[0]
+    return oid, invoice
+
+
+def _ledger(db_engine, facility):
+    return _q(db_engine, "SELECT COALESCE(SUM(amount),0) AS s FROM ledger_entry WHERE credit_facility_id=:f", f=facility)[0]["s"]
+
+
+def test_ac46_credit_note_issued_mirrors_and_closes_the_return(client, db_engine, office_on, session):
+    """SPEC v1.1 AC-46 / REVIEW F-1: credit_note.issued with return_ref for a
+    return in RECEIVED_BY_VENDOR -> credit_note mirror + ledger_entry(CREDIT_NOTE)
+    + the return CLOSED (as SYSTEM, via=phoffice). A note citing no Store return
+    (GOODWILL) is SKIPPED with a clear reason, never FAILED."""
+    from rova.domain.hooks import wire
+    from rova.domain.machines.registry import MACHINES
+    from rova.integrations.office.inbound import office_actor
+    wire()
+    w = _world(db_engine)
+    oid, invoice = _office_order_to_invoice(client, db_engine, w)
+    assert _ledger(db_engine, w["facility"]) == Decimal("51.00")
+    sx, line = w["sx"], _order_lines(db_engine, oid)[0]
+    session.execute(text('INSERT INTO "return" (id, order_id, rma_number, origin, status) '
+                         "VALUES (:id, :o, :rma, 'PHARMACY_RMA', 'REQUESTED')"),
+                    {"id": f"rtn_{sx}", "o": oid, "rma": f"RMA-{sx}"})
+    session.execute(text("INSERT INTO return_line (id, return_id, order_line_id, qty, reason_code) "
+                         "VALUES (:id, :r, :l, 1, 'DAMAGED')"), {"id": f"rtl_{sx}", "r": f"rtn_{sx}", "l": line["id"]})
+    session.commit()
+    vfin = _login(client, w["users"]["vfin"])
+    assert client.post(f"/v1/returns/rtn_{sx}/approve", headers=vfin).status_code == 200
+    MACHINES["SM-10"].apply(session, f"rtn_{sx}", "SHIP", office_actor("Dispatcher"))
+    session.commit()
+    assert client.post(f"/v1/returns/rtn_{sx}/receive", headers=vfin).json()["status"] == "RECEIVED_BY_VENDOR"
+
+    cn = {"store_order_id": oid, "office_credit_note_id": f"bo_crn_{sx}", "number": f"NC T/2026/{sx}",
+          "office_invoice_id": invoice["office_invoice_id"], "reason": "RETURN", "gross_total": "8.50",
+          "return_ref": f"rtn_{sx}"}
+    r, _ = _event(client, "credit_note.issued", "order", oid, cn)
+    assert r.status_code == 200 and r.json()["processing"] == "PROCESSED", r.text
+    row = _q(db_engine, "SELECT * FROM credit_note WHERE office_credit_note_id=:c", c=cn["office_credit_note_id"])
+    assert len(row) == 1
+    row = row[0]
+    assert (row["order_id"], row["return_id"], row["dispute_id"], row["amount"]) == (oid, f"rtn_{sx}", None, Decimal("8.50"))
+    assert (row["vendor_id"], row["pharmacy_id"]) == (w["vendor"], w["pharmacy"])
+    led = _q(db_engine, "SELECT entry_type, amount FROM ledger_entry WHERE reference_id=:c", c=row["id"])
+    assert led == [{"entry_type": "CREDIT_NOTE", "amount": Decimal("-8.50")}]
+    assert _ledger(db_engine, w["facility"]) == Decimal("42.50")
+    assert _q(db_engine, 'SELECT status FROM "return" WHERE id=:r', r=f"rtn_{sx}")[0]["status"] == "CLOSED"
+    st = _q(db_engine, "SELECT * FROM state_transition WHERE subject_id=:r AND trigger='CLOSE_WITH_CREDIT_NOTE'",
+            r=f"rtn_{sx}")[0]
+    assert st["actor_role"] == "SYSTEM" and st["actor_user_id"] is None and st["notes"]["via"] == "phoffice"
+    # the same credit note again (new event id, later version): nothing doubles
+    r, _ = _event(client, "credit_note.issued", "order", oid, cn)
+    assert r.json()["processing"] == "SKIPPED"
+    assert _ledger(db_engine, w["facility"]) == Decimal("42.50")
+    # a GOODWILL note with no Store return: SKIPPED with a reason, no row, no ledger movement
+    gw = {**cn, "office_credit_note_id": f"bo_crn_gw_{sx}", "reason": "GOODWILL", "return_ref": None}
+    r, env = _event(client, "credit_note.issued", "order", oid, gw)
+    assert r.status_code == 200 and r.json()["processing"] == "SKIPPED"
+    ev = _q(db_engine, "SELECT status, error FROM integration_inbound_event WHERE event_id=:e", e=env["event_id"])[0]
+    assert ev["status"] == "SKIPPED" and "cites no Store return" in ev["error"] and "account.updated" in ev["error"]
+    assert _q(db_engine, "SELECT COUNT(*) AS n FROM credit_note WHERE order_id=:o", o=oid)[0]["n"] == 1
+    assert _ledger(db_engine, w["facility"]) == Decimal("42.50")
+    # a return_ref naming a return of ANOTHER order is not trusted either
+    r, _ = _event(client, "credit_note.issued", "order", oid,
+                  {**cn, "office_credit_note_id": f"bo_crn_x_{sx}", "return_ref": "rtn_does_not_exist"})
+    assert r.json()["processing"] == "SKIPPED"
+
+
+def test_payment_reversed_restores_the_ledger_and_reopens_the_invoice(client, db_engine, office_on):
+    """SPEC 5.6 payment.reversed / REVIEW F-1: ledger_entry(ADJUSTMENT, +amount)
+    against the facility and SM-11 moved back for the invoices it had paid."""
+    w = _world(db_engine)
+    oid, invoice = _office_order_to_invoice(client, db_engine, w)
+    cid = f"bo_cus_{w['sx']}"
+    pays = [{"office_payment_id": f"bo_pay_{w['sx']}_{n}", "store_pharmacy_id": w["pharmacy"],
+             "store_vendor_id": w["vendor"], "method": "CASH", "amount": amt, "received_at": "2026-09-26T10:02:00Z",
+             "allocations": [{"office_invoice_id": invoice["office_invoice_id"], "store_order_id": oid, "amount": amt}]}
+            for n, amt in ((1, "20.00"), (2, "31.00"))]
+    for p in pays:
+        assert _event(client, "payment.received", "customer_account", cid, p)[0].json()["processing"] == "PROCESSED"
+    assert _q(db_engine, "SELECT status FROM invoice WHERE id=:i", i=invoice["id"])[0]["status"] == "PAID"
+    assert _ledger(db_engine, w["facility"]) == Decimal("0.00")
+    # reverse the second payment: PAID -> PARTIALLY_PAID, ledger back to 31.00
+    rev = {"office_payment_id": pays[1]["office_payment_id"], "amount": "31.00", "reason": "cheque bounced"}
+    r, _ = _event(client, "payment.reversed", "customer_account", cid, rev)
+    assert r.status_code == 200 and r.json()["processing"] == "PROCESSED", r.text
+    pid2 = _q(db_engine, "SELECT id FROM payment WHERE office_payment_id=:p", p=rev["office_payment_id"])[0]["id"]
+    assert _q(db_engine, "SELECT entry_type, reference_type, amount FROM ledger_entry WHERE reference_id=:p "
+                         "ORDER BY created_at", p=pid2) == [
+        {"entry_type": "PAYMENT", "reference_type": "payment", "amount": Decimal("-31.00")},
+        {"entry_type": "ADJUSTMENT", "reference_type": "payment", "amount": Decimal("31.00")}]
+    assert _ledger(db_engine, w["facility"]) == Decimal("31.00")
+    assert _q(db_engine, "SELECT status FROM invoice WHERE id=:i", i=invoice["id"])[0]["status"] == "PARTIALLY_PAID"
+    assert _q(db_engine, "SELECT COUNT(*) AS n FROM payment_allocation WHERE payment_id=:p", p=pid2)[0]["n"] == 0
+    st = _q(db_engine, "SELECT * FROM state_transition WHERE subject_id=:i ORDER BY occurred_at DESC, id DESC LIMIT 1",
+            i=invoice["id"])[0]
+    assert (st["trigger"], st["actor_role"]) == ("UNALLOCATE_PARTIAL", "SYSTEM")
+    assert st["notes"]["via"] == "phoffice" and st["notes"]["reversed_payment"] == pid2
+    # applied once only
+    r, _ = _event(client, "payment.reversed", "customer_account", cid, rev)
+    assert r.json()["processing"] == "SKIPPED" and _ledger(db_engine, w["facility"]) == Decimal("31.00")
+    # reverse the first one too: PARTIALLY_PAID -> AWAITING_PAYMENT, full exposure back
+    r, _ = _event(client, "payment.reversed", "customer_account", cid,
+                  {"office_payment_id": pays[0]["office_payment_id"], "amount": "20.00", "reason": "x"})
+    assert r.json()["processing"] == "PROCESSED"
+    assert _q(db_engine, "SELECT status FROM invoice WHERE id=:i", i=invoice["id"])[0]["status"] == "AWAITING_PAYMENT"
+    assert _ledger(db_engine, w["facility"]) == Decimal("51.00")
+    # a payment Store never mirrored: SKIPPED, not FAILED
+    r, _ = _event(client, "payment.reversed", "customer_account", cid,
+                  {"office_payment_id": "bo_pay_unknown", "amount": "1.00", "reason": "x"})
+    assert r.json()["processing"] == "SKIPPED"

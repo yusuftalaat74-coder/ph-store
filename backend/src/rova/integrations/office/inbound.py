@@ -60,6 +60,7 @@ DESK = office_actor(RoleCode.VENDOR_ORDER_DESK)
 PICKER = office_actor(RoleCode.VENDOR_PICKER)
 DISPATCHER = office_actor(RoleCode.DISPATCHER)
 COURIER = office_actor(RoleCode.COURIER)
+VENDOR_FINANCE = office_actor(RoleCode.VENDOR_FINANCE)
 
 
 class Skip(Exception):
@@ -236,6 +237,85 @@ def payment_received(session, p):
     return applied
 
 
+def credit_note_issued(session, p):
+    """SPEC 5.6 (v1.1, REVIEW F-1): mirror an Office credit note and close the
+    Store return it answers. PH Office owns credit notes; the Store row exists
+    so exposure/ledger and SM-10 agree with the books."""
+    if session.execute(text("SELECT 1 FROM credit_note WHERE office_credit_note_id=:c"),
+                       {"c": p["office_credit_note_id"]}).first():
+        raise Skip("credit note already mirrored")
+    o = _order(session, p["store_order_id"])
+    ret = None
+    if p.get("return_ref"):
+        ret = session.execute(
+            text('SELECT id, status FROM "return" WHERE order_id=:o AND (id=:r OR rma_number=:r) FOR UPDATE'),
+            {"o": o["id"], "r": p["return_ref"]}).mappings().first()
+    if ret is None:
+        # ck_credit_note_origin: a Store credit note must cite a return or a
+        # dispute. A GOODWILL / PRICE_CORRECTION note from Office cites
+        # neither; the balance is corrected by the account.updated that follows.
+        raise Skip(f"credit note {p.get('number') or p['office_credit_note_id']} ({p.get('reason')}) cites no Store "
+                   f"return (return_ref={p.get('return_ref')!r}); not mirrored — balance follows account.updated")
+    amount = quantize(Decimal(p["gross_total"]))
+    cid = new_id("crn")
+    session.execute(
+        text("INSERT INTO credit_note (id, vendor_id, pharmacy_id, order_id, return_id, dispute_id, amount, issued_at, "
+             "office_credit_note_id) VALUES (:id, :v, :p, :o, :r, NULL, :a, :t, :oc)"),
+        {"id": cid, "v": o["vendor_id"], "p": o["pharmacy_id"], "o": o["id"], "r": ret["id"], "a": amount,
+         "t": _ts(p.get("issued_at")) or now(), "oc": p["office_credit_note_id"]},
+    )
+    facility = session.execute(text("SELECT id FROM credit_facility WHERE vendor_id=:v AND pharmacy_id=:p"),
+                               {"v": o["vendor_id"], "p": o["pharmacy_id"]}).scalar()
+    if facility:
+        session.execute(
+            text("INSERT INTO ledger_entry (id, credit_facility_id, entry_type, reference_type, reference_id, amount) "
+                 "VALUES (:id, :f, 'CREDIT_NOTE', 'credit_note', :r, :a)"),
+            {"id": new_id("led"), "f": facility, "r": cid, "a": -amount})
+    if ret["status"] == "RECEIVED_BY_VENDOR":
+        MACHINES["SM-10"].apply(session, ret["id"], "CLOSE_WITH_CREDIT_NOTE", VENDOR_FINANCE)
+
+
+def payment_reversed(session, p):
+    """SPEC 5.6 (REVIEW F-1): undo a mirrored Office payment — an ADJUSTMENT
+    ledger entry that puts back exactly what the mirror took off the facility,
+    the mirror allocations removed, and SM-11 moved back for each invoice."""
+    pay = session.execute(text("SELECT * FROM payment WHERE office_payment_id=:p FOR UPDATE"),
+                          {"p": p["office_payment_id"]}).mappings().first()
+    if pay is None:
+        raise Skip("payment was never mirrored in PH Store; balance follows account.updated")
+    if session.execute(text("SELECT 1 FROM ledger_entry WHERE entry_type='ADJUSTMENT' AND reference_type='payment' "
+                            "AND reference_id=:p"), {"p": pay["id"]}).first():
+        raise Skip("payment reversal already applied")
+    facility = session.execute(text("SELECT id FROM credit_facility WHERE vendor_id=:v AND pharmacy_id=:p"),
+                               {"v": pay["vendor_id"], "p": pay["pharmacy_id"]}).scalar()
+    # payment.received only moved the ledger for the part allocated to mirrored
+    # invoices, so the reversal restores that part (== amount when fully allocated)
+    taken = session.execute(text("SELECT COALESCE(SUM(amount), 0) FROM ledger_entry WHERE entry_type='PAYMENT' "
+                                 "AND reference_type='payment' AND reference_id=:p"), {"p": pay["id"]}).scalar()
+    if facility and Decimal(taken) != 0:
+        session.execute(
+            text("INSERT INTO ledger_entry (id, credit_facility_id, entry_type, reference_type, reference_id, amount) "
+                 "VALUES (:id, :f, 'ADJUSTMENT', 'payment', :r, :a)"),
+            {"id": new_id("led"), "f": facility, "r": pay["id"], "a": -Decimal(taken)})
+    allocs = session.execute(text("SELECT * FROM payment_allocation WHERE payment_id=:p ORDER BY created_at, id"),
+                             {"p": pay["id"]}).mappings().all()
+    token = transition_notes.set({**(transition_notes.get() or {}), "reversed_payment": pay["id"],
+                                  "reason": p.get("reason")})
+    try:
+        for a in allocs:
+            session.execute(text("DELETE FROM payment_allocation WHERE id=:id"), {"id": a["id"]})
+            inv = session.execute(text("SELECT * FROM invoice WHERE id=:i FOR UPDATE"),
+                                  {"i": a["invoice_id"]}).mappings().one()
+            if inv["status"] not in ("PAID", "PARTIALLY_PAID") or _outstanding(session, inv) <= 0:
+                continue
+            still_paid = session.execute(text("SELECT COALESCE(SUM(amount),0) FROM payment_allocation WHERE invoice_id=:i"),
+                                         {"i": inv["id"]}).scalar()
+            MACHINES["SM-11"].apply(session, inv["id"], "UNALLOCATE_PARTIAL" if Decimal(still_paid) > 0
+                                    else "UNALLOCATE_ALL", SYSTEM)
+    finally:
+        transition_notes.reset(token)
+
+
 def account_updated(session, p):
     session.execute(
         text("UPDATE credit_facility SET office_balance=:b, office_credit_limit=:l, office_hold=:h, office_synced_at=:n, "
@@ -260,6 +340,8 @@ HANDLERS = {
     "invoice.issued": invoice_issued,
     "payment.received": payment_received,
     "account.updated": account_updated,
+    "credit_note.issued": credit_note_issued,
+    "payment.reversed": payment_reversed,
 }
 
 

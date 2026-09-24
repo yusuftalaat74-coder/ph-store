@@ -120,6 +120,11 @@ MACHINE = Machine(
         Transition("SM-11", (S.PARTIALLY_PAID,), S.PARTIALLY_PAID, "ALLOCATE_PARTIAL", _SYSTEM),
         Transition("SM-11", (S.AWAITING_PAYMENT,), S.PAID, "ALLOCATE_FULL", _SYSTEM),
         Transition("SM-11", (S.PARTIALLY_PAID,), S.PAID, "ALLOCATE_FULL", _SYSTEM),
+        # PH Office link only (SPEC 5.6 payment.reversed): a mirrored payment
+        # reversed in PH Office takes its allocation back. Never fired by
+        # PH Store's own routes, so nothing changes with the link off.
+        Transition("SM-11", (S.PAID, S.PARTIALLY_PAID), S.PARTIALLY_PAID, "UNALLOCATE_PARTIAL", _SYSTEM),
+        Transition("SM-11", (S.PAID, S.PARTIALLY_PAID), S.AWAITING_PAYMENT, "UNALLOCATE_ALL", _SYSTEM),
         Transition("SM-11", (S.AWAITING_PAYMENT, S.PARTIALLY_PAID), S.WRITTEN_OFF, "WRITE_OFF", _VF,
                    effects=_effect_write_off),
     ],
