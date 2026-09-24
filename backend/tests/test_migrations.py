@@ -23,7 +23,7 @@ def test_downgrade_is_forward_only_refused():
 
 
 def test_68_tables_exist(db_engine):
-    # 66 through 0004, + integration_outbox and integration_inbound_event from 0005 (PH Office link)
+    # 66 through 0004, + integration_outbox and integration_inbound_event from 0007 (PH Office link)
     with db_engine.connect() as conn:
         count = conn.execute(
             text("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name <> 'alembic_version'")

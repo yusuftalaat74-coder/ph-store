@@ -1,4 +1,4 @@
-"""0005 PH Office link — integration_outbox / integration_inbound_event and the
+"""0007 PH Office link — integration_outbox / integration_inbound_event and the
 nullable mirror columns of PH Office SPEC 5.9.1. Additive; inert while
 ROVA_OFFICE_ENABLED=false.
 
@@ -8,12 +8,12 @@ from pathlib import Path
 
 from alembic import op
 
-revision = "0005_office_link"
-down_revision = "0004_product_category"
+revision = "0007_office_link"
+down_revision = "0006_one_cart_per_pharmacy"
 branch_labels = None
 depends_on = None
 
-SQL_PATH = Path(__file__).resolve().parents[1] / "sql" / "0005_office_link.sql"
+SQL_PATH = Path(__file__).resolve().parents[1] / "sql" / "0007_office_link.sql"
 
 
 def upgrade() -> None:
