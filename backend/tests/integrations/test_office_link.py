@@ -131,12 +131,19 @@ def test_flag_off_checkout_writes_no_outbox_and_receiver_is_closed(client, db_en
     assert JOBS["office_outbox"]() == 0
 
 
-def test_current_exposure_ignores_office_until_a_balance_arrives(db_engine, session):
+def test_current_exposure_ignores_office_until_a_balance_arrives(db_engine, session, monkeypatch):
+    """SPEC 5.9.4 + 1.4: office_balance counts only while the link is enabled,
+    so rolling back the cutover is the flag alone."""
+    from rova.config import get_settings
     from rova.credit.exposure import current_exposure
     w = _world(db_engine)
     assert current_exposure(session, w["facility"]) == Decimal("0")
     session.execute(text("UPDATE credit_facility SET office_balance=123.45 WHERE id=:f"), {"f": w["facility"]})
-    assert current_exposure(session, w["facility"]) == Decimal("123.45")
+    assert current_exposure(session, w["facility"]) == Decimal("0")          # flag off: mirror ignored
+    monkeypatch.setattr(get_settings(), "office_enabled", True)
+    assert current_exposure(session, w["facility"]) == Decimal("123.45")     # flag on: mirror is the exposure
+    monkeypatch.setattr(get_settings(), "office_enabled", False)
+    assert current_exposure(session, w["facility"]) == Decimal("0")          # rollback = flag only
 
 
 # ------------------------------------------------------------------ flag ON
@@ -405,3 +412,38 @@ def test_pull_endpoints_are_hmac_protected(client, db_engine, office_on):
     assert oid in [i["order_id"] for i in r.json()["items"]]
     r = client.get("/v1/office/reconcile/facilities", headers=_sign(b""))
     assert w["facility"] in [i["facility_id"] for i in r.json()["items"]]
+
+
+def test_returns_stay_in_store_when_linked_and_emit_received(client, db_engine, office_on, session):
+    """SPEC 1.3 (v1.1): approve / reject / receive of a return are NOT locked by
+    the link (BO-SM-10 is deferred, the approval is a Store decision); Store
+    emits return.approved and return.received so PH Office can book the credit
+    note. /credit-notes stays locked (PH Office owns credit notes)."""
+    from rova.domain.hooks import wire
+    from rova.domain.machines.registry import MACHINES
+    wire()
+    w = _world(db_engine)
+    oid = _checkout(client, w).json()["orders"][0]["id"]
+    line = _order_lines(db_engine, oid)[0]
+    sx = w["sx"]
+    session.execute(text('INSERT INTO "return" (id, order_id, rma_number, origin, status) '
+                         "VALUES (:id, :o, :rma, 'PHARMACY_RMA', 'REQUESTED')"),
+                    {"id": f"rtn_{sx}", "o": oid, "rma": f"RMA-{sx}"})
+    session.execute(text("INSERT INTO return_line (id, return_id, order_line_id, qty, reason_code) "
+                         "VALUES (:id, :r, :l, 1, 'DAMAGED')"), {"id": f"rtl_{sx}", "r": f"rtn_{sx}", "l": line["id"]})
+    session.commit()
+    vfin = _login(client, w["users"]["vfin"])
+    r = client.post(f"/v1/returns/rtn_{sx}/approve", headers=vfin)
+    assert r.status_code == 200, r.text
+    assert r.json()["status"] == "APPROVED"
+    for trig, actor in (("SHIP", "Dispatcher"),):
+        from rova.integrations.office.inbound import office_actor
+        MACHINES["SM-10"].apply(session, f"rtn_{sx}", trig, office_actor(actor))
+    session.commit()
+    r = client.post(f"/v1/returns/rtn_{sx}/receive", headers=vfin)
+    assert r.status_code == 200 and r.json()["status"] == "RECEIVED_BY_VENDOR", r.text
+    ev = [e["event_type"] for e in _q(db_engine, "SELECT event_type FROM integration_outbox WHERE aggregate_id=:r ORDER BY seq",
+                                     r=f"rtn_{sx}")]
+    assert ev == ["return.approved", "return.received"]
+    assert client.post("/v1/credit-notes", headers=vfin, json={"order_id": oid, "amount": "1.00",
+                       "return_id": f"rtn_{sx}"}).status_code == 409

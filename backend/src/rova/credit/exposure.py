@@ -13,12 +13,15 @@ PENDING_EXPOSURE_STATES = (
 
 def current_exposure(session: Session, facility_id: str) -> Decimal:
     """R-038: opening_balance + sum of signed ledger_entry.amount (ADJUSTMENT included).
-    PH Office SPEC 5.9.4: once PH Office has sent a balance (office_balance),
-    that mirror is the current exposure."""
+    PH Office SPEC 5.9.4: while the link is enabled and PH Office has sent a
+    balance (office_balance), that mirror is the current exposure. With the
+    flag off the mirror is ignored, so rolling back the cutover is the flag
+    alone (SPEC 1.4)."""
+    from rova.integrations.office import config as office_config
     row = session.execute(
         text("SELECT opening_balance, office_balance FROM credit_facility WHERE id=:f"), {"f": facility_id}
     ).mappings().one()
-    if row["office_balance"] is not None:
+    if row["office_balance"] is not None and office_config.enabled():
         return Decimal(row["office_balance"])
     opening = row["opening_balance"]
     ledger_sum = session.execute(

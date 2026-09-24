@@ -84,6 +84,7 @@ def wire_office_hooks() -> None:
     register_hook("SM-09", "RESOLVED", _dispute_resolved)
     register_hook("SM-10", "APPROVED", _return("return.approved"))
     register_hook("SM-10", "REJECTED", _return("return.rejected"))
+    register_hook("SM-10", "RECEIVED_BY_VENDOR", _return("return.received"))   # SPEC 1.3 v1.1: receive stays in Store
     for state in ("ACTIVE", "SUSPENDED", "CLOSED"):
         register_hook("SM-07", state, _pharmacy)
     _wired = True

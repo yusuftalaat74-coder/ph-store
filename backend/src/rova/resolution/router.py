@@ -313,17 +313,18 @@ def _return_transition(trigger: str, roles):
     return _endpoint
 
 
+# PH Office SPEC 1.3 (v1.1): the return lifecycle (approve / reject / ship /
+# receive) stays in PH Store in the MVP — PH Office only books the credit note
+# (SPEC 2.3, BO-SM-10 deferred). These routes are therefore NOT locked when the
+# link is on; Store emits return.approved / return.rejected / return.received.
 router.add_api_route("/returns/{return_id}/approve", _return_transition("APPROVE", _VENDOR_FINANCE),
-                     methods=["POST"], name="approve_return", tags=["resolution"],
-                     dependencies=[Depends(require_not_office_managed)])
+                     methods=["POST"], name="approve_return", tags=["resolution"])
 router.add_api_route("/returns/{return_id}/reject", _return_transition("REJECT", _VENDOR_FINANCE),
-                     methods=["POST"], name="reject_return", tags=["resolution"],
-                     dependencies=[Depends(require_not_office_managed)])
+                     methods=["POST"], name="reject_return", tags=["resolution"])
 router.add_api_route("/returns/{return_id}/ship", _return_transition("SHIP", (RoleCode.DISPATCHER,)),
                      methods=["POST"], name="ship_return", tags=["resolution"])
 router.add_api_route("/returns/{return_id}/receive", _return_transition("RECEIVE", _VENDOR_FINANCE),
-                     methods=["POST"], name="receive_return", tags=["resolution"],
-                     dependencies=[Depends(require_not_office_managed)])
+                     methods=["POST"], name="receive_return", tags=["resolution"])
 
 
 # ------------------------------------------------------------------ credit notes
