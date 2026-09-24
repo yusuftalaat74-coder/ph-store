@@ -333,6 +333,22 @@ def _enforce_prices(session: Session, *, lines, chosen_offer: dict[str, dict],
                        details=moved, rule="A2.4")
 
 
+def _tell_the_admins(session: Session, *, req, total: Decimal, threshold: Decimal) -> None:
+    """The buyer is standing at a counter and the person who can release this
+    is somewhere else in the shop, or not in it at all."""
+    from rova.notifications.router import emit
+
+    org = session.execute(
+        text("SELECT organisation_id FROM pharmacy_account WHERE id=:p"),
+        {"p": req["pharmacy_id"]}).scalar()
+    emit(session, event_code="N-CART-NEEDS-ADMIN",
+         recipient_org_id=org,
+         payload={"request_id": req["id"], "number": req["number"],
+                  "pharmacy_id": req["pharmacy_id"],
+                  "basket_total": money_str(total),
+                  "threshold": money_str(threshold)})
+
+
 def checkout(session: Session, *, request_id: str, actor, payment_overrides: dict[str, str] | None = None,
              acknowledged_prices: dict[str, str] | None = None) -> dict:
     """`payment_overrides`: `{vendor_id: "UPFRONT"}` — the J-20 minimum this
@@ -414,6 +430,33 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
     _enforce_prices(session, lines=lines, chosen_offer=chosen_offer,
                     acknowledged=acknowledged_prices)
 
+    # R-122, before a single order exists.
+    #
+    # This used to be discovered at the end: every order was written, then
+    # `SUBMIT_CART`'s guard refused the basket for exceeding the pharmacy's
+    # `buyer_approval_threshold`, and the whole transaction rolled back with
+    # "requires PharmacyAdmin approval" — a full basket, a refusal, and no
+    # way to get the approval it named. SM-01 has had the state and the
+    # timer for it all along; nothing drove them.
+    #
+    # Checked here rather than left to the guard because the answer is not an
+    # error: the basket goes to the admin and the buyer is told so. Raising
+    # would roll back the very transition that sends it.
+    basket_total = sum(
+        (chosen_offer[line["id"]]["unit_price"] * line["qty_requested"] for line in lines),
+        Decimal("0"))
+    threshold = session.execute(
+        text("SELECT buyer_approval_threshold FROM pharmacy_account WHERE id=:p"),
+        {"p": req["pharmacy_id"]},
+    ).scalar()
+    if entry_status == "DRAFT" and threshold is not None and basket_total > threshold:
+        MACHINES["SM-01"].apply(session, request_id, "SUBMIT_CART_OVER_THRESHOLD", actor)
+        _tell_the_admins(session, req=req, total=basket_total, threshold=threshold)
+        return {"request_id": request_id, "orders": [],
+                "awaiting_admin_approval": True,
+                "basket_total": money_str(basket_total),
+                "threshold": money_str(threshold)}
+
     orders_out = []
     for vendor_id, vendor_lines in by_vendor.items():
         orders_out.append(_create_order_for_vendor(
@@ -428,4 +471,5 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
         machine.apply(session, request_id, "SUBMIT_CART", actor)
     machine.apply(session, request_id, "FIRST_ORDER_CREATED", "SYSTEM")
 
-    return {"request_id": request_id, "orders": orders_out}
+    return {"request_id": request_id, "orders": orders_out,
+            "awaiting_admin_approval": False}

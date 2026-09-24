@@ -25,6 +25,7 @@ POLICY_CONFIRMATION = "CONFIRMATION"
 BUYER = Principal(user_id=None, roles=frozenset({"PharmacyBuyer"}))
 ADMIN = Principal(user_id=None, roles=frozenset({"PharmacyAdmin"}))
 OPS = Principal(user_id=None, roles=frozenset({"OpsReviewer"}))
+RECEIVER = Principal(user_id=None, roles=frozenset({"PharmacyReceiver"}))
 
 
 @pytest.fixture
@@ -253,9 +254,20 @@ def test_all_quotations_terminal_guard_fails_with_pending_quotation(session, pha
 
 
 def test_wrong_actor_forbidden(session, pharmacy):
+    """A receiver signs for deliveries; he does not send baskets for
+    approval.
+
+    This used to assert that a PharmacyAdmin could not fire it either, which
+    was the machine's own rule and a trap: `SUBMIT_CART` refuses an
+    over-threshold basket whoever is holding it, so an admin who filled one
+    himself — which is most of a two-person pharmacy — could neither submit
+    it nor send it for approval, and was simply stuck. He goes through the
+    same gate now and then releases it, which costs a tap and keeps R-122's
+    record of who allowed it.
+    """
     rid = _request(session, pharmacy)
     with pytest.raises(ApiError) as exc:
-        MACHINE.apply(session, rid, "SUBMIT_CART_OVER_THRESHOLD", ADMIN)  # PharmacyBuyer-only
+        MACHINE.apply(session, rid, "SUBMIT_CART_OVER_THRESHOLD", RECEIVER)
     assert exc.value.code == "FORBIDDEN"
 
 

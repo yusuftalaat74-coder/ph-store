@@ -475,6 +475,79 @@ function runJobs() {
   check(ordersAfterReorder === ordersBeforeReorder,
         `"add all" created ${ordersAfterReorder - ordersBeforeReorder} order(s); it must only fill the basket`);
 
+  /* ---- the pharmacy's own approval limit ------------------------------
+     R-122. A basket over `buyer_approval_threshold` used to have every order
+     written and then rolled back, with "requires PharmacyAdmin approval" and
+     no way to get it. The pilot pharmacy has no threshold set, so one is put
+     on it and taken off again. */
+  const phaForGate = sql("SELECT pa.id FROM pharmacy_account pa " +
+                         "JOIN membership m ON m.organisation_id = pa.organisation_id " +
+                         `JOIN app_user u ON u.id = m.user_id WHERE u.phone='${PHONE}' LIMIT 1`);
+  const thresholdWas = sql(`SELECT coalesce(buyer_approval_threshold::text,'') ` +
+                           `FROM pharmacy_account WHERE id='${phaForGate}'`);
+  try {
+    await resetState();
+    sql(`UPDATE pharmacy_account SET buyer_approval_threshold = 1.00 WHERE id='${phaForGate}'`);
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(2200);
+    await page.click('.p [data-act="add"]');
+    await page.waitForTimeout(1200);
+    await page.click('[data-act="goCart"]');
+    await page.waitForTimeout(1200);
+
+    const ordersBeforeGate = Number(sql('SELECT count(*) FROM "order"'));
+    await page.click('[data-act="checkout"]');
+    await page.waitForTimeout(2500);
+    const gate = await page.$eval("#admingate", (e) => e.textContent.replace(/\s+/g, " ").trim())
+      .catch(() => null);
+    step("over the pharmacy's limit, the cart says: " + (gate ? gate.slice(0, 110) : "(nothing)"));
+    check(!!gate, "over the approval limit is still a refusal with nothing to do about it");
+    check(Number(sql('SELECT count(*) FROM "order"')) === ordersBeforeGate,
+          "a basket waiting on the manager already produced an order");
+    const waiting = sql("SELECT status FROM request WHERE is_cart " +
+                        "ORDER BY created_at DESC LIMIT 1");
+    check(waiting === "AWAITING_ADMIN_APPROVAL",
+          `the basket is ${waiting}, not waiting on the manager`);
+    // The buyer sees that it is with his manager and no way to release it,
+    // which is the point of the gate.
+    check(!(await page.$('[data-act="approveBasket"]')),
+          "a buyer can release his own basket past the pharmacy's limit");
+
+    // The manager opens the app and finds the basket waiting — he never saw
+    // the refusal that created it, so it has to surface on its own.
+    const mgrPhone = sql("SELECT u.phone FROM app_user u JOIN membership m ON m.user_id=u.id " +
+                         `WHERE m.organisation_id=(SELECT organisation_id FROM pharmacy_account WHERE id='${phaForGate}') ` +
+                         "AND 'PharmacyAdmin' = ANY(m.role_codes) LIMIT 1");
+    check(!!mgrPhone, "this pharmacy has no manager who could release anything");
+    const mgrCtx = await browser.newContext({ viewport: { width: 420, height: 880 } });
+    const mgr = await mgrCtx.newPage();
+    await mgr.goto(BASE, { waitUntil: "networkidle" });
+    await mgr.fill("#ph", mgrPhone);
+    await mgr.fill("#pw", PW);
+    await mgr.click('[data-act="login"]');
+    await mgr.waitForTimeout(3000);
+    // No tap needed: it has to be on the screen he lands on. The cart
+    // button is not even there — a request that has left DRAFT is not a
+    // cart — so anything that required opening the basket would have left
+    // him with no way in at all.
+    await mgr.waitForTimeout(1500);
+    const mgrSees = await mgr.$eval("#admingate", (e) => e.textContent.replace(/\s+/g, " ").trim())
+      .catch(() => null);
+    step("the manager opens the app and sees: " + (mgrSees ? mgrSees.slice(0, 90) : "(nothing)"));
+    check(!!mgrSees, "the manager has no way to find the basket waiting on him");
+    check(!!(await mgr.$('[data-act="approveBasket"]')), "the manager cannot release it");
+
+    await mgr.click('[data-act="approveBasket"]');
+    await mgr.waitForSelector(".ok", { timeout: 25000 });
+    step("the manager released it: " + (await mgr.textContent(".ok")).trim());
+    check(Number(sql('SELECT count(*) FROM "order"')) > ordersBeforeGate,
+          "releasing the basket did not place the order");
+    await mgrCtx.close();
+  } finally {
+    sql("UPDATE pharmacy_account SET buyer_approval_threshold = " +
+        (thresholdWas ? thresholdWas : "NULL") + ` WHERE id='${phaForGate}'`);
+  }
+
   /* ---- the credit limit, and the two ways past it ---------------------
      R-044 used to be the end of the conversation: a full basket and nothing
      to press. The pilot's own facility is Ahmed Distribuição against

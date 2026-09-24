@@ -39,13 +39,17 @@ jobs named in the brief:
                                 للفاتورة ... قبل التصعيد" — an escalation, not a state
                                 change; SM-11's own states all start at UPLOADED).
 
-  admin_approval_timeout        NOT WIRED. SM-01's `AWAITING_ADMIN_APPROVAL` branch
-                                (R-122's buyer/admin split at request level) is itself
-                                not implemented — sm01_request.py's own pre-existing
-                                docstring documents this, and SM-01 is not one of
-                                Scope A's 12 machines. A timer job with no transition
-                                to fire would be dead code, so this is a named,
-                                documented gap rather than a silent omission.
+  admin_approval_timeout        SM-01 ADMIN_REJECT on expired ADMIN_APPROVAL timers.
+                                Wired now that something drives the branch: checkout
+                                sends an over-threshold basket to AWAITING_ADMIN_APPROVAL
+                                instead of refusing it. Without the job the timer
+                                expires, `_guard_admin_approve` starts refusing because
+                                it requires a running timer, and the basket sits in a
+                                state nobody can approve and no screen can edit — the
+                                same dead end the gate was wired to remove, one state
+                                further along. The basket goes back to DRAFT with its
+                                lines, because silence from an admin is not the pharmacy
+                                deciding it does not want the medicines.
 
 Every job here is idempotent and safe to run concurrently with itself: each
 sla_timer row is claimed with `UPDATE ... WHERE status='RUNNING'` before the
@@ -424,6 +428,60 @@ def _queue_idle_notice(session: Session, row, names: list[str]) -> None:
     )
 
 
+def admin_approval_timeout() -> int:
+    """CFG-ADMIN-APPROVAL-TIMEOUT-HOURS (A-142): a basket waiting on the
+    pharmacy admin that nobody answered goes back to the buyer.
+
+    `ADMIN_REJECT` rather than a cancellation: the basket returns to DRAFT
+    with its lines intact, which is where the pharmacist can edit it, split
+    it under the threshold, or ask again. Silence from the admin is not the
+    pharmacy deciding it does not want the medicines.
+
+    Without this the timer expires, `_guard_admin_approve` starts refusing —
+    it requires a running timer — and the request sits in
+    AWAITING_ADMIN_APPROVAL where nobody can approve it and no screen can
+    edit it. That is the same dead end the approval gate was wired to
+    remove, one state further along.
+    """
+    wire_hooks()
+    session = get_sessionmaker()()
+    try:
+        due = session.execute(
+            text("SELECT id, subject_id FROM sla_timer WHERE policy_type='ADMIN_APPROVAL' "
+                 "AND status='RUNNING' AND expires_at <= :now"),
+            {"now": now()},
+        ).mappings().all()
+        fired = 0
+        for row in due:
+            claimed = session.execute(
+                text("UPDATE sla_timer SET status='EXPIRED', updated_at=:n "
+                     "WHERE id=:id AND status='RUNNING'"),
+                {"n": now(), "id": row["id"]},
+            ).rowcount
+            if not claimed:
+                continue
+            request = session.execute(
+                text("SELECT id, number, pharmacy_id, created_by_user_id, status "
+                     "FROM request WHERE id=:r"), {"r": row["subject_id"]},
+            ).mappings().first()
+            if request is None or request["status"] != "AWAITING_ADMIN_APPROVAL":
+                continue
+            MACHINES["SM-01"].apply(session, request["id"], "ADMIN_REJECT", "SYSTEM")
+            org = session.execute(
+                text("SELECT organisation_id FROM pharmacy_account WHERE id=:p"),
+                {"p": request["pharmacy_id"]}).scalar()
+            _emit(session, event_code="N-CART-APPROVAL-TIMED-OUT",
+                  recipient_user_id=request["created_by_user_id"],
+                  recipient_org_id=org,
+                  payload={"request_id": request["id"], "number": request["number"],
+                           "pharmacy_id": request["pharmacy_id"]})
+            fired += 1
+        session.commit()
+        return fired
+    finally:
+        session.close()
+
+
 def close_orders() -> int:
     """A14.6 job 5 (item 2, backend-review-r1.md): `RECEIPT_ACCEPTED` orders
     past `CFG-RETURN-WINDOW-DAYS` attempt SM-03 `CLOSE` — its own guard
@@ -471,6 +529,7 @@ JOBS = {
     "verification_sla": verification_sla,
     "invoice_upload_sla": invoice_upload_sla,
     "cart_idle": cart_idle,
+    "admin_approval_timeout": admin_approval_timeout,
     "close_orders": close_orders,
 }
 

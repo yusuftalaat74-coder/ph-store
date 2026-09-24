@@ -209,8 +209,14 @@ MACHINE = Machine(
     status_column="status",
     transitions=[
         # -- catalogue path (checkout) --
+        # `_PHARMACY`, not the buyer alone. `SUBMIT_CART`'s guard refuses an
+        # over-threshold basket whoever is holding it, so a PharmacyAdmin who
+        # fills a basket himself — which is most of a two-person pharmacy —
+        # could neither submit it nor send it for approval, and was simply
+        # stuck. He goes through the same gate and then approves it, which
+        # costs him a tap and leaves R-122's record of who allowed it intact.
         Transition("SM-01", (RequestStatus.DRAFT,), RequestStatus.AWAITING_ADMIN_APPROVAL,
-                   "SUBMIT_CART_OVER_THRESHOLD", frozenset({RoleCode.PHARMACY_BUYER}),
+                   "SUBMIT_CART_OVER_THRESHOLD", _PHARMACY,
                    guard=_guard_submit_over_threshold, effects=_effect_start_admin_approval_timer,
                    rule_refs=("R-030", "R-031", "R-032", "R-122")),
         Transition("SM-01", (RequestStatus.DRAFT,), RequestStatus.CONFIRMED, "SUBMIT_CART",

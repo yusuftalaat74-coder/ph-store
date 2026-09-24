@@ -270,6 +270,7 @@ const T = {
     notifs:"Notices", no_notifs:"Nothing new.", mark_all_read:"Mark all read", cart_waiting:"in your cart since", cart_idle_notice:"Your basket is still waiting.", open_cart:"Open cart", notice:"Notice", 
     usual:"What you usually buy", cheaper:"Cheaper now than you paid", best_off:"Biggest discount", running_low:"Running low", you_paid:"you paid", now_at:"now", reorder:"Add all to cart", reorder_done:"Added to your cart.", shelf_basis:"From your own orders",
     credit_wall:"Over your credit limit with", credit_headroom:"left on the limit", credit_order_value:"this order", pay_cash:"Pay cash instead", ask_credit:"Ask them to allow it", credit_asked:"Asked. Waiting for an answer.", credit_pending:"Waiting for permission to go over the limit", credit_approved:"Allowed — you can order now", credit_declined:"Not allowed", credit_note_ph:"Why you need it (optional)", credit_ask_sent:"Sent.",
+    needs_admin:"Waiting for the pharmacy manager", needs_admin_sub:"Over the limit set for this pharmacy. Nothing is ordered yet.", approve_and_order:"Approve and order", reject_basket:"Send it back", basket_sent_back:"Sent back to the basket.", over_limit_by:"over the limit by", admin_limit:"limit for this pharmacy",
     credit_over_by:"already over the limit by",
     quote_sub:"These are the prices you would pay. Nothing is ordered until you agree.", quote_accept:"Confirm and order", quote_back:"Not yet",
     reorder_partial:"Added {n} of {all}. The rest cannot be ordered right now.", nothing_to_reorder:"Nothing on this order can be added.",
@@ -323,6 +324,7 @@ const T = {
     notifs:"Avisos", no_notifs:"Nada de novo.", mark_all_read:"Marcar tudo como lido", cart_waiting:"no seu carrinho desde", cart_idle_notice:"O seu carrinho continua à espera.", open_cart:"Abrir carrinho", notice:"Aviso", 
     usual:"O que costuma comprar", cheaper:"Mais barato agora do que pagou", best_off:"Maior desconto", running_low:"A acabar", you_paid:"pagou", now_at:"agora", reorder:"Adicionar tudo ao carrinho", reorder_done:"Adicionado ao seu carrinho.", shelf_basis:"Dos seus próprios pedidos",
     credit_wall:"Acima do seu limite de crédito com", credit_headroom:"disponível no limite", credit_order_value:"esta encomenda", pay_cash:"Pagar a pronto", ask_credit:"Pedir autorização", credit_asked:"Pedido enviado. À espera de resposta.", credit_pending:"À espera de autorização para exceder o limite", credit_approved:"Autorizado — já pode encomendar", credit_declined:"Não autorizado", credit_note_ph:"Porque precisa (opcional)", credit_ask_sent:"Enviado.",
+    needs_admin:"À espera do responsável da farmácia", needs_admin_sub:"Acima do limite definido para esta farmácia. Ainda nada foi encomendado.", approve_and_order:"Autorizar e encomendar", reject_basket:"Devolver", basket_sent_back:"Devolvido ao carrinho.", over_limit_by:"acima do limite em", admin_limit:"limite desta farmácia",
     credit_over_by:"já acima do limite em",
     quote_sub:"Estes são os preços que pagaria. Nada é encomendado até concordar.", quote_accept:"Confirmar e encomendar", quote_back:"Ainda não",
     reorder_partial:"Adicionados {n} de {all}. Os restantes não podem ser encomendados agora.", nothing_to_reorder:"Nada neste pedido pode ser adicionado.",
@@ -377,6 +379,7 @@ const T = {
     notifs:"التنبيهات", no_notifs:"مفيش جديد.", mark_all_read:"علّم الكل كمقروء", cart_waiting:"في سلتك من", cart_idle_notice:"سلتك لسه مستنية.", open_cart:"افتح السلة", notice:"تنبيه", 
     usual:"اللي بتشتريه عادةً", cheaper:"أرخص دلوقتي عن اللي دفعته", best_off:"أعلى خصم", running_low:"قرب يخلص", you_paid:"دفعت", now_at:"دلوقتي", reorder:"ضيف الكل للسلة", reorder_done:"اتضاف للسلة.", shelf_basis:"من طلباتك إنت",
     credit_wall:"عدّيت حد الائتمان مع", credit_headroom:"الباقي في الحد", credit_order_value:"الطلب ده", pay_cash:"ادفع كاش بدالها", ask_credit:"اطلب منهم يسمحوا", credit_asked:"اتبعت. مستني الرد.", credit_pending:"مستني موافقة على تعدّي الحد", credit_approved:"اتوافق — تقدر تطلب دلوقتي", credit_declined:"مااتوافقش", credit_note_ph:"محتاجها ليه (اختياري)", credit_ask_sent:"اتبعت.",
+    needs_admin:"مستنية مدير الصيدلية", needs_admin_sub:"فوق الحد المحدد للصيدلية. لسه مفيش حاجة اتطلبت.", approve_and_order:"وافق واطلب", reject_basket:"رجّعها", basket_sent_back:"رجعت للسلة.", over_limit_by:"فوق الحد بـ", admin_limit:"حد الصيدلية",
     credit_over_by:"متعدّي الحد بـ",
     quote_sub:"دي الأسعار اللي هتدفعها. مفيش حاجة هتتطلب غير لما توافق.", quote_accept:"أكّد واطلب", quote_back:"لسه",
     reorder_partial:"اتضاف {n} من {all}. الباقي مش ممكن يتطلب دلوقتي.", nothing_to_reorder:"مفيش حاجة في الطلب دا ممكن تتضاف.",
@@ -463,6 +466,7 @@ const S = {
   order: null,
   norm: null,          // normalisation view for a pasted list
   quote: null,         // the same list, priced, before he agrees to pay it
+  adminGate: null,     // {basket_total, threshold} when it needs the manager
   creditWall: null,    // {vendor_id, headroom, order_value} when a limit blocks
   creditAsk: null,     // the permission he asked for, and its answer
   thread: null,
@@ -914,6 +918,12 @@ function storeView(){
     "</button>" +
   "</div>" +
   '<p class="sub">' + sentence(t("store_sub")) + "</p>" +
+  // The basket waiting on the manager belongs here too. He never saw the
+  // refusal that created it, and it is not in his cart — a request that has
+  // left DRAFT is not a cart — so the store is where he opens the app and
+  // where it has to find him. The buyer gets it in the same place rather
+  // than having to open an empty basket to be told his is elsewhere.
+  adminGateBlock() +
   cartReminder() +
   '<div class="card">' +
     '<input id="q" type="search" placeholder="' + esc(t("search_ph")) + '" dir="ltr" ' +
@@ -1164,6 +1174,47 @@ function shelves(){
 
    Nothing here decides anything itself. The server refuses or allows; this
    screen only stops the refusal from being a wall. */
+/* A basket over the pharmacy's own limit.
+
+   Nothing is ordered while this is on screen. The buyer sees that it is
+   with his manager; the manager sees the same basket, priced, with a way to
+   release it or send it back. Approving and buying stay two acts on the
+   server — the release lets the basket through, the checkout writes the
+   order at prices agreed then — but for a manager who is also the person
+   who filled it, which is most of a two-person pharmacy, the app does both
+   on one tap rather than making him find the basket again afterwards. */
+function isPharmacyAdmin(){
+  return !!(S.me && (S.me.roles || []).indexOf("PharmacyAdmin") >= 0);
+}
+
+function adminGateBlock(){
+  const g = S.adminGate;
+  if (!g) return "";
+  const over = Number(g.basket_total) - Number(g.threshold);
+  return '<div class="card" id="admingate" style="border:1.5px solid var(--purple)">' +
+    '<span class="t">' + sentence(t("needs_admin")) + "</span>" +
+    '<p class="s">' + sentence(t("needs_admin_sub")) + "</p>" +
+    '<div class="row"><span class="s">' + esc(t("goods")) + "</span>" +
+      '<span class="price">' + money(g.basket_total) + "</span></div>" +
+    (g.threshold !== null && g.threshold !== undefined
+      ? '<div class="row"><span class="s">' + esc(t("admin_limit")) + "</span>" +
+          '<span class="bidi">' + esc(MT(g.threshold)) + "</span></div>"
+      : "") +
+    (g.threshold !== null && g.threshold !== undefined && over > 0
+      ? '<div class="row"><span class="s">' + esc(t("over_limit_by")) + "</span>" +
+          '<span class="bidi">' + esc(MT(over.toFixed(2))) + "</span></div>"
+      : "") +
+    (isPharmacyAdmin()
+      ? '<div style="height:12px"></div>' +
+        '<button class="btn g" data-act="approveBasket"' + (S.busy ? " disabled" : "") + ">" +
+          (S.busy ? '<span class="spin"></span>' : esc(t("approve_and_order"))) + "</button>" +
+        '<div style="height:8px"></div>' +
+        '<button class="btn ghost" data-act="rejectBasket"' + (S.busy ? " disabled" : "") + ">" +
+          esc(t("reject_basket")) + "</button>"
+      : "") +
+  "</div>";
+}
+
 function creditBlock(){
   const w = S.creditWall;
   if (!w) return "";
@@ -1209,6 +1260,7 @@ function cartView(){
   '<button class="btn ghost sm" data-act="goStore">← ' + esc(t("back")) + "</button>" +
   '<div style="height:12px"></div>' +
   "<h1>" + esc(t("cart")) + "</h1>" +
+  adminGateBlock() +
   creditBlock() +
   (lines.length === 0
     ? '<div class="card empty">' + sentence(t("empty_cart")) + "<br>" +
@@ -1278,6 +1330,7 @@ function quoteBlock(){
       '<span class="t bidi">' + esc(q.number) + "</span>" + statusPill(q.status) +
     "</div>" +
     '<p class="s">' + sentence(t("quote_sub")) + "</p>" +
+    adminGateBlock() +
     creditBlock() +
     (moved ? '<div class="err">' + sentence(t("prices_changed")) + "</div>" : "") +
     (blocked.length ? '<div class="err">' +
@@ -1650,7 +1703,23 @@ async function loadOrders(){
   S.requests = (await api("/v1/requests?limit=50&include_cart=false")).items;
 }
 async function loadThread(){ S.thread = await api("/v1/support/threads/me"); }
-async function loadCart(){ S.cart = await api("/v1/cart"); }
+async function loadCart(){
+  S.cart = await api("/v1/cart");
+  // A basket left with the manager is not in the cart — `find_cart` only
+  // returns a DRAFT — so opening the app would show an empty basket and no
+  // hint that one is waiting on somebody. The manager needs to find it too,
+  // and he never saw the refusal that created it.
+  if (!S.cart.request_id) {
+    const waiting = ((await api("/v1/requests?limit=20&status=AWAITING_ADMIN_APPROVAL")
+                        .catch(() => ({ items: [] }))).items || [])[0];
+    if (waiting) {
+      S.quote = await api("/v1/requests/" + waiting.id + "/priced").catch(() => null);
+      if (S.quote)
+        S.adminGate = { basket_total: S.quote.totals.goods_total,
+                        threshold: null };
+    }
+  }
+}
 
 async function afterLogin(){
   S.me = await api("/v1/auth/me");
@@ -1695,7 +1764,7 @@ const ACT = {
     S.token = null; S.me = null; store.del("token");
     S.cart = null; S.results = null; S.requests = null; S.thread = null;
     S.assistant = null; S.norm = null; S.quote = null; S.order = null;
-    S.creditWall = null; S.creditAsk = null;
+    S.creditWall = null; S.creditAsk = null; S.adminGate = null;
     // The inbox too: on a shared counter phone the next person tapped the
     // bell and saw the last person's notices until the call came back.
     S.notifs = null; S.unread = 0;
@@ -1750,6 +1819,42 @@ const ACT = {
     await api("/v1/notifications/read-all", { method:"POST" });
     await loadNotifications();
   },
+  async approveBasket(){
+    const rid = (S.quote && S.quote.request_id) || (S.cart && S.cart.request_id);
+    if (!rid) return;
+    // Two acts on the server and one tap here. `admin-approve` releases the
+    // basket; the checkout writes the order at the prices agreed now, which
+    // is why they stay separate underneath — a release is not an instruction
+    // to buy at whatever the figures have become.
+    await api("/v1/requests/" + rid + "/admin-approve", { method:"POST" });
+    S.adminGate = null;
+    const lines = ((S.quote && S.quote.lines) || cartLines());
+    const acknowledged = {};
+    lines.forEach(l => { if (l.price_now) acknowledged[l.id] = l.price_now; });
+    const out = await api("/v1/requests/" + rid + "/checkout", {
+      method:"POST", headers:{ "Idempotency-Key": "co-adm-" + rid },
+      body:{ acknowledged_prices: acknowledged }
+    });
+    const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
+    S.flash = t("order_made") + " " + (out.orders || []).length + " " +
+              t("order_count") + " · " + total;
+    S.quote = null;
+    await loadCart();
+    await loadOrders();
+    S.tab = "orders";
+  },
+  async rejectBasket(){
+    const rid = (S.quote && S.quote.request_id) || (S.cart && S.cart.request_id);
+    if (!rid) return;
+    // Back to the basket with its lines, not cancelled: the point of sending
+    // it back is that somebody edits it.
+    await api("/v1/requests/" + rid + "/admin-reject", { method:"POST" });
+    S.adminGate = null;
+    S.quote = null;
+    S.flash = t("basket_sent_back");
+    await loadCart();
+    S.tab = "cart";
+  },
   async askCredit(){
     const w = S.creditWall;
     const rid = (S.quote && S.quote.request_id) || (S.cart && S.cart.request_id);
@@ -1781,7 +1886,7 @@ const ACT = {
     const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
     S.flash = t("order_made") + " " + (out.orders || []).length + " " +
               t("order_count") + " · " + total;
-    S.creditWall = null; S.creditAsk = null; S.quote = null;
+    S.creditWall = null; S.creditAsk = null; S.adminGate = null; S.quote = null;
     await loadCart();
     await loadOrders();
     S.tab = "orders";
@@ -1860,7 +1965,7 @@ const ACT = {
   },
 
   async checkout(){
-    S.creditWall = null;
+    S.creditWall = null; S.adminGate = null;
     const c = S.cart;
     if (!c || !cartLines().length) throw new Error(t("empty_cart"));
     // Rule: the server is told what the screen was showing, and refuses if
@@ -1872,6 +1977,14 @@ const ACT = {
       method:"POST", headers:{ "Idempotency-Key": "co-" + c.request_id },
       body:{ acknowledged_prices: acknowledged }
     });
+    // Over the pharmacy's own limit: nothing was bought, the basket is with
+    // the manager, and saying "order placed" here would be a lie the
+    // pharmacist would only discover when the medicines did not arrive.
+    if (out.awaiting_admin_approval) {
+      S.adminGate = { basket_total: out.basket_total, threshold: out.threshold };
+      await loadCart();
+      return;
+    }
     const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
     // Held as one string and rendered through `sentence()` where the flash is
     // drawn: "تم الطلب: 1 طلب · 1 069,00 MT" has words, a count and an amount
@@ -1939,7 +2052,7 @@ const ACT = {
     S.scrollTo = "quoteblock";
   },
   async quoteAccept(){
-    S.creditWall = null;
+    S.creditWall = null; S.adminGate = null;
     const q = S.quote;
     // The prices on this screen, sent back as the claim — the same
     // mechanism the basket uses, so the server refuses if any of them is
@@ -1954,6 +2067,11 @@ const ACT = {
       method:"POST", headers:{ "Idempotency-Key": "co-" + q.request_id },
       body:{ acknowledged_prices: acknowledged }
     });
+    if (out.awaiting_admin_approval) {
+      S.adminGate = { basket_total: out.basket_total, threshold: out.threshold };
+      S.quote = await api("/v1/requests/" + q.request_id + "/priced");
+      return;
+    }
     const total = (out.orders || []).map(o => MT(o.goods_total)).join(" + ");
     S.flash = t("list_confirmed") + " " + (out.orders || []).length + " " +
               t("order_count") + " · " + total;
