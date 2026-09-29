@@ -17,6 +17,11 @@
 #      its Traefik labels would silently fall off https://api.novaraca.com.
 #   2. pg_dump of the database to /opt/phstore/backups — aborts if it fails,
 #      before anything has changed (the build setup's `git pull` included)
+#   2b. makes sure uploaded files (licence photos, price lists) survive a
+#      recreate: when the api has no volume at ROVA_STORAGE_DIR, copies what
+#      the container holds to /opt/phstore/storage, writes
+#      docker-compose.storage.yml (a bind mount of that directory) and adds
+#      it to COMPOSE_FILE in .env (backup: .env.bak-<stamp>)
 #   3. checks the code to deploy actually contains the expected migration
 #      (clone: on GitHub; build: in the checkout after `git pull`)
 #   4. rolls the code: clone → recreate api (it clones + migrates on boot),
@@ -106,13 +111,83 @@ fi
 say "setup: $MODE  (services: $(tr '\n' ' ' <<<"$services"))"
 if grep -qi traefik <<<"$api_block"; then info "api carries Traefik labels — kept"; fi
 
-# where uploaded licences land must survive a recreate
+# --- where uploaded licences (and price-list files) land must survive a recreate
+# Inside the container the API writes to ROVA_STORAGE_DIR. In the build setup
+# the repository's compose file mounts a named volume there; the clone setup's
+# compose file may not. Without a mount, every recreate — this script's own
+# step 4 included — throws the files away. So when the api has no mount at
+# that path, this script adds one: a bind mount of $PHSTORE_DIR/storage,
+# declared in docker-compose.storage.yml and added to COMPOSE_FILE in .env so
+# that a plain `docker compose up -d` by hand keeps it too. Files already in
+# the running container are copied out first.
 storage_dir="$(grep -E 'ROVA_STORAGE_DIR' <<<"$api_block" | head -n1 | sed -E 's/.*ROVA_STORAGE_DIR:? *"?([^"]*)"?.*/\1/' || true)"
-storage_dir="${storage_dir:-./var/storage}"
-if ! grep -qE "target: ${storage_dir}|:${storage_dir}" <<<"$api_block"; then
-  printf '\033[33m    WARNING: api has no volume at %s — licence photos uploaded at sign-up\n' "$storage_dir"
-  printf '             would be lost on the next recreate. Add a named volume for it.\033[0m\n'
+if [[ -z "$storage_dir" || "$storage_dir" != /* ]]; then
+  # relative or unset: only the container knows where that resolves to
+  resolved="$("${DC[@]}" exec -T api python -c 'import os; from rova.config import get_settings; print(os.path.abspath(get_settings().storage_dir))' 2>/dev/null | tr -d '\r' || true)"
+  [[ "$resolved" == /* ]] && storage_dir="$resolved"
 fi
+STORAGE_OVERLAY=docker-compose.storage.yml
+NEED_STORAGE_MOUNT=0
+if [[ "$storage_dir" != /* ]]; then
+  printf '\033[33m    WARNING: cannot tell where the api keeps uploaded files (ROVA_STORAGE_DIR is not set and\n'
+  printf '             the api container did not answer). Licence photos may not survive a recreate.\033[0m\n'
+elif grep -qE "target: ${storage_dir}$|:${storage_dir}(:|$)" <<<"$api_block"; then
+  info "uploaded files: api mounts $storage_dir — kept"
+else
+  NEED_STORAGE_MOUNT=1
+  say "uploaded files: api has NO mount at $storage_dir — will bind-mount $PHSTORE_DIR/storage there ($STORAGE_OVERLAY)"
+fi
+
+ensure_storage_mount() {
+  # called after the backup, before anything is recreated
+  (( NEED_STORAGE_MOUNT )) || return 0
+  local host_dir="$PHSTORE_DIR/storage" tmp
+  info "host directory: $host_dir"
+  run mkdir -p "$host_dir"
+  run chmod 700 "$host_dir"
+
+  # what the running container holds, before it is thrown away
+  if "${DC[@]}" ps --status running --services 2>/dev/null | grep -qx api; then
+    info "copying the api container's $storage_dir to $host_dir"
+    if (( ! DRY_RUN )); then
+      "${DC[@]}" cp "api:${storage_dir}/." "$host_dir/" 2>/dev/null \
+        || docker cp "$("${DC[@]}" ps -q api | head -n1):${storage_dir}/." "$host_dir/" \
+        || die "could not copy $storage_dir out of the api container — copy it by hand to $host_dir, then rerun"
+      info "$(find "$host_dir" -type f | wc -l) file(s) now in $host_dir"
+    fi
+  fi
+
+  # the overlay: one bind mount for api (and jobs, which shares the image)
+  tmp="$(printf '# Written by phstore-deploy.sh on %s.\n# Keeps uploaded licence photos and price-list files across container recreates.\n# Listed in COMPOSE_FILE (.env); do not remove it from there.\nservices:\n  api:\n    volumes:\n      - %s:%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$host_dir" "$storage_dir")"
+  if (( has_jobs )); then
+    tmp+="$(printf '\n  jobs:\n    volumes:\n      - %s:%s\n' "$host_dir" "$storage_dir")"
+  fi
+  info "writing $STORAGE_OVERLAY:"
+  sed 's/^/        | /' <<<"$tmp"
+  if (( ! DRY_RUN )); then printf '%s\n' "$tmp" > "$STORAGE_OVERLAY"; fi
+
+  # make it stick: COMPOSE_FILE in .env, with a backup of .env first
+  local new_compose_file="${COMPOSE_FILE}:${STORAGE_OVERLAY}"
+  if [[ "$COMPOSE_FILE" == *"$STORAGE_OVERLAY"* ]]; then new_compose_file="$COMPOSE_FILE"; fi
+  info "COMPOSE_FILE -> $new_compose_file (in .env; backup .env.bak-$stamp)"
+  if (( ! DRY_RUN )); then
+    [[ -f .env ]] && cp -p .env ".env.bak-$stamp"
+    if [[ -n "$env_compose_file" ]]; then
+      sed -i -E "s#^([[:space:]]*COMPOSE_FILE=).*#\1${new_compose_file}#" .env
+    else
+      printf '\n# added by phstore-deploy.sh: the storage overlay keeps uploaded files across recreates\nCOMPOSE_FILE=%s\n' "$new_compose_file" >> .env
+    fi
+    export COMPOSE_FILE="$new_compose_file"
+    if ! "${DC[@]}" config >/dev/null 2>&1; then
+      [[ -f ".env.bak-$stamp" ]] && cp -p ".env.bak-$stamp" .env
+      rm -f "$STORAGE_OVERLAY"
+      die "'docker compose config' rejected the storage overlay — .env restored, nothing recreated"
+    fi
+    "${DC[@]}" config 2>/dev/null | awk '/^  api:/{f=1;print;next} f&&/^  [^ ]/{f=0} f' \
+      | grep -qE "target: ${storage_dir}$" || die "the overlay did not take: api still has no mount at $storage_dir"
+    info "api now mounts $host_dir at $storage_dir"
+  fi
+}
 
 # --- database coordinates ----------------------------------------------------
 db_block="$(awk '/^  db:/{f=1;print;next} f&&/^  [^ ]/{f=0} f' <<<"$CONFIG")"
@@ -140,6 +215,9 @@ if (( ! DRY_RUN )); then
   chmod 600 "$dump"
   info "$(du -h "$dump" | cut -f1) — reads back with pg_restore"
 fi
+
+# --- 2b. the storage mount, now that there is a backup and before anything is recreated ----
+ensure_storage_mount
 
 # --- 3. is the code to deploy the code we mean? ------------------------------
 if [[ "$MODE" == clone ]]; then
