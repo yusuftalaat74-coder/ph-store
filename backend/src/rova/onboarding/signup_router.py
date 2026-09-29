@@ -37,6 +37,7 @@ from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from rova.auth.phone import InvalidPhone, normalise_mz_phone
@@ -91,11 +92,12 @@ def _client_ip(request: Request) -> str:
 
     `X-Forwarded-For` is honoured only when the direct peer is a proxy we
     run (a private, loopback or non-IP address — Traefik on the Docker
-    network, or the test client). Then the right-most public entry is the
-    one our proxy appended, which the caller cannot forge; the left-most
-    entry is whatever the caller typed. A request that reaches the published
-    port directly is judged by its peer address alone, so a forged header
-    buys nothing there."""
+    network, or the test client). Then the RIGHT-MOST entry is the one our
+    proxy appended — the address it actually talked to — which the caller
+    cannot forge; everything left of it is whatever the caller typed and is
+    ignored, private or public. A request that reaches the published port
+    directly is judged by its peer address alone, so a forged header buys
+    nothing there either."""
     peer = request.client.host if request.client else ""
     xff = request.headers.get("x-forwarded-for", "")
     try:
@@ -105,15 +107,12 @@ def _client_ip(request: Request) -> str:
         trusted = True   # not an address at all (the test client says "testclient")
     if trusted and xff:
         hops = [h.strip() for h in xff.split(",") if h.strip()]
-        for hop in reversed(hops):
-            try:
-                ip = ipaddress.ip_address(hop)
-            except ValueError:
-                continue
-            if not (ip.is_private or ip.is_loopback):
-                return hop
         if hops:
-            return hops[0]
+            try:
+                ipaddress.ip_address(hops[-1])
+                return hops[-1]
+            except ValueError:
+                pass   # not an address: fall back to the peer, never to the caller's text
     return peer or "unknown"
 
 
@@ -348,6 +347,37 @@ async def signup(
     region_code, city_label = _CITIES[city.upper()]
     org_id, pha_id, lic_id = new_id("org"), new_id("pha"), new_id("lic")
     usr_id, mem_id, vcs_id = new_id("usr"), new_id("mem"), new_id("vcs")
+
+    # A NUIT some other organisation already carries (uq_organisation_tax)
+    # must not turn into a 500 — and must not turn into "this NUIT is
+    # taken" either, which is a fact sign-up is not allowed to reveal (§2.1,
+    # §3). The account is created without it; the reviewer sees "NUIT not
+    # given" and the typed value in the audit row, and decides.
+    nuit_conflict = None
+    if tax and session.execute(text("SELECT 1 FROM organisation WHERE country='MZ' AND tax_id=:t"),
+                               {"t": tax}).first():
+        nuit_conflict, tax = tax, ""
+
+    # The user row goes first: it is the one that can collide. The duplicate
+    # check above and this insert are not one step — two requests with the
+    # same number can pass the check together, and the second insert then
+    # trips uq_app_user_phone. That is the same answer as a duplicate, not a
+    # 500: the request's rows are rolled back, the attempt is recorded, and
+    # the 409 follows. Nothing has been written to disk yet at this point.
+    try:
+        session.execute(
+            text("INSERT INTO app_user (id, phone, name, locale, password_hash, failed_login_count) "
+                 "VALUES (:id, :p, :n, :l, :h, 0)"),
+            {"id": usr_id, "p": e164, "n": owner, "l": "ar" if locale == "ar" else "pt",
+             "h": hash_password(password)},
+        )
+        session.flush()
+    except IntegrityError:
+        session.rollback()
+        _record_attempt(session, e164, ip, "DUPLICATE_PHONE", commit=True)
+        raise ApiError("PHONE_ALREADY_REGISTERED", "this number already has an account — sign in instead",
+                       details=[{"field": "phone", "reason": "already_registered"}])
+
     document_ref = save_bytes(f"licences/{pha_id}", f"alvara{upload[2]}", upload[0]) if upload else None
 
     session.execute(
@@ -367,12 +397,6 @@ async def signup(
              "document_ref, status) VALUES (:id, 'PHARMACY', :h, 'RETAIL_A', NULL, 'ANARME', NULL, NULL, "
              ":d, 'SUBMITTED')"),
         {"id": lic_id, "h": pha_id, "d": document_ref},
-    )
-    session.execute(
-        text("INSERT INTO app_user (id, phone, name, locale, password_hash, failed_login_count) "
-             "VALUES (:id, :p, :n, :l, :h, 0)"),
-        {"id": usr_id, "p": e164, "n": owner, "l": "ar" if locale == "ar" else "pt",
-         "h": hash_password(password)},
     )
     session.execute(
         text("INSERT INTO membership (id, user_id, organisation_id, role_codes, status) "
@@ -396,7 +420,8 @@ async def signup(
         )
     _audit(session, user_id=usr_id, role="PharmacyAdmin", action="ROLE_MEMBERSHIP_CHANGE",
            subject_type="organisation", subject_id=org_id,
-           metadata={"signup": True, "pharmacy_id": pha_id, "licence_id": lic_id})
+           metadata={"signup": True, "pharmacy_id": pha_id, "licence_id": lic_id,
+                     **({"nuit_conflict": nuit_conflict} if nuit_conflict else {})})
     _record_attempt(session, e164, ip, "CREATED", commit=False)
     _notify_reviewers(session, {"pharmacy_id": pha_id, "trade_name": name, "phone": e164,
                                 "region_code": region_code, "has_document": bool(document_ref)})

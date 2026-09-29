@@ -61,7 +61,15 @@ def get_request(request_id: str, principal: Principal = Depends(require_roles(*_
     row = session.execute(text("SELECT * FROM request WHERE id=:r"), {"r": request_id}).mappings().first()
     if row is None or not Scope.pharmacy(row["pharmacy_id"]).owns_pharmacy(principal.pharmacy_id or ""):
         raise ApiError("NOT_FOUND", "request not found")
-    lines = session.execute(text("SELECT * FROM request_line WHERE request_id=:r"), {"r": request_id}).mappings().all()
+    # The product's name rides along with each line: the order screen is
+    # where the pharmacist follows what he bought, and `idx_…` is not a
+    # medicine to him. LEFT JOIN — a WhatsApp line nobody resolved has none.
+    lines = session.execute(
+        text("SELECT rl.*, p.brand_name, p.inn, p.strength, p.form "
+             "FROM request_line rl LEFT JOIN index_product p ON p.id = rl.index_product_id "
+             "WHERE rl.request_id=:r ORDER BY rl.created_at, rl.id"),
+        {"r": request_id},
+    ).mappings().all()
     orders = session.execute(text('SELECT id, number, vendor_id, status, goods_total FROM "order" WHERE request_id=:r'),
                               {"r": request_id}).mappings().all()
     return {"id": row["id"], "number": row["number"], "status": row["status"], "mode": row["mode"],

@@ -244,8 +244,14 @@ def allocate_remainder(session: Session, *, request_line_id: str, actor) -> dict
 
     req = session.execute(text("SELECT * FROM request WHERE id=:r"), {"r": line["request_id"]}).mappings().one()
     pharmacy = session.execute(
-        text("SELECT region_code FROM pharmacy_account WHERE id=:p"), {"p": req["pharmacy_id"]}
+        text("SELECT region_code, status FROM pharmacy_account WHERE id=:p"), {"p": req["pharmacy_id"]}
     ).mappings().one()
+    # This is the second place an `order` is born. A pharmacy suspended or
+    # closed after its first order must not grow a new one from a remainder
+    # (signup spec §2.7 — the same gate `checkout()` applies).
+    if pharmacy["status"] not in ("ACTIVE", "LICENCE_EXPIRING"):
+        raise ApiError("PHARMACY_NOT_ACTIVE", "this pharmacy cannot order yet",
+                       details=[{"field": "pharmacy_status", "reason": pharmacy["status"]}], rule="R-113")
 
     origin_vendor_id = session.execute(
         text(

@@ -453,3 +453,126 @@ def test_existing_login_and_me_are_unchanged(client, db_engine):
     assert "pharmacy_status" in me and me["pharmacy_status"] == "ONBOARDING"
     platform = client.get("/v1/auth/me", headers=_reviewer(client, db_engine, "s13", "admin")).json()
     assert platform["pharmacy_id"] is None and platform["pharmacy_status"] is None
+
+
+# ------------------------------------------------------------------ review fixes (Fable)
+
+def test_duplicate_nuit_is_not_a_500_and_not_a_hint(client, db_engine):
+    """uq_organisation_tax: a second pharmacy typing a NUIT that is already
+    on file used to trip the unique constraint and answer 500. Now the
+    account is created without the NUIT — the caller learns nothing about
+    whose it is — and the reviewer finds the typed value on the audit row."""
+    nuit = "123456789"
+    first = _signup(client, nuit=nuit)
+    assert first.status_code == 201, first.text
+    second = _signup(client, nuit=nuit)
+    assert second.status_code == 201, second.text
+    org_id = client.get("/v1/auth/me", headers=_h(second.json()["access_token"])).json()["organisation_id"]
+    org = _one(db_engine, "SELECT tax_id FROM organisation WHERE id=:o", o=org_id)
+    assert org["tax_id"] is None
+    aud = _one(db_engine, "SELECT metadata FROM audit_event WHERE subject_id=:o AND action_code='ROLE_MEMBERSHIP_CHANGE'",
+               o=org_id)
+    assert aud["metadata"]["nuit_conflict"] == nuit
+    # the first one keeps its NUIT
+    first_org = client.get("/v1/auth/me", headers=_h(first.json()["access_token"])).json()["organisation_id"]
+    assert _one(db_engine, "SELECT tax_id FROM organisation WHERE id=:o", o=first_org)["tax_id"] == nuit
+
+
+def test_same_phone_racing_past_the_check_is_409_not_500(client, db_engine, monkeypatch):
+    """Two sign-ups with one number can both pass `SELECT 1 FROM app_user`
+    before either inserts. The loser's INSERT trips uq_app_user_phone; that
+    is a duplicate, answered 409, with its attempt row — never a 500 and
+    never a half-written pharmacy."""
+    import rova.onboarding.signup_router as sr
+    from rova.auth.security import hash_password
+    phone = _phone()
+    real = sr.hash_password
+
+    def racing(pw):
+        # the other request lands its user row between our check and our insert
+        with db_engine.begin() as c:
+            c.execute(text("INSERT INTO app_user (id, phone, name, password_hash) VALUES (:id, :p, 'Other', :h)"),
+                      {"id": f"usr_race_{phone[-6:]}", "p": phone, "h": hash_password("rova-demo")})
+        return real(pw)
+
+    monkeypatch.setattr(sr, "hash_password", racing)
+    r = _signup(client, phone, file=None)
+    assert r.status_code == 409, r.text
+    assert r.json()["error"]["code"] == "PHONE_ALREADY_REGISTERED"
+    assert _one(db_engine, "SELECT outcome FROM signup_attempt WHERE phone=:p ORDER BY created_at DESC LIMIT 1",
+                p=phone)["outcome"] == "DUPLICATE_PHONE"
+    # nothing else of the losing request survived
+    assert _one(db_engine, "SELECT 1 AS x FROM organisation o JOIN membership m ON m.organisation_id=o.id "
+                "JOIN app_user u ON u.id=m.user_id WHERE u.phone=:p", p=phone) is None
+
+
+def test_forwarded_for_uses_the_hop_our_proxy_appended():
+    """Behind Traefik the right-most entry is the peer Traefik saw. Anything
+    to its left is the caller's text — a private address there must not be
+    picked as a fallback key, or a caller could choose its own budget."""
+    from starlette.requests import Request
+    from rova.onboarding.signup_router import _client_ip
+
+    def req(peer, xff):
+        headers = [(b"x-forwarded-for", xff.encode())] if xff else []
+        return Request({"type": "http", "headers": headers, "client": (peer, 1234)})
+
+    assert _client_ip(req("172.18.0.5", "10.9.9.9, 41.220.1.2")) == "41.220.1.2"
+    assert _client_ip(req("172.18.0.5", "41.220.1.2, 10.9.9.9")) == "10.9.9.9"     # what our proxy saw
+    assert _client_ip(req("172.18.0.5", "not-an-ip")) == "172.18.0.5"
+    assert _client_ip(req("172.18.0.5", "1.2.3.4, garbage")) == "172.18.0.5"
+
+
+def test_order_detail_names_the_medicine(client, db_engine):
+    """`GET /v1/requests/{id}` carries the product's name on each line — the
+    app's order screen showed `idx_…` before."""
+    body = _signup(client, file=None).json()
+    h = _h(body["access_token"])
+    pharmacy_id = body["pharmacy"]["id"]
+    pid = _priced_product(db_engine, pharmacy_id, "nm1")
+    cart = client.post("/v1/cart/lines", headers=h, json={"lines": [{"index_product_id": pid, "qty_requested": 2}]})
+    assert cart.status_code == 200, cart.text
+    request_id = cart.json().get("request_id") or cart.json().get("id") or _one(
+        db_engine, "SELECT id FROM request WHERE pharmacy_id=:p AND status='DRAFT'", p=pharmacy_id)["id"]
+    r = client.get(f"/v1/requests/{request_id}", headers=h)
+    assert r.status_code == 200, r.text
+    line = r.json()["lines"][0]
+    assert line["brand_name"] == "SIGNUPINOL nm1" and line["inn"] == "Signupinol"
+    assert line["strength"] == "500mg" and line["form"] == "Comprimido"
+
+
+def test_remainder_allocation_is_gated_like_checkout(client, db_engine):
+    """The second place an order is born. A pharmacy suspended after its
+    first order cannot grow a follow-on order from a rerouted remainder."""
+    from .test_reroute_and_seals import _base_pharmacy_and_product, _vendor
+    suffix = "sg1"
+    with db_engine.begin() as conn:
+        phone = _base_pharmacy_and_product(conn, suffix)
+        _vendor(conn, suffix, "a", "10.00")
+        _vendor(conn, suffix, "b", "20.00")
+    h = _login(client, phone, surface="PH")
+    rid = client.post("/v1/requests", json={"mode": "CATALOGUE", "allocation_strategy": "FEWEST_VENDORS"},
+                      headers=h).json()["id"]
+    assert client.post(f"/v1/requests/{rid}/lines", json={"index_product_id": f"idx_rs_{suffix}", "qty_requested": 10},
+                       headers=h).status_code == 200
+    r = client.post(f"/v1/requests/{rid}/checkout", headers={**h, "Idempotency-Key": f"co-{suffix}"})
+    assert r.status_code == 200, r.text
+    order_id = r.json()["orders"][0]["id"]
+    line = _one(db_engine, "SELECT id, request_line_id FROM order_line WHERE order_id=:o", o=order_id)
+    va = _login(client, f"+2588400007a{suffix}", surface="PH")
+    assert client.post(f"/v1/orders/{order_id}/accept", headers=va,
+                       json={"lines": [{"order_line_id": line["id"], "confirmed_qty": 4}]}).status_code == 200
+    assert client.post(f"/v1/order-lines/{line['id']}/reroute-decision", json={"action": "REROUTE"},
+                       headers=h).status_code == 200
+    remainder = _one(db_engine, "SELECT id FROM request_line WHERE origin_line_id=:o", o=line["request_line_id"])
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE pharmacy_account SET status='SUSPENDED', suspension_cause='MANUAL_INCIDENT' WHERE id=:p"),
+                  {"p": f"pha_rs_{suffix}"})
+    r = client.post(f"/v1/request-lines/{remainder['id']}/allocate", headers=h)
+    assert r.status_code == 403, r.text
+    assert r.json()["error"]["code"] == "PHARMACY_NOT_ACTIVE"
+    assert _one(db_engine, "SELECT count(*) AS n FROM \"order\" WHERE request_id=:r", r=rid)["n"] == 1
+    with db_engine.begin() as c:
+        c.execute(text("UPDATE pharmacy_account SET status='ACTIVE', suspension_cause=NULL WHERE id=:p"),
+                  {"p": f"pha_rs_{suffix}"})
+    assert client.post(f"/v1/request-lines/{remainder['id']}/allocate", headers=h).status_code == 200
