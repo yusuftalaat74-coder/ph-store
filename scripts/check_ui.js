@@ -74,7 +74,7 @@ const KNOWN = new Set([
   "parseInt", "parseFloat", "isNaN", "encodeURIComponent", "decodeURIComponent",
   "setTimeout", "setInterval", "clearTimeout", "requestAnimationFrame",
   "fetch", "alert", "confirm", "RegExp", "Intl", "console", "URLSearchParams",
-  "URL", "localStorage", "document", "window", "Element", "Event",
+  "URL", "localStorage", "document", "window", "Element", "Event", "FormData",
 ]);
 
 // `[^.\\w$\\\\]` also skips regex escapes like `\\B(` inside a literal

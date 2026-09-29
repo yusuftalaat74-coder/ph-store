@@ -68,10 +68,17 @@ h1{font-size:30px;line-height:1.1;margin:6px 0 2px;letter-spacing:-.6px}
 .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
 .btn.sm{padding:9px 14px;width:auto;font-size:13px;border-radius:11px;display:inline-block}
 
-input[type=text],input[type=password],input[type=number],input[type=search],textarea,select{
+input[type=text],input[type=password],input[type=number],input[type=search],input[type=tel],
+input[type=date],textarea,select{
   width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:13px;
   background:#fff;outline:none}
 input:focus,textarea:focus{border-color:var(--green)}
+input.bad,select.bad{border-color:var(--red);background:rgba(226,59,55,.04)}
+input[type=file]{width:100%;font-size:13px;padding:10px;border:1.5px dashed var(--line);
+  border-radius:13px;background:#fff}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:14px;margin:14px 0 4px}
+.check input{width:20px;height:20px;margin:1px 0 0;flex:0 0 auto;accent-color:var(--green)}
+.check.bad{color:var(--red)}
 label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 textarea{min-height:120px;resize:vertical}
 
@@ -79,6 +86,43 @@ textarea{min-height:120px;resize:vertical}
      font-size:13px;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
 .ok{background:rgba(23,163,74,.1);color:#0C6B31;border-radius:12px;padding:12px;
     font-size:13px;margin-bottom:12px}
+.err .btn{margin-top:10px}
+/* the account is being checked: a card, not an error — nothing is wrong,
+   it is waiting on us */
+.note{background:#fff;border:1.5px solid var(--orange);border-radius:var(--r);
+      padding:var(--pad);margin-bottom:12px}
+.note .t{color:#B45F10}
+.err.review{border-radius:var(--r);padding:var(--pad);font-size:14px}
+.err.review .t{color:#9B1D1A}
+.picked{font-size:12px;color:#0C6B31;margin-top:6px}
+/* first-time guide: three numbered rows, the current one in bold */
+.guide ol{margin:8px 0 0;padding:0;list-style:none;counter-reset:g}
+.guide li{counter-increment:g;display:flex;gap:10px;align-items:center;padding:6px 0;
+          color:var(--muted);font-size:14px}
+.guide li::before{content:counter(g);width:24px;height:24px;flex:0 0 24px;border-radius:50%;
+          background:var(--ground);color:var(--muted);font-weight:800;font-size:12px;
+          display:flex;align-items:center;justify-content:center}
+.guide li.now{color:var(--ink);font-weight:800}
+.guide li.now::before{background:var(--green);color:#fff}
+.guide li.wait{font-style:italic}
+.guide li.wait::before{content:"…"}
+/* order timeline */
+.tl{margin:10px 0 0;padding:0;list-style:none}
+.tl li{position:relative;padding:0 0 12px 26px;font-size:14px;color:var(--muted)}
+.tl li::before{content:"";position:absolute;left:4px;top:4px;width:12px;height:12px;
+               border-radius:50%;border:2px solid var(--line);background:#fff}
+.tl li::after{content:"";position:absolute;left:10px;top:18px;bottom:-2px;width:2px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl li.done{color:var(--ink)}
+.tl li.done::before{background:var(--green);border-color:var(--green)}
+.tl li.now{color:var(--ink);font-weight:800}
+.tl li.now::before{border-color:var(--green);box-shadow:0 0 0 3px rgba(23,163,74,.18)}
+.tl li .x{display:block;font-weight:500;color:var(--muted);font-size:13px;margin-top:2px}
+.tl li.side{color:var(--red);font-weight:700}
+.tl li.side::before{background:var(--red);border-color:var(--red)}
+.tl li.side.m{color:var(--muted)}
+.tl li.side.m::before{background:var(--muted);border-color:var(--muted)}
+.doc{width:100%;border-radius:12px;background:var(--ground);display:block;margin-top:10px}
 .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px}
 .spin{display:inline-block;width:15px;height:15px;border:2px solid var(--line);
       border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;
@@ -307,6 +351,58 @@ const T = {
     computed_from:"Computed from:", session:"Session", sign_out:"Sign out",
     language:"Language", loading:"loading…", no_data:"No data", draw_error:"Could not draw the screen:",
     no_connection:"No connection to the server.",
+    /* pharmacy self-signup, review, guide, timeline (signup spec §4.9) */
+    create_account:"Create a pharmacy account", login_failed:"Wrong number or password.",
+    signup_title:"New pharmacy",
+    signup_sub:"Two minutes. You can browse right away; ordering opens after we check your licence.",
+    pharmacy_name:"Pharmacy name", owner_name:"Responsible person",
+    phone_hint:"Mozambique mobile, e.g. 84 123 4567", password_hint:"At least 8 characters", city:"City",
+    city_maputo:"Maputo", city_matola:"Matola", city_other:"Other", neighbourhood:"Neighbourhood / street",
+    nuit:"NUIT (optional)", licence_file:"Photo of the Alvará",
+    licence_file_hint:"JPG, PNG or PDF, up to 10 MB",
+    licence_later_note:"Send the Alvará by WhatsApp to our team, or upload it from the web version. We will attach it for you.",
+    accept_terms:"I accept the terms of service", create_account_btn:"Create account",
+    have_account:"Already have an account? Sign in", signup_fix_fields:"Please check the highlighted fields.",
+    phone_taken:"This number already has an account. Sign in instead.",
+    too_many_signups:"Too many attempts. Try again in an hour.", signup_done:"Account created. Welcome.",
+    review_title:"Your account is being checked",
+    review_body:"You can browse and fill your cart now. Ordering opens as soon as our team confirms your Alvará — usually within one working day. We will notify you here.",
+    review_no_doc:"We have not received your Alvará yet.", upload_licence:"Send the Alvará",
+    licence_sent:"Received. We will check it.", rejected_title:"We could not approve your account",
+    rejected_reason:"Reason:", rejected_next:"Send a clear photo of the Alvará and we will check again.",
+    suspended_title:"Your account is paused", contact_support:"Talk to us in Chat.",
+    approved_flash:"Your account is approved. You can order now.",
+    approved_body:"Search, add to cart, confirm.", cannot_order_yet:"Ordering opens after approval",
+    cannot_order_yet_long:"Your account is not approved yet, so this order was not sent. Your cart is kept.",
+    guide_title:"How to order", guide_1:"Search for a product", guide_2:"Tap + to add it to the cart",
+    guide_3:"Open the cart and confirm", guide_review:"Confirming opens after your account is approved",
+    confirm_order:"Confirm order",
+    confirm_note:"Nothing is paid now. The supplier confirms first, then delivers.",
+    tl_received:"Order received", tl_received_x:"We sent it to the supplier. Waiting for their answer.",
+    tl_accepted:"Accepted by the supplier", tl_accepted_x:"The supplier confirmed the quantities.",
+    tl_preparing:"Being prepared", tl_preparing_x:"Your products are being picked and packed.",
+    tl_on_way:"On the way", tl_on_way_x:"A courier has your order.", tl_delivered:"Delivered",
+    tl_delivered_x:"Check the boxes, then confirm below.", tl_confirmed:"You confirmed receipt",
+    tl_rejected_x:"The supplier could not take this order. Nothing is charged.",
+    tl_cancelled_x:"This order was cancelled. Nothing is charged.",
+    tl_disputed_x:"You reported a problem. Our team is on it.", tl_return_x:"A return is in progress.",
+    confirm_receipt:"Confirm I received everything", receipt_done:"Thank you. Receipt confirmed.",
+    receipt_problem:"Something missing or damaged? Tell us in Chat before confirming.", ch_APP:"App",
+    ch_WHATSAPP_TEXT:"WhatsApp list", ch_PHOTO:"Photo", ch_FILE:"File", ch_VOICE_NOTE:"Voice note",
+    ch_PHONE_CALL:"Phone call", ch_PMS:"Pharmacy system", tab_pending:"Pharmacies",
+    pending_title:"Pharmacies waiting for approval", pending_none:"Nothing waiting.",
+    filter_waiting:"Waiting", filter_rejected:"Rejected", owner:"Responsible", nuit_missing:"NUIT not given",
+    doc_attached:"Alvará attached", doc_missing:"No Alvará yet",
+    same_name_warn:"Another pharmacy has the same name — check before approving.", open_pdf:"Open the PDF",
+    attach_doc:"Attach the Alvará for this pharmacy", licence_number:"Alvará number", issue_date:"Issue date",
+    expiry_date:"Expiry date", licence_type:"Licence type", notes:"Notes (optional)", approve:"Approve",
+    reject:"Reject", reject_reason:"Reason the pharmacy will see",
+    approved_ok:"Approved. The pharmacy can order now.", rejected_ok:"Rejected. The pharmacy was told why.",
+    need_doc_to_approve:"Attach the Alvará before approving.", n_signup:"New pharmacy signed up",
+    chosen_file:"Chosen:", signup_fields_hint:"Fields marked * are required.",
+    licence_or_whatsapp:"No photo at hand? You can send it later from this screen, or by WhatsApp to our team.",
+    call_owner:"Call before approving",
+    pdf_in_app:"This is a PDF. Open it from a computer browser to read it.", submitted_on:"Signed up",
     st:{DRAFT:"Draft", NORMALIZING:"Reading the list", AWAITING_CONFIRMATION:"Awaiting confirmation",
         AWAITING_ADMIN_APPROVAL:"Awaiting approval", CONFIRMED:"Confirmed",
         IN_FULFILMENT:"In progress", CLOSED:"Closed", CANCELLED:"Cancelled",
@@ -362,6 +458,60 @@ const T = {
     computed_from:"Calculado de:", session:"Sessão", sign_out:"Sair",
     language:"Idioma", loading:"a carregar…", no_data:"Sem dados",
     draw_error:"Erro ao desenhar o ecrã:", no_connection:"Sem ligação ao servidor.",
+    /* pharmacy self-signup, review, guide, timeline (signup spec §4.9) */
+    create_account:"Criar conta da farmácia", login_failed:"Número ou palavra-passe errados.",
+    signup_title:"Nova farmácia",
+    signup_sub:"Dois minutos. Pode ver os produtos já; encomendar abre depois de verificarmos o alvará.",
+    pharmacy_name:"Nome da farmácia", owner_name:"Responsável",
+    phone_hint:"Telemóvel de Moçambique, ex.: 84 123 4567", password_hint:"Pelo menos 8 caracteres",
+    city:"Cidade", city_maputo:"Maputo", city_matola:"Matola", city_other:"Outra",
+    neighbourhood:"Bairro / rua", nuit:"NUIT (opcional)", licence_file:"Foto do alvará",
+    licence_file_hint:"JPG, PNG ou PDF, até 10 MB",
+    licence_later_note:"Envie o alvará por WhatsApp à nossa equipa, ou carregue-o na versão web. Nós anexamos por si.",
+    accept_terms:"Aceito os termos do serviço", create_account_btn:"Criar conta",
+    have_account:"Já tem conta? Entrar", signup_fix_fields:"Verifique os campos indicados.",
+    phone_taken:"Este número já tem conta. Entre com ele.",
+    too_many_signups:"Demasiadas tentativas. Tente daqui a uma hora.", signup_done:"Conta criada. Bem-vindo.",
+    review_title:"A sua conta está em verificação",
+    review_body:"Já pode ver produtos e encher o carrinho. Encomendar abre assim que a equipa confirmar o alvará — normalmente num dia útil. Avisamos aqui.",
+    review_no_doc:"Ainda não recebemos o seu alvará.", upload_licence:"Enviar o alvará",
+    licence_sent:"Recebido. Vamos verificar.", rejected_title:"Não conseguimos aprovar a sua conta",
+    rejected_reason:"Motivo:", rejected_next:"Envie uma foto legível do alvará e voltamos a verificar.",
+    suspended_title:"A sua conta está suspensa", contact_support:"Fale connosco na Conversa.",
+    approved_flash:"A sua conta foi aprovada. Já pode encomendar.",
+    approved_body:"Procure, adicione ao carrinho, confirme.",
+    cannot_order_yet:"Encomendar abre após aprovação",
+    cannot_order_yet_long:"A sua conta ainda não foi aprovada, por isso o pedido não foi enviado. O carrinho fica guardado.",
+    guide_title:"Como encomendar", guide_1:"Procure um produto", guide_2:"Toque em + para o pôr no carrinho",
+    guide_3:"Abra o carrinho e confirme", guide_review:"Confirmar abre depois da aprovação da conta",
+    confirm_order:"Confirmar pedido",
+    confirm_note:"Nada é pago agora. O fornecedor confirma primeiro e depois entrega.",
+    tl_received:"Pedido recebido", tl_received_x:"Enviámos ao fornecedor. À espera da resposta.",
+    tl_accepted:"Aceite pelo fornecedor", tl_accepted_x:"O fornecedor confirmou as quantidades.",
+    tl_preparing:"Em preparação", tl_preparing_x:"Os produtos estão a ser separados e embalados.",
+    tl_on_way:"A caminho", tl_on_way_x:"Um estafeta tem o seu pedido.", tl_delivered:"Entregue",
+    tl_delivered_x:"Confira as caixas e depois confirme abaixo.", tl_confirmed:"Recepção confirmada",
+    tl_rejected_x:"O fornecedor não pôde aceitar. Nada é cobrado.",
+    tl_cancelled_x:"Este pedido foi cancelado. Nada é cobrado.",
+    tl_disputed_x:"Reportou um problema. A equipa está a tratar.", tl_return_x:"Uma devolução está em curso.",
+    confirm_receipt:"Confirmo que recebi tudo", receipt_done:"Obrigado. Recepção confirmada.",
+    receipt_problem:"Falta algo ou veio danificado? Diga-nos na Conversa antes de confirmar.", ch_APP:"App",
+    ch_WHATSAPP_TEXT:"Lista WhatsApp", ch_PHOTO:"Foto", ch_FILE:"Ficheiro", ch_VOICE_NOTE:"Nota de voz",
+    ch_PHONE_CALL:"Chamada", ch_PMS:"Sistema da farmácia", tab_pending:"Farmácias",
+    pending_title:"Farmácias à espera de aprovação", pending_none:"Nada em espera.",
+    filter_waiting:"Em espera", filter_rejected:"Recusadas", owner:"Responsável",
+    nuit_missing:"NUIT não indicado", doc_attached:"Alvará anexado", doc_missing:"Sem alvará ainda",
+    same_name_warn:"Outra farmácia tem o mesmo nome — verifique antes de aprovar.", open_pdf:"Abrir o PDF",
+    attach_doc:"Anexar o alvará desta farmácia", licence_number:"Número do alvará",
+    issue_date:"Data de emissão", expiry_date:"Data de validade", licence_type:"Tipo de licença",
+    notes:"Notas (opcional)", approve:"Aprovar", reject:"Recusar",
+    reject_reason:"Motivo que a farmácia vai ver", approved_ok:"Aprovada. A farmácia já pode encomendar.",
+    rejected_ok:"Recusada. A farmácia foi informada do motivo.",
+    need_doc_to_approve:"Anexe o alvará antes de aprovar.", n_signup:"Nova farmácia registou-se",
+    chosen_file:"Escolhido:", signup_fields_hint:"Os campos com * são obrigatórios.",
+    licence_or_whatsapp:"Sem foto agora? Pode enviá-la depois neste ecrã, ou por WhatsApp à nossa equipa.",
+    call_owner:"Ligue antes de aprovar",
+    pdf_in_app:"É um PDF. Abra-o num navegador de computador para o ler.", submitted_on:"Registada",
     st:{DRAFT:"Rascunho", NORMALIZING:"A ler a lista", AWAITING_CONFIRMATION:"A confirmar",
         AWAITING_ADMIN_APPROVAL:"A aguardar aprovação", CONFIRMED:"Confirmado",
         IN_FULFILMENT:"Em execução", CLOSED:"Fechado", CANCELLED:"Cancelado",
@@ -417,6 +567,51 @@ const T = {
     computed_from:"محسوب من:", session:"الجلسة", sign_out:"خروج",
     language:"اللغة", loading:"جارٍ التحميل…", no_data:"لا توجد بيانات",
     draw_error:"تعذّر رسم الشاشة:", no_connection:"لا يوجد اتصال بالخادم.",
+    /* pharmacy self-signup, review, guide, timeline (signup spec §4.9) */
+    create_account:"إنشاء حساب صيدلية", login_failed:"الرقم أو كلمة المرور غلط.", signup_title:"صيدلية جديدة",
+    signup_sub:"دقيقتين. تقدر تتصفح فوراً؛ الطلب بيتفتح بعد ما نراجع الرخصة.", pharmacy_name:"اسم الصيدلية",
+    owner_name:"اسم المسؤول", phone_hint:"موبايل موزمبيقي، مثلاً 84 123 4567",
+    password_hint:"8 حروف على الأقل", city:"المدينة", city_maputo:"مابوتو", city_matola:"ماتولا",
+    city_other:"مدينة أخرى", neighbourhood:"الحي / الشارع", nuit:"NUIT (اختياري)",
+    licence_file:"صورة الرخصة (Alvará)", licence_file_hint:"JPG أو PNG أو PDF حتى 10 ميجا",
+    licence_later_note:"ابعت الرخصة واتساب لفريقنا أو ارفعها من نسخة الويب، وإحنا هنضيفها لك.",
+    accept_terms:"موافق على شروط الخدمة", create_account_btn:"إنشاء الحساب", have_account:"عندك حساب؟ ادخل",
+    signup_fix_fields:"راجع الخانات المطلوبة.", phone_taken:"الرقم ده عليه حساب بالفعل. ادخل بيه.",
+    too_many_signups:"محاولات كتير. جرّب تاني بعد ساعة.", signup_done:"الحساب اتعمل. أهلاً بيك.",
+    review_title:"حسابك تحت المراجعة",
+    review_body:"تقدر تتصفح وتملى السلة دلوقتي. الطلب هيتفتح أول ما الفريق يأكد الرخصة — عادةً في يوم عمل. هنبلغك هنا.",
+    review_no_doc:"لسه ماستلمناش الرخصة بتاعتك.", upload_licence:"إرسال الرخصة",
+    licence_sent:"استلمناها. هنراجعها.", rejected_title:"مقدرناش نوافق على حسابك", rejected_reason:"السبب:",
+    rejected_next:"ابعت صورة واضحة للرخصة وهنراجع تاني.", suspended_title:"حسابك موقوف",
+    contact_support:"كلّمنا في المحادثة.", approved_flash:"حسابك اتوافق عليه. تقدر تطلب دلوقتي.",
+    approved_body:"ابحث، ضيف للسلة، أكّد.", cannot_order_yet:"الطلب بيتفتح بعد الموافقة",
+    cannot_order_yet_long:"حسابك لسه مااتوافقش عليه، فالطلب مااتبعتش. السلة محفوظة.", guide_title:"إزاي تطلب",
+    guide_1:"ابحث عن منتج", guide_2:"دوس + عشان تضيفه للسلة", guide_3:"افتح السلة وأكّد",
+    guide_review:"التأكيد بيتفتح بعد الموافقة على الحساب", confirm_order:"تأكيد الطلب",
+    confirm_note:"مفيش دفع دلوقتي. المورد بيأكد الأول وبعدين بيوصّل.", tl_received:"الطلب اتستلم",
+    tl_received_x:"بعتناه للمورد. مستنيين رده.", tl_accepted:"المورد قبله",
+    tl_accepted_x:"المورد أكد الكميات.", tl_preparing:"جارٍ التجهيز",
+    tl_preparing_x:"منتجاتك بتتجهز وبتتغلف.", tl_on_way:"في الطريق", tl_on_way_x:"المندوب معاه طلبك.",
+    tl_delivered:"اتسلّم", tl_delivered_x:"راجع الكراتين وبعدين أكّد تحت.", tl_confirmed:"أكّدت الاستلام",
+    tl_rejected_x:"المورد مقدرش يقبل الطلب. مفيش أي مبلغ اتحسب.",
+    tl_cancelled_x:"الطلب ده اتلغى. مفيش أي مبلغ اتحسب.", tl_disputed_x:"بلّغت عن مشكلة. الفريق شغال عليها.",
+    tl_return_x:"في مرتجع جارٍ.", confirm_receipt:"أؤكد إني استلمت كل حاجة",
+    receipt_done:"شكراً. الاستلام اتأكد.",
+    receipt_problem:"في حاجة ناقصة أو بايظة؟ قولنا في المحادثة قبل ما تأكد.", ch_APP:"التطبيق",
+    ch_WHATSAPP_TEXT:"قائمة واتساب", ch_PHOTO:"صورة", ch_FILE:"ملف", ch_VOICE_NOTE:"رسالة صوتية",
+    ch_PHONE_CALL:"مكالمة", ch_PMS:"نظام الصيدلية", tab_pending:"الصيدليات",
+    pending_title:"صيدليات مستنية الموافقة", pending_none:"مفيش حاجة مستنية.", filter_waiting:"مستنية",
+    filter_rejected:"مرفوضة", owner:"المسؤول", nuit_missing:"NUIT مش مكتوب", doc_attached:"الرخصة مرفقة",
+    doc_missing:"مفيش رخصة لسه", same_name_warn:"في صيدلية تانية بنفس الاسم — اتأكد قبل الموافقة.",
+    open_pdf:"افتح الـPDF", attach_doc:"إرفاق رخصة الصيدلية دي", licence_number:"رقم الرخصة",
+    issue_date:"تاريخ الإصدار", expiry_date:"تاريخ الانتهاء", licence_type:"نوع الرخصة",
+    notes:"ملاحظات (اختياري)", approve:"موافقة", reject:"رفض", reject_reason:"السبب اللي الصيدلية هتشوفه",
+    approved_ok:"اتوافق عليها. الصيدلية تقدر تطلب دلوقتي.", rejected_ok:"اترفضت. الصيدلية اتبلغت بالسبب.",
+    need_doc_to_approve:"أرفق الرخصة قبل الموافقة.", n_signup:"صيدلية جديدة سجّلت", chosen_file:"اخترت:",
+    signup_fields_hint:"الخانات اللي عليها * لازم تتملى.",
+    licence_or_whatsapp:"مفيش صورة دلوقتي؟ تقدر تبعتها بعدين من الشاشة دي، أو واتساب لفريقنا.",
+    call_owner:"اتصل قبل الموافقة", pdf_in_app:"ده ملف PDF. افتحه من متصفح الكمبيوتر عشان تقراه.",
+    submitted_on:"سجّلت",
     st:{DRAFT:"مسودة", NORMALIZING:"جارٍ قراءة القائمة", AWAITING_CONFIRMATION:"في انتظار التأكيد",
         AWAITING_ADMIN_APPROVAL:"في انتظار الموافقة", CONFIRMED:"مؤكَّد",
         IN_FULFILMENT:"جارٍ التنفيذ", CLOSED:"مقفول", CANCELLED:"ملغى",
@@ -476,7 +671,20 @@ const S = {
   shelvesLoading: false,
   unread: 0,           // the badge on the bell
   askResult: null,
-  lastRequestId: null
+  lastRequestId: null,
+  // pharmacy self-signup (signup spec §4)
+  signup: false,       // the login screen shows the sign-up form instead
+  review: null,        // GET /v1/pharmacies/me/review-status — drives the banner
+  bad: {},             // form fields the last attempt refused, by input id
+  errAct: null,        // {act, label}: a button drawn inside the error card
+  files: {},           // File objects picked in file inputs, by input id
+  orderFull: {},       // GET /v1/orders/{id} per order, for the timeline
+  // the review team's screen (same app, reviewer login)
+  isReviewer: false,
+  pending: null,       // GET /v1/onboarding-review/pharmacies
+  pendingFilter: "ONBOARDING",
+  pendingItem: null,   // the pharmacy open on the review screen
+  doc: null            // {url, type} of its Alvará, fetched with the bearer token
 };
 
 /* ---------------- api ---------------- */
@@ -592,13 +800,23 @@ S.form = {};
 function snapshotForm(){
   const f = {};
   document.querySelectorAll("#main input, #main textarea, #main select")
-    .forEach(el => { if (el.id) f[el.id] = el.value; });
+    .forEach(el => {
+      if (!el.id) return;
+      // A file input's value cannot be written back (browser rule), so the
+      // File itself is kept instead, and kept across a failed attempt: the
+      // re-render empties the input, and asking him to find the photo again
+      // after a typo in the phone number is how a sign-up gets abandoned.
+      if (el.type === "file") { if (el.files && el.files[0]) S.files[el.id] = el.files[0]; return; }
+      f[el.id] = el.type === "checkbox" ? (el.checked ? "on" : "") : el.value;
+    });
   S.form = f;
 }
 function restoreForm(){
   document.querySelectorAll("#main input, #main textarea, #main select")
     .forEach(el => {
-      if (el.id && S.form[el.id] !== undefined && !el.value) el.value = S.form[el.id];
+      if (!el.id || el.type === "file" || S.form[el.id] === undefined) return;
+      if (el.type === "checkbox") { if (S.form[el.id]) el.checked = true; return; }
+      if (!el.value) el.value = S.form[el.id];
     });
 }
 function val(id){
@@ -616,11 +834,19 @@ function clearField(id){
 function setBusy(v){ S.busy = v; render(); }
 
 async function guard(fn){
-  S.err = null;
+  S.err = null; S.errAct = null;
   setBusy(true);
   try { await fn(); }
   catch (e) {
     S.err = e.message || String(e);
+    S.errAct = e.act || null;
+    // Checkout by an account the review team has not approved yet. The cart
+    // button is disabled in that state, so this is the race where approval
+    // was withdrawn while the screen was open — say it in his words.
+    if (e && e.code === "PHARMACY_NOT_ACTIVE") {
+      S.err = t("cannot_order_yet_long");
+      loadReview().catch(() => {});
+    }
     // A refusal that names line ids is unreadable and, worse, unactionable:
     // the screen still shows the old prices, so the next tap sends the same
     // stale numbers and earns the same refusal. Reload the cart instead, so
@@ -688,13 +914,18 @@ const ICONS = {
 };
 const TABS = [["store","tab_store"], ["list","tab_list"], ["orders","tab_orders"],
               ["chat","tab_chat"], ["panel","tab_panel"]];
+// The review team signs in to the same app (signup spec §4.7, D-4). They have
+// no pharmacy, so no store, cart or orders — the store endpoints refuse them.
+const REVIEWER_TABS = [["pending","tab_pending"], ["panel","tab_panel"]];
+ICONS.pending = ICONS.orders;
+function tabs(){ return S.isReviewer ? REVIEWER_TABS : TABS; }
 
 function renderTabs(){
   const bar = document.getElementById("tabbar");
   if (!bar) return;
   if (!S.token){ bar.style.display = "none"; return; }
   bar.style.display = "flex";
-  bar.innerHTML = TABS.map(([id,key]) =>
+  bar.innerHTML = tabs().map(([id,key]) =>
     '<button data-tab="' + id + '" class="' + (S.tab === id ? "on" : "") + '">' +
       '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + ICONS[id] + "</svg>" +
@@ -710,9 +941,11 @@ function render(){
     main.innerHTML =
       // `sentence()`, not `esc()`: both banners routinely carry a count or an
       // amount inside a sentence, and an LTR box reorders the Arabic ones.
-      (S.err   ? '<div class="err">'  + sentence(S.err)   + "</div>" : "") +
+      (S.err   ? '<div class="err">'  + sentence(S.err) +
+                   (S.errAct ? '<button class="btn ghost" data-act="' + esc(S.errAct.act) + '">' +
+                               esc(S.errAct.label) + "</button>" : "") + "</div>" : "") +
       (S.flash ? '<div class="ok">'   + sentence(S.flash) + "</div>" : "") +
-      (S.token ? VIEW[S.tab]() : loginView());
+      (S.token ? (VIEW[S.tab] || VIEW.store)() : (S.signup ? signupView() : loginView()));
   } catch (e) {
     // rule 3: a broken screen still shows why, and the app stays alive
     main.innerHTML = '<div class="err">' + sentence(t("draw_error")) + "\n" + esc(e.message) + "</div>";
@@ -747,6 +980,8 @@ function loginView(){
     '<div style="height:16px"></div>' +
     '<button class="btn g" data-act="login"' + (S.busy ? " disabled" : "") + ">" +
       (S.busy ? '<span class="spin"></span>' : esc(t("sign_in"))) + "</button>" +
+    '<div style="height:10px"></div>' +
+    '<button class="btn ghost" data-act="goSignup">' + esc(t("create_account")) + "</button>" +
   "</div>" +
   '<div class="card">' +
     '<label for="api">' + esc(t("server")) + "</label>" +
@@ -908,16 +1143,11 @@ function storeView(){
   const filtered = !!(S.vendor || S.category || (S.search || "").trim());
   return '' +
   '<div class="row" style="margin:0 0 2px;padding:0;border:0;align-items:flex-start">' +
-    "<h1 style='margin:0'>" + esc(t("store")) + "</h1>" +
-    '<button class="bell" data-act="goNotifs" aria-label="' + esc(t("notifs")) + '">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
-      'stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/>' +
-      '<path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>' +
-      (S.unread ? '<span class="badge">' + (S.unread > 9 ? "9+" : S.unread) + "</span>" : "") +
-    "</button>" +
+    "<h1 style='margin:0'>" + esc(t("store")) + "</h1>" + bellButton() +
   "</div>" +
   '<p class="sub">' + sentence(t("store_sub")) + "</p>" +
+  reviewBanner() +
+  guideCard() +
   // The basket waiting on the manager belongs here too. He never saw the
   // refusal that created it, and it is not in his cart — a request that has
   // left DRAFT is not a cart — so the store is where he opens the app and
@@ -1070,6 +1300,13 @@ function noticeText(n){
              act: current ? "goCart" : null,
              cta: current ? t("open_cart") : null };
   }
+  if (n.event_code === "N-PHARMACY-SIGNUP")
+    return { title: t("n_signup"), body: [p.trade_name, p.phone].filter(Boolean).join(" · "),
+             act: "goPending", cta: null };
+  if (n.event_code === "N-PHARMACY-APPROVED")
+    return { title: t("approved_flash"), body: t("approved_body"), act: "goStore", cta: null };
+  if (n.event_code === "N-PHARMACY-REJECTED")
+    return { title: t("rejected_title"), body: p.reason || "", act: "goStore", cta: null };
   return { title: t("notice"), body: n.event_code, act: null, cta: null };
 }
 
@@ -1260,6 +1497,7 @@ function cartView(){
   '<button class="btn ghost sm" data-act="goStore">← ' + esc(t("back")) + "</button>" +
   '<div style="height:12px"></div>' +
   "<h1>" + esc(t("cart")) + "</h1>" +
+  reviewBanner() +
   adminGateBlock() +
   creditBlock() +
   (lines.length === 0
@@ -1287,12 +1525,17 @@ function cartView(){
           "</div>").join("") +
         '<div class="row"><span class="t">' + esc(t("goods")) + "</span>" +
           '<span class="price">' + money(c.totals.goods_total) + "</span></div>" +
-        '<div style="height:14px"></div>' +
-        '<button class="btn g" data-act="checkout"' +
-          ((S.busy || blocked.length) ? " disabled" : "") + ">" +
-          (S.busy ? '<span class="spin"></span>'
-                  : esc(moved ? t("continue_new") : t("place_order"))) + "</button>" +
-      "</div>");
+      "</div>" +
+      guideCard() +
+      '<p class="s" style="margin:0 2px 10px">' + sentence(t("confirm_note")) + "</p>" +
+      // One primary button. Before approval it is there, disabled, saying
+      // when it opens — a missing button reads as a broken app.
+      (canOrder()
+        ? '<button class="btn g" data-act="checkout"' +
+            ((S.busy || blocked.length) ? " disabled" : "") + ">" +
+            (S.busy ? '<span class="spin"></span>'
+                    : esc(moved ? t("continue_new") : t("confirm_order"))) + "</button>"
+        : '<button class="btn g" data-act="checkout" disabled>' + esc(t("cannot_order_yet")) + "</button>"));
 }
 
 /* ---------------- list (the WhatsApp paste) ---------------- */
@@ -1300,6 +1543,7 @@ function listView(){
   return '' +
   "<h1>" + esc(t("list_title")) + "</h1>" +
   '<p class="sub">' + sentence(t("list_sub")) + "</p>" +
+  reviewBanner() +
   '<div class="card">' +
     '<textarea id="paste" dir="ltr" placeholder="Amoxicilina 500 mg 21&#10;Paracetamol 500&#10;..."></textarea>' +
     '<div style="height:10px"></div>' +
@@ -1412,6 +1656,7 @@ function ordersView(){
   return '' +
   "<h1>" + esc(t("orders")) + "</h1>" +
   '<p class="sub">' + sentence(t("orders_sub")) + "</p>" +
+  reviewBanner() +
   '<button class="btn ghost sm" data-act="reloadOrders">' + esc(t("refresh")) + "</button>" +
   '<div style="height:12px"></div>' +
   (rs === null ? '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : "—") + "</div>"
@@ -1419,7 +1664,9 @@ function ordersView(){
    : rs.map(r => '<div class="card tap" data-act="openReq" data-id="' + esc(r.id) + '">' +
         '<div class="row" style="margin:0;padding:0;border:0">' +
           '<span><span class="t bidi">' + esc(r.number) + "</span><br>" +
-          '<span class="s bidi">' + esc(r.channel) + " · " + (r.line_count || 0) + "</span></span>" +
+          '<span class="s">' + sentence(channelLabel(r.channel) + " · " + (r.line_count || 0) + " " +
+                                        t("items") + (r.created_at ? " · " + dayLabel(r.created_at) : "")) +
+          "</span></span>" +
           statusPill(r.status) +
         "</div>" +
       "</div>").join(""));
@@ -1442,13 +1689,26 @@ function orderDetail(){
   '<button class="btn" data-act="reorder"' + (S.busy ? " disabled" : "") + ">" +
     (S.busy ? '<span class="spin"></span>' : esc(t("reorder"))) + "</button>" +
   '<div style="height:12px"></div>' +
-  (orders.length ? orders.map(x => '<div class="card">' +
+  (orders.length ? orders.map(x => {
+      const full = S.orderFull[x.id];
+      const o = full || x;
+      const receiving = o.status === "DELIVERED_PENDING_RECEIPT" && canReceive() && full;
+      return '<div class="card" id="order-' + esc(x.id) + '">' +
       '<div class="row" style="margin:0;padding:0;border:0">' +
-        '<span class="t bidi">' + esc(x.number || x.id) + "</span>" + statusPill(x.status) +
+        '<span class="t bidi">' + esc(x.number || x.id) + "</span>" + statusPill(o.status) +
       "</div>" +
+      // the plain-language steps; without the full order (a failed load)
+      // the pill above still says where it is
+      (full ? timeline(full) : "") +
       '<div class="row"><span class="s">' + esc(t("goods")) + '</span><span class="t">' +
         money(x.goods_total) + "</span></div>" +
-    "</div>").join("")
+      (receiving
+        ? '<div style="height:12px"></div>' +
+          '<p class="s" style="margin:0 0 10px">' + sentence(t("receipt_problem")) + "</p>" +
+          '<button class="btn g" data-act="confirmReceipt" data-id="' + esc(x.id) + '"' +
+            (S.busy ? " disabled" : "") + ">" + esc(t("confirm_receipt")) + "</button>"
+        : "") +
+    "</div>"; }).join("")
    : '<div class="card empty">' + sentence(t("no_orders_made")) + "</div>");
 }
 
@@ -1491,7 +1751,7 @@ function panelView(){
     '<span class="t">' + esc(t("language")) + "</span>" +
     '<div style="height:10px"></div>' + langChips() +
   "</div>" +
-  (a ? '<div class="hero">' +
+  (S.isReviewer ? "" : a ? '<div class="hero">' +
       '<div class="k">' + esc(t("owed")) + "</div>" +
       '<div class="v">' + money(a.outstanding_to_vendors) + "</div>" +
     "</div>" +
@@ -1524,11 +1784,351 @@ function panelView(){
   "</div>";
 }
 
+/* ---------------- sign-up (signup spec §4.1–4.2) ----------------
+   A pharmacy creates its own account at the counter. It can browse and fill
+   a cart at once; ordering opens once the review team has read its Alvará.
+   Fewer fields is the point: what the reviewer can read off the document
+   (number, dates) is not asked for here. */
+
+/* Inside the APK the page is file:///android_asset/index.html. */
+function isApk(){ return location.protocol === "file:"; }
+
+/* Whether a file input can open anything here. A browser always can. The
+   Android shell can from v4.3, which adds a file chooser and says so in its
+   user agent; an older shell had none, and a file input there was a dead
+   button — so the note about WhatsApp is shown instead of it. */
+function canPickFile(){ return !isApk() || /PHStoreShell\/[\d.]+ files/.test(navigator.userAgent || ""); }
+
+/* The same rules as the server's `normalise_mz_phone`: "84 123 4567",
+   "841234567", "00258…", "258…" and "+258 84-…" all become +258841234567.
+   Anything else is returned trimmed and untouched, so an account created
+   with some other spelling can still sign in exactly as before. */
+function normPhone(raw){
+  const s = String(raw || "").trim();
+  let plus = s.charAt(0) === "+";
+  let d = s.replace(/\D/g, "");
+  if (!plus && d.slice(0, 2) === "00") { d = d.slice(2); plus = true; }
+  let c = plus ? "+" + d
+        : (d.length === 12 && d.slice(0, 3) === "258") ? "+" + d
+        : (d.length === 9 && d.charAt(0) === "8") ? "+258" + d
+        : "";
+  return /^\+2588[2-7]\d{7}$/.test(c) ? c : null;
+}
+
+function field(id, labelKey, input, hintKey){
+  return '<label for="' + id + '">' + sentence(t(labelKey)) + "</label>" + input +
+    (hintKey ? '<p class="s" style="margin:6px 0 0">' + sentence(t(hintKey)) + "</p>" : "");
+}
+function bad(id){ return S.bad[id] ? " bad" : ""; }
+
+/* A file input, plus the file already chosen for it — the input itself is
+   emptied by every re-render, the File is not. */
+// what a licence file may be; spelt in two pieces because "/" followed by
+// "*" would open a comment for scripts/check_ui.js
+const ACCEPT_DOCS = "image/" + "*,application/pdf";
+function fileInput(id){
+  const f = S.files[id];
+  return '<input id="' + id + '" type="file" accept="' + ACCEPT_DOCS + '" class="' + bad(id).trim() + '">' +
+    (f ? '<div class="picked">' + sentence(t("chosen_file") + " " + f.name) +
+         ' <button class="chip" data-act="clearFile" data-id="' + id + '" style="margin:0 0 0 6px">' +
+         esc(t("remove")) + "</button></div>" : "");
+}
+
+function signupView(){
+  return '' +
+  '<button class="btn ghost sm" data-act="goLogin">← ' + esc(t("back")) + "</button>" +
+  '<div style="height:12px"></div>' +
+  "<h1>" + esc(t("signup_title")) + "</h1>" +
+  '<p class="sub">' + sentence(t("signup_sub")) + "</p>" +
+  '<div class="card">' + langChips() + "</div>" +
+  '<div class="card">' +
+    field("su_name", "pharmacy_name",
+          '<input id="su_name" type="text" autocomplete="organization" class="' + bad("su_name").trim() + '">') +
+    field("su_owner", "owner_name",
+          '<input id="su_owner" type="text" autocomplete="name" class="' + bad("su_owner").trim() + '">') +
+    field("su_phone", "phone",
+          '<input id="su_phone" type="tel" inputmode="tel" dir="ltr" placeholder="84 123 4567" ' +
+          'autocomplete="tel" class="' + bad("su_phone").trim() + '">', "phone_hint") +
+    field("su_pw", "password",
+          '<input id="su_pw" type="password" dir="ltr" autocomplete="new-password" class="' +
+          bad("su_pw").trim() + '">', "password_hint") +
+    field("su_city", "city",
+          '<select id="su_city">' +
+            '<option value="MAPUTO">' + esc(t("city_maputo")) + "</option>" +
+            '<option value="MATOLA">' + esc(t("city_matola")) + "</option>" +
+            '<option value="OUTRA">' + esc(t("city_other")) + "</option>" +
+          "</select>") +
+    field("su_bairro", "neighbourhood", '<input id="su_bairro" type="text">') +
+    field("su_nuit", "nuit",
+          '<input id="su_nuit" type="text" inputmode="numeric" dir="ltr" maxlength="9" class="' +
+          bad("su_nuit").trim() + '">') +
+  "</div>" +
+  '<div class="card">' +
+    '<span class="t">' + sentence(t("licence_file")) + "</span>" +
+    (canPickFile()
+      ? '<p class="s" style="margin:4px 0 10px">' + sentence(t("licence_file_hint")) + "</p>" +
+        fileInput("su_file") +
+        '<p class="s" style="margin:10px 0 0">' + sentence(t("licence_or_whatsapp")) + "</p>"
+      : '<p class="s" style="margin:6px 0 0">' + sentence(t("licence_later_note")) + "</p>") +
+  "</div>" +
+  '<div class="card">' +
+    '<label class="check' + bad("su_terms") + '"><input id="su_terms" type="checkbox"> ' +
+      sentence(t("accept_terms")) + "</label>" +
+    '<div style="height:12px"></div>' +
+    '<button class="btn g" data-act="signup"' + (S.busy ? " disabled" : "") + ">" +
+      (S.busy ? '<span class="spin"></span>' : esc(t("create_account_btn"))) + "</button>" +
+    '<div style="height:10px"></div>' +
+    '<button class="btn ghost" data-act="goLogin">' + esc(t("have_account")) + "</button>" +
+  "</div>";
+}
+
+/* ---------------- the review banner (§4.3) ----------------
+   Drawn at the top of the store, the list, the cart and the orders, from
+   the one call that says where the account stands. Nothing is drawn for an
+   approved pharmacy — the seeded pilot accounts never see it. */
+function canOrder(){ return !S.review || S.review.can_checkout; }
+
+function licenceUpload(){
+  if (!canPickFile())
+    return '<p class="s" style="margin:10px 0 0">' + sentence(t("licence_later_note")) + "</p>";
+  return '<div style="height:10px"></div>' + fileInput("rv_file") +
+    '<div style="height:10px"></div>' +
+    '<button class="btn sm" data-act="uploadLicence"' + (S.busy ? " disabled" : "") + ">" +
+      esc(t("upload_licence")) + "</button>";
+}
+
+function reviewBanner(){
+  const r = S.review;
+  if (!r) return "";
+  const st = r.pharmacy_status;
+  if (st === "ONBOARDING")
+    return '<div class="note" id="reviewbanner">' +
+      '<span class="t">' + sentence(t("review_title")) + "</span>" +
+      '<p class="s" style="margin:6px 0 0">' + sentence(t("review_body")) + "</p>" +
+      (r.licence && !r.licence.has_document
+        ? '<p style="margin:10px 0 0;font-weight:700">' + sentence(t("review_no_doc")) + "</p>" + licenceUpload()
+        : "") +
+    "</div>";
+  if (st === "REJECTED")
+    return '<div class="err review" id="reviewbanner">' +
+      '<span class="t">' + sentence(t("rejected_title")) + "</span><br>" +
+      sentence(t("rejected_reason")) + ' <span class="bidi">' + esc(r.rejection_reason || "—") + "</span><br>" +
+      sentence(t("rejected_next")) +
+      licenceUpload() +
+    "</div>";
+  if (st === "SUSPENDED" || st === "CLOSED")
+    return '<div class="err review" id="reviewbanner">' +
+      '<span class="t">' + sentence(t("suspended_title")) + "</span><br>" +
+      '<button class="btn ghost sm" data-tab="chat" style="margin-top:8px">' +
+        esc(t("contact_support")) + "</button>" +
+    "</div>";
+  return "";
+}
+
+/* ---------------- first-time guide (§4.4) ----------------
+   Shown while the pharmacy has never placed an order — the data says
+   whether he is new, not a flag on the phone. The step he is on is bold. */
+function isNewPharmacy(){
+  if (!S.requests) return false;
+  return !S.requests.some(r => r.status !== "DRAFT" && r.status !== "CANCELLED");
+}
+function guideCard(){
+  if (!isNewPharmacy()) return "";
+  const n = cartCount();
+  const searched = !!((S.search || "").trim() || S.vendor || S.category);
+  const now = n ? 3 : (searched ? 2 : 1);
+  const li = (i, key) => '<li class="' + (i === now ? "now" : "") + '">' + sentence(t(key)) + "</li>";
+  return '<div class="card guide" id="guide">' +
+    '<span class="t">' + sentence(t("guide_title")) + "</span>" +
+    "<ol>" + li(1, "guide_1") + li(2, "guide_2") + li(3, "guide_3") +
+      (S.review && S.review.pharmacy_status === "ONBOARDING"
+        ? '<li class="wait">' + sentence(t("guide_review")) + "</li>" : "") +
+    "</ol></div>";
+}
+
+/* ---------------- order timeline (§4.6) ----------------
+   Six plain steps instead of a status code. "Being prepared" is current
+   once the distributor has started picking (a line has `picked_at`) or a
+   delivery job exists: accepting already moves every line off LINE_PENDING,
+   so that column cannot tell accepted from being packed. */
+const TL_DONE = {
+  tl_accepted: ["ACCEPTED", "DISPATCHED", "DELIVERED_PENDING_RECEIPT", "RECEIPT_ACCEPTED", "DISPUTED",
+                "RETURN_IN_PROGRESS", "CLOSED"],
+  tl_preparing: ["DISPATCHED", "DELIVERED_PENDING_RECEIPT", "RECEIPT_ACCEPTED", "DISPUTED",
+                 "RETURN_IN_PROGRESS", "CLOSED"],
+  tl_on_way: ["DELIVERED_PENDING_RECEIPT", "RECEIPT_ACCEPTED", "DISPUTED", "RETURN_IN_PROGRESS", "CLOSED"],
+  tl_delivered: ["RECEIPT_ACCEPTED", "DISPUTED", "RETURN_IN_PROGRESS", "CLOSED"],
+  tl_confirmed: ["RECEIPT_ACCEPTED", "CLOSED"],
+};
+function timelineCurrent(o){
+  const st = o.status;
+  if (st === "PENDING_ACCEPTANCE") return "tl_received";
+  if (st === "ACCEPTED") {
+    const started = (o.lines || []).some(l => l.picked_at) || !!o.delivery_job;
+    return started ? "tl_preparing" : "tl_accepted";
+  }
+  if (st === "DISPATCHED") return "tl_on_way";
+  if (st === "DELIVERED_PENDING_RECEIPT") return "tl_delivered";
+  return null;
+}
+function timeline(o){
+  const steps = ["tl_received", "tl_accepted", "tl_preparing", "tl_on_way", "tl_delivered", "tl_confirmed"];
+  const cur = timelineCurrent(o);
+  const side = ({ REJECTED: ["tl_rejected_x", "r"], CANCELLED: ["tl_cancelled_x", "m"],
+                  DISPUTED: ["tl_disputed_x", "r"], RETURN_IN_PROGRESS: ["tl_return_x", "m"] })[o.status];
+  return '<ul class="tl">' + steps.map(k => {
+      const done = k === "tl_received" ? (cur !== k) : (TL_DONE[k] || []).indexOf(o.status) >= 0;
+      const cls = k === cur ? "now" : done ? "done" : "";
+      return '<li class="' + cls + '">' + sentence(t(k)) +
+        (k === cur ? '<span class="x">' + sentence(t(k + "_x")) + "</span>" : "") + "</li>";
+    }).join("") +
+    (side ? '<li class="side ' + side[1] + '">' + sentence(t(side[0])) + "</li>" : "") +
+  "</ul>";
+}
+function canReceive(){
+  const r = (S.me && S.me.roles) || [];
+  return r.indexOf("PharmacyReceiver") >= 0 || r.indexOf("PharmacyAdmin") >= 0;
+}
+function channelLabel(ch){ return T.en["ch_" + ch] !== undefined ? t("ch_" + ch) : (ch || ""); }
+
+/* ---------------- the review team's screen (§4.7) ---------------- */
+const REGION_KEY = { MAPUTO_CIDADE: "city_maputo", MATOLA: "city_matola", OUTRA: "city_other" };
+function regionLabel(code){ return REGION_KEY[code] ? t(REGION_KEY[code]) : (code || ""); }
+
+function pendingView(){
+  if (S.tab === "notifs") return notifView();
+  if (S.pendingItem) return pendingDetail();
+  const rows = S.pending;
+  const chip = (value, key) => '<button class="chip' + (S.pendingFilter === value ? " on" : "") +
+    '" data-act="setPendingFilter" data-value="' + value + '">' + esc(t(key)) + "</button>";
+  return '' +
+  '<div class="row" style="margin:0 0 2px;padding:0;border:0;align-items:flex-start">' +
+    "<h1 style='margin:0'>" + esc(t("tab_pending")) + "</h1>" + bellButton() +
+  "</div>" +
+  '<p class="sub">' + sentence(t("pending_title") + (rows ? " · " + rows.length : "")) + "</p>" +
+  '<div class="chips">' + chip("ONBOARDING", "filter_waiting") + chip("REJECTED", "filter_rejected") + "</div>" +
+  (rows === null
+    ? '<div class="card empty">' + (S.busy ? '<span class="spin"></span>' : esc(t("loading"))) + "</div>"
+    : rows.length === 0
+      ? '<div class="card empty">' + sentence(t("pending_none")) + "</div>"
+      : rows.map(x => '<div class="card tap" data-act="openPending" data-id="' + esc(x.pharmacy_id) + '">' +
+          '<div class="row" style="margin:0;padding:0;border:0">' +
+            '<span class="t bidi">' + esc(x.trade_name) + "</span>" +
+            '<span class="pill ' + (x.licence && x.licence.has_document ? "g" : "o") + '">' +
+              esc(x.licence && x.licence.has_document ? t("doc_attached") : t("doc_missing")) + "</span>" +
+          "</div>" +
+          '<p class="s" style="margin:6px 0 0">' +
+            sentence(regionLabel(x.region_code) + " · " + dayLabel(x.created_at)) + "<br>" +
+            (x.owner ? sentence(x.owner.name) + ' · <a class="bidi" href="tel:' + esc(x.owner.phone) + '">' +
+                       esc(x.owner.phone) + "</a><br>" : "") +
+            (x.nuit ? '<span class="bidi">NUIT ' + esc(x.nuit) + "</span>" : sentence(t("nuit_missing"))) +
+          "</p>" +
+          (x.same_name_pharmacies > 0
+            ? '<p class="s" style="margin:6px 0 0;color:var(--red);font-weight:700">' +
+              sentence(t("same_name_warn")) + "</p>" : "") +
+        "</div>").join(""));
+}
+
+function pendingDetail(){
+  const x = S.pendingItem;
+  const lic = x.licence || {};
+  const waiting = x.status === "ONBOARDING";
+  const today = new Date().toISOString().slice(0, 10);
+  const doc = S.doc;
+  return '' +
+  '<button class="btn ghost sm" data-act="closePending">← ' + esc(t("back")) + "</button>" +
+  '<div style="height:12px"></div>' +
+  '<h1 class="bidi">' + esc(x.trade_name) + "</h1>" +
+  '<p class="sub">' + sentence(regionLabel(x.region_code) + " · " + (x.address || "")) + "</p>" +
+  '<div class="card">' +
+    '<div class="row" style="margin:0;padding:0;border:0"><span class="s">' + esc(t("owner")) + "</span>" +
+      "<span>" + sentence(x.owner ? x.owner.name : "—") + "</span></div>" +
+    (x.owner
+      ? '<div class="row"><span class="s">' + esc(t("phone")) + "</span>" +
+          '<a class="bidi t" href="tel:' + esc(x.owner.phone) + '">' + esc(x.owner.phone) + "</a></div>" +
+        '<p class="s" style="margin:6px 0 0">' + sentence(t("call_owner")) + "</p>"
+      : "") +
+    '<div class="row"><span class="s">NUIT</span>' +
+      (x.nuit ? '<span class="bidi">' + esc(x.nuit) + "</span>" : "<span>" + sentence(t("nuit_missing")) + "</span>") +
+    "</div>" +
+    '<div class="row"><span class="s">' + esc(t("submitted_on")) + "</span><span>" +
+      sentence(dayLabel(x.created_at)) + "</span></div>" +
+    (x.same_name_pharmacies > 0
+      ? '<p class="s" style="margin:10px 0 0;color:var(--red);font-weight:700">' +
+        sentence(t("same_name_warn")) + "</p>" : "") +
+  "</div>" +
+  '<div class="card" id="doccard">' +
+    '<div class="row" style="margin:0;padding:0;border:0"><span class="t">' + sentence(t("licence_file")) + "</span>" +
+      '<span class="pill ' + (lic.has_document ? "g" : "o") + '">' +
+        esc(lic.has_document ? t("doc_attached") : t("doc_missing")) + "</span></div>" +
+    (lic.has_document
+      ? (doc && doc.type === "application/pdf"
+          ? (isApk() ? '<p class="s">' + sentence(t("pdf_in_app")) + "</p>"
+                     : '<a class="btn ghost sm" style="margin-top:10px" target="_blank" href="' +
+                       esc(doc.url) + '">' + esc(t("open_pdf")) + "</a>")
+          : doc ? '<img class="doc" id="docimg" alt="Alvará" src="' + esc(doc.url) + '">'
+                : '<p class="s"><span class="spin"></span></p>')
+      : (canPickFile() && waiting
+          ? '<p class="s" style="margin:8px 0">' + sentence(t("attach_doc")) + "</p>" + fileInput("rev_file") +
+            '<div style="height:10px"></div>' +
+            '<button class="btn sm" data-act="attachDoc"' + (S.busy ? " disabled" : "") + ">" +
+              esc(t("attach_doc")) + "</button>"
+          : "")) +
+  "</div>" +
+  (waiting
+    ? '<div class="card" id="approveform">' +
+        '<span class="t">' + esc(t("approve")) + "</span>" +
+        field("rev_number", "licence_number", '<input id="rev_number" type="text" dir="ltr">') +
+        field("rev_issue", "issue_date", '<input id="rev_issue" type="date" dir="ltr" max="' + today + '">') +
+        field("rev_expiry", "expiry_date", '<input id="rev_expiry" type="date" dir="ltr" min="' + today + '">') +
+        field("rev_type", "licence_type",
+              '<select id="rev_type">' + ["A", "B", "C", "POSTO_DE_VENDA", "HEALTH_UNIT"].map(v =>
+                '<option value="' + v + '">' + esc(v.replace(/_/g, " ")) + "</option>").join("") + "</select>") +
+        field("rev_notes", "notes", '<input id="rev_notes" type="text">') +
+        '<div style="height:14px"></div>' +
+        (lic.has_document
+          ? '<button class="btn g" data-act="approvePharmacy"' + (S.busy ? " disabled" : "") + ">" +
+              (S.busy ? '<span class="spin"></span>' : esc(t("approve"))) + "</button>"
+          : '<button class="btn g" disabled>' + esc(t("approve")) + "</button>" +
+            '<p class="s" style="margin:8px 0 0">' + sentence(t("need_doc_to_approve")) + "</p>") +
+      "</div>" +
+      '<div class="card" id="rejectform">' +
+        '<span class="t">' + esc(t("reject")) + "</span>" +
+        field("rev_reason", "reject_reason", '<textarea id="rev_reason" style="min-height:80px"></textarea>') +
+        '<div style="height:12px"></div>' +
+        '<button class="btn ghost" style="color:var(--red);border-color:rgba(226,59,55,.4)" ' +
+          'data-act="rejectPharmacy" id="rejectbtn"' +
+          ((S.busy || (val("rev_reason") || "").trim().length < 3) ? " disabled" : "") + ">" +
+          esc(t("reject")) + "</button>" +
+      "</div>"
+    : '<div class="card"><span class="pill ' + (x.status === "REJECTED" ? "r" : "g") + '">' +
+        esc(x.status) + "</span></div>");
+}
+
+function bellButton(){
+  return '<button class="bell" data-act="goNotifs" aria-label="' + esc(t("notifs")) + '">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+      'stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/>' +
+      '<path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>' +
+      (S.unread ? '<span class="badge">' + (S.unread > 9 ? "9+" : S.unread) + "</span>" : "") +
+    "</button>";
+}
+
+/* A licence document, fetched with the bearer token — an <img src> cannot
+   send one, and the file is never on a public URL. */
+async function apiBlob(path){
+  const res = await fetch(apiBase() + path, { headers: { Authorization: "Bearer " + S.token } });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const blob = await res.blob();
+  return { url: URL.createObjectURL(blob), type: blob.type };
+}
+
 // `cart` and `notifs` are screens reached from the store rather than tabs of
 // their own: the bar has five already, and a sixth on a phone is a target
 // nobody hits. `storeView` routes to them before it draws anything.
 const VIEW = { store:storeView, cart:storeView, notifs:storeView, list:listView,
-               orders:ordersView, chat:chatView, panel:panelView };
+               orders:ordersView, chat:chatView, panel:panelView, pending:pendingView };
 
 /* ---------------- loaders ---------------- */
 async function loadFilters(){
@@ -1721,9 +2321,36 @@ async function loadCart(){
   }
 }
 
+/* Where the account stands. A one-time flash when it has just been
+   approved, so the change is announced rather than noticed. */
+async function loadReview(){
+  if (!S.me || !S.me.pharmacy_id) { S.review = null; return; }
+  const was = S.review && S.review.pharmacy_status;
+  S.review = await api("/v1/pharmacies/me/review-status");
+  if (was === "ONBOARDING" && S.review.can_checkout) S.flash = t("approved_flash");
+}
+
+async function loadPending(){
+  S.pending = (await api("/v1/onboarding-review/pharmacies?status=" + S.pendingFilter)).items;
+}
+
+const REVIEWER_ROLES = ["PlatformAdmin", "OpsReviewer", "ComplianceOfficer"];
+
 async function afterLogin(){
   S.me = await api("/v1/auth/me");
-  await Promise.all([loadFilters(), loadCart(), loadUnread()]);
+  S.isReviewer = !S.me.pharmacy_id &&
+                 (S.me.roles || []).some(r => REVIEWER_ROLES.indexOf(r) >= 0);
+  if (S.isReviewer) {
+    // No store for the review team: the catalogue and cart endpoints refuse
+    // a principal with no pharmacy, and there is nothing for them to buy.
+    if (["pending", "panel", "notifs"].indexOf(S.tab) < 0) S.tab = "pending";
+    await Promise.all([loadPending(), loadUnread()]);
+    return;
+  }
+  if (S.tab === "pending") S.tab = "store";
+  // the orders ride along: they are how the guide knows he is new
+  await Promise.all([loadFilters(), loadCart(), loadUnread(), loadReview(),
+                     loadOrders().catch(() => { S.requests = null; })]);
   await loadProducts(true);
   // After the grid, not with it: the shelves are five more calls and the
   // pharmacist should be looking at products before they land.
@@ -1737,18 +2364,147 @@ const ACT = {
     applyLang();
   },
   async login(){
-    const phone = val("ph");
+    // "84 123 4567" and "+258841234567" are the same number; the server
+    // matches exactly, so the phone is normalised here (D-11). A string that
+    // is not a Mozambican mobile is sent as typed.
+    const phone = normPhone(val("ph")) || val("ph").trim();
     const pw = val("pw");
     const apiVal = val("api");
     if (apiVal) store.set("api", apiVal.trim());
-    const out = await api("/v1/auth/login", {
-      method:"POST", body:{ phone: phone.trim(), password: pw, surface:"PH" }
-    });
+    let out;
+    try {
+      out = await api("/v1/auth/login", {
+        method:"POST", body:{ phone: phone, password: pw, surface:"PH" }
+      });
+    } catch (e) {
+      if (e.status === 401 && /invalid phone or password/.test(e.message)) throw new Error(t("login_failed"));
+      throw e;
+    }
     S.token = out.access_token;
     store.set("token", S.token);
-    store.set("lastPhone", phone.trim());
-    await afterLogin();
+    store.set("lastPhone", phone);
     S.tab = "store";
+    await afterLogin();
+  },
+
+  /* ---- sign-up ---- */
+  async goSignup(){ S.signup = true; S.bad = {}; S.err = null; },
+  async goLogin(){ S.signup = false; S.bad = {}; },
+  async clearFile(el){ delete S.files[el.dataset.id]; },
+  async signup(){
+    const phone = normPhone(val("su_phone"));
+    const bad = {};
+    if ((val("su_name") || "").trim().length < 2) bad.su_name = 1;
+    if ((val("su_owner") || "").trim().length < 2) bad.su_owner = 1;
+    if (!phone) bad.su_phone = 1;
+    if ((val("su_pw") || "").length < 8) bad.su_pw = 1;
+    const nuit = (val("su_nuit") || "").replace(/\s/g, "");
+    if (nuit && !/^\d{9}$/.test(nuit)) bad.su_nuit = 1;
+    if (!val("su_terms")) bad.su_terms = 1;
+    S.bad = bad;
+    if (Object.keys(bad).length) throw new Error(t("signup_fix_fields"));
+
+    const fd = new FormData();
+    fd.append("pharmacy_name", val("su_name").trim());
+    fd.append("owner_name", val("su_owner").trim());
+    fd.append("phone", phone);
+    fd.append("password", val("su_pw"));
+    fd.append("city", val("su_city") || "MAPUTO");
+    fd.append("neighbourhood", (val("su_bairro") || "").trim());
+    if (nuit) fd.append("nuit", nuit);
+    fd.append("locale", lang());
+    fd.append("accept_terms", "true");
+    if (S.files.su_file) fd.append("licence_file", S.files.su_file, S.files.su_file.name);
+    let out;
+    try {
+      out = await api("/v1/auth/signup", { method:"POST", body: fd });
+    } catch (e) {
+      if (e.code === "PHONE_ALREADY_REGISTERED") {
+        store.set("lastPhone", phone);
+        S.bad = { su_phone: 1 };
+        const err = new Error(t("phone_taken"));
+        err.act = { act: "goLogin", label: t("sign_in") };
+        throw err;
+      }
+      if (e.code === "RATE_LIMITED") throw new Error(t("too_many_signups"));
+      if (e.code === "VALIDATION_ERROR") {
+        const map = { pharmacy_name:"su_name", owner_name:"su_owner", phone:"su_phone", password:"su_pw",
+                      nuit:"su_nuit", accept_terms:"su_terms", licence_file:"su_file", city:"su_city" };
+        const lab = { su_name:"pharmacy_name", su_owner:"owner_name", su_phone:"phone", su_pw:"password",
+                      su_nuit:"nuit", su_terms:"accept_terms", su_file:"licence_file", su_city:"city" };
+        const b = {};
+        (e.details || []).forEach(d => { if (map[d.field]) b[map[d.field]] = 1; });
+        S.bad = b;
+        throw new Error(t("signup_fix_fields") + "\n" +
+                        Object.keys(b).map(id => "· " + t(lab[id])).join("\n"));
+      }
+      throw e;
+    }
+    S.token = out.access_token;
+    store.set("token", S.token);
+    store.set("lastPhone", phone);
+    S.signup = false; S.bad = {}; S.files = {}; S.form = {};
+    S.tab = "store";
+    await afterLogin();
+    S.flash = t("signup_done");
+  },
+  async uploadLicence(){
+    const f = S.files.rv_file;
+    if (!f) throw new Error(t("licence_file_hint"));
+    const fd = new FormData();
+    fd.append("licence_file", f, f.name);
+    S.review = await api("/v1/pharmacies/me/licence", { method:"POST", body: fd });
+    delete S.files.rv_file;
+    S.flash = t("licence_sent");
+  },
+
+  /* ---- the review team ---- */
+  async goPending(){ S.tab = "pending"; S.pendingItem = null; await loadPending(); },
+  async setPendingFilter(el){ S.pendingFilter = el.dataset.value; S.pendingItem = null; await loadPending(); },
+  async openPending(el){
+    S.pendingItem = (S.pending || []).find(x => x.pharmacy_id === el.dataset.id) || null;
+    if (S.doc) { try { URL.revokeObjectURL(S.doc.url); } catch (_) {} }
+    S.doc = null;
+    const lic = S.pendingItem && S.pendingItem.licence;
+    if (lic && lic.has_document) S.doc = await apiBlob("/v1/licences/" + lic.id + "/document").catch(() => null);
+  },
+  async closePending(){ S.pendingItem = null; S.doc = null; await loadPending(); },
+  async attachDoc(){
+    const f = S.files.rev_file;
+    if (!f) throw new Error(t("licence_file_hint"));
+    const fd = new FormData();
+    fd.append("licence_file", f, f.name);
+    const item = await api("/v1/onboarding-review/pharmacies/" + S.pendingItem.pharmacy_id +
+                           "/licence-document", { method:"POST", body: fd });
+    delete S.files.rev_file;
+    S.pendingItem = item;
+    S.doc = await apiBlob("/v1/licences/" + item.licence.id + "/document").catch(() => null);
+  },
+  async approvePharmacy(){
+    const body = { licence_number: (val("rev_number") || "").trim(), issue_date: val("rev_issue"),
+                   expiry_date: val("rev_expiry"), licence_type: val("rev_type") || "A" };
+    const notes = (val("rev_notes") || "").trim();
+    if (notes) body.notes = notes;
+    const b = {};
+    if (!body.licence_number) b.rev_number = 1;
+    if (!body.issue_date) b.rev_issue = 1;
+    if (!body.expiry_date) b.rev_expiry = 1;
+    S.bad = b;
+    if (Object.keys(b).length) throw new Error(t("signup_fix_fields"));
+    await api("/v1/onboarding-review/pharmacies/" + S.pendingItem.pharmacy_id + "/approve",
+              { method:"POST", body: body });
+    S.pendingItem = null; S.doc = null; S.form = {};
+    await loadPending();
+    S.flash = t("approved_ok");
+  },
+  async rejectPharmacy(){
+    const reason = (val("rev_reason") || "").trim();
+    if (reason.length < 3) throw new Error(t("reject_reason"));
+    await api("/v1/onboarding-review/pharmacies/" + S.pendingItem.pharmacy_id + "/reject",
+              { method:"POST", body:{ reason: reason } });
+    S.pendingItem = null; S.doc = null; S.form = {};
+    await loadPending();
+    S.flash = t("rejected_ok");
   },
   async saveApi(){
     const v = val("api").trim();
@@ -1770,6 +2526,8 @@ const ACT = {
     S.notifs = null; S.unread = 0;
     S.filters = null; S.shelves = null; S.vendor = ""; S.category = "";
     S.product = null; S.form = {};
+    S.review = null; S.isReviewer = false; S.pending = null; S.pendingItem = null; S.doc = null;
+    S.orderFull = {}; S.files = {}; S.bad = {}; S.tab = "store";
   },
 
   /* ---- store ---- */
@@ -1813,7 +2571,8 @@ const ACT = {
     }
     // Read first, then act: tapping a notice about a basket should open the
     // basket, not leave him on a list to find it himself.
-    if (noticeText(n).act === "goCart") return ACT.goCart();
+    const act = noticeText(n).act;
+    if (act && ACT[act]) return ACT[act]();
   },
   async readAll(){
     await api("/v1/notifications/read-all", { method:"POST" });
@@ -1892,7 +2651,7 @@ const ACT = {
     S.tab = "orders";
   },
   async goCart(){ S.tab = "cart"; S.product = null; await loadCart(); },
-  async goStore(){ S.tab = "store"; },
+  async goStore(){ if (S.isReviewer) return ACT.goPending(); S.tab = "store"; },
 
   /* Every cart action sends the quantity the screen is showing, and the
      server answers with the whole cart. A retry after a dropped connection
@@ -2082,7 +2841,25 @@ const ACT = {
 
   /* ---- orders ---- */
   async reloadOrders(){ await loadOrders(); },
-  async openReq(el){ S.order = await api("/v1/requests/" + el.dataset.id); },
+  async openReq(el){
+    S.order = await api("/v1/requests/" + el.dataset.id);
+    // each order in full, for its timeline; one failing only loses its steps
+    const full = await Promise.all((S.order.orders || []).map(x =>
+      api("/v1/orders/" + x.id).catch(() => null)));
+    S.orderFull = {};
+    (S.order.orders || []).forEach((x, i) => { if (full[i]) S.orderFull[x.id] = full[i]; });
+  },
+  async confirmReceipt(el){
+    // All or nothing from the app (D-5): every line as the distributor
+    // confirmed it. A missing or damaged box is a conversation, in Chat.
+    const o = S.orderFull[el.dataset.id];
+    if (!o) return;
+    await api("/v1/orders/" + o.id + "/receipt", { method:"POST", body:{
+      lines: (o.lines || []).map(l => ({ order_line_id: l.id, accepted_qty: l.confirmed_qty, rejected_qty: 0 }))
+    }});
+    S.flash = t("receipt_done");
+    await ACT.openReq({ dataset: { id: S.order.id } });
+  },
   async reorder(){
     const o = S.order;
     const all = (o.lines || []).length;
@@ -2143,7 +2920,8 @@ document.addEventListener("click", function(ev){
     if (S.tab === "store"  && S.shelves  === null && !S.shelvesLoading) guard(loadShelves);
     if (S.tab === "orders" && S.requests === null) guard(loadOrders);
     if (S.tab === "chat"   && S.thread   === null) guard(loadThread);
-    if (S.tab === "panel"  && S.assistant=== null) guard(loadHome);
+    if (S.tab === "panel"  && S.assistant=== null && !S.isReviewer) guard(loadHome);
+    if (S.tab === "pending") { S.pendingItem = null; guard(loadPending); }
     return;
   }
   const el = ev.target.closest && ev.target.closest("[data-act]");
@@ -2170,9 +2948,28 @@ document.addEventListener("click", function(ev){
    a second is worse than a slightly stale badge. */
 document.addEventListener("visibilitychange", function(){
   if (document.visibilityState !== "visible" || !S.token) return;
-  Promise.all([loadCart().catch(() => {}), loadUnread().catch(() => {})])
+  if (S.isReviewer) {
+    Promise.all([loadUnread().catch(() => {}),
+                 S.pendingItem ? null : loadPending().catch(() => {})]).then(render);
+    return;
+  }
+  // the review status too: approval happens while the phone is in a pocket.
+  // A flash from before he left is stale by now; `loadReview` sets a new one
+  // if the account was approved meanwhile.
+  S.flash = null;
+  Promise.all([loadCart().catch(() => {}), loadUnread().catch(() => {}),
+               loadReview().catch(() => {})])
     .then(() => { if (S.tab === "notifs") return loadNotifications().catch(() => {}); })
     .then(render);
+});
+
+/* The reject button stays disabled until there is a reason worth reading;
+   toggled in place, because a re-render on every keystroke would lose the
+   caret. */
+document.addEventListener("input", function(ev){
+  if (!ev.target || ev.target.id !== "rev_reason") return;
+  const b = document.getElementById("rejectbtn");
+  if (b) b.disabled = S.busy || ev.target.value.trim().length < 3;
 });
 
 document.addEventListener("keydown", function(ev){

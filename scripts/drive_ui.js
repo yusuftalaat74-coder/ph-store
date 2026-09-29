@@ -16,6 +16,10 @@
 */
 const { chromium } = require("playwright");
 const { execFileSync } = require("child_process");
+const path = require("path");
+// this checkout's backend, wherever it lives — the walk runs the real job
+// tick and the real SM-01 from it
+const BACKEND = path.resolve(__dirname, "..", "backend");
 
 const BASE = "http://127.0.0.1:8099/app/";
 const PHONE = "+258840000011";
@@ -59,8 +63,8 @@ async function resetState() {
       " surface='PH', roles=frozenset({'PharmacyBuyer'}), pharmacy_id=r['pharmacy_id']," +
       " vendor_id=None, transporter_id=None);" +
       `MACHINES['SM-01'].apply(s, '${id}', 'ABANDON', p);s.commit()`],
-      { cwd: "/home/claude/phstore/backend",
-        env: { ...process.env,
+      { cwd: BACKEND,
+        env: { ...process.env, PYTHONPATH: path.join(BACKEND, "src"),
                ROVA_DATABASE_URL: `postgresql+psycopg://postgres:postgres@localhost:5432/${DB}`,
                ROVA_JWT_SECRET: "dev-secret-please-be-32-characters-min", ROVA_ENV: "dev" } });
   }
@@ -68,9 +72,10 @@ async function resetState() {
 
 function runJobs() {
   execFileSync("python", ["-m", "rova.cli", "jobs", "tick"], {
-    cwd: "/home/claude/phstore/backend",
+    cwd: BACKEND,
     env: {
       ...process.env,
+      PYTHONPATH: path.join(BACKEND, "src"),
       ROVA_DATABASE_URL: `postgresql+psycopg://postgres:postgres@localhost:5432/${DB}`,
       ROVA_JWT_SECRET: "dev-secret-please-be-32-characters-min",
       ROVA_ENV: "dev",
@@ -78,8 +83,289 @@ function runJobs() {
   });
 }
 
+/* ---------------------------------------------------------------------------
+   The self-signup walk (signup spec §5.2). Kept in its own function so the
+   original walk above reads exactly as it did.
+   ------------------------------------------------------------------------- */
+const SHOTS = process.env.SIGNUP_SHOTS || "/home/claude/phstore-office-spec/signup/after";
+const FIXTURE = path.join(__dirname, "fixtures", "alvara.png");
+const PHONE_W = { width: 390, height: 844 };
+
+/* the page's own translation table, read out of the page, so an assertion
+   compares against the words the app would show — never a copy of them */
+async function T(page, key) {
+  return page.evaluate((k) => {
+    const l = localStorage.getItem("lang") || "en";
+    return (T[l] && T[l][k]) || null;   // the page's own `T`, not this file's
+  }, key);
+}
+async function setLang(page, code) {
+  await page.evaluate((c) => { localStorage.setItem("lang", c); render(); }, code);
+  await page.waitForTimeout(250);
+}
+async function shot(page, name) {
+  const fs = require("fs");
+  fs.mkdirSync(SHOTS, { recursive: true });
+  for (const code of ["pt", "ar"]) {
+    await setLang(page, code);
+    // The page scrolls inside #main, so a "full page" screenshot is just the
+    // viewport. The phone is made as tall as the screen's content instead,
+    // from the top, and put back afterwards.
+    const tall = await page.evaluate(() => {
+      const m = document.getElementById("main");
+      m.scrollTop = 0;
+      return m.scrollHeight + (document.body.scrollHeight - m.clientHeight);
+    });
+    await page.setViewportSize({ width: PHONE_W.width, height: Math.max(PHONE_W.height, Math.min(tall, 1500)) });
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: path.join(SHOTS, `${name}-${code}.png`) });
+    await page.setViewportSize(PHONE_W);
+  }
+  await setLang(page, "pt");
+  note(`screenshots: ${name}-pt.png, ${name}-ar.png`);
+}
+function freshPhone(offset) {
+  // 84 7xx xxxx — inside the 82–87 mobile range, unique per run
+  const tail = String((Date.now() + (offset || 0)) % 1000000).padStart(6, "0");
+  return { local: `84 7${tail.slice(0, 2)} ${tail.slice(2)}`, e164: `+258847${tail}` };
+}
+async function newPhonePage(browser) {
+  const ctx = await browser.newContext({ viewport: PHONE_W });
+  const page = await ctx.newPage();
+  page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
+  page.on("console", (m) => {
+    if (m.type() !== "error") return;
+    if (expectRefusal && /Failed to load resource/.test(m.text())) return;
+    errors.push("console: " + m.text());
+  });
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.evaluate(() => { localStorage.setItem("lang", "pt"); render(); });
+  return { ctx, page };
+}
+async function fillSignup(page, name, phone, withFile) {
+  await page.click('[data-act="goSignup"]');
+  await page.waitForSelector("#su_name");
+  await page.fill("#su_name", name);
+  await page.fill("#su_owner", "Ana Muianga");
+  await page.fill("#su_phone", phone);
+  await page.fill("#su_pw", "segredo-123");
+  await page.selectOption("#su_city", "MAPUTO");
+  await page.fill("#su_bairro", "Polana Caniço");
+  if (withFile) await page.setInputFiles("#su_file", FIXTURE);
+  await page.check("#su_terms");
+}
+async function visible(page) {
+  // what the Android shell does on unlock: the page is told it is visible
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await page.waitForTimeout(1800);
+}
+
+async function signupWalk(browser) {
+  // The walk signs up from 127.0.0.1 every run; the per-IP limit is real,
+  // so this address's history is cleared first on the dev database.
+  sql("DELETE FROM signup_attempt WHERE ip IN ('127.0.0.1','::1','testclient')");
+  const tag = String(Date.now()).slice(-6);
+  const nameA = `Farmácia Walk ${tag}`;
+  const nameB = `Farmácia Recusa ${tag}`;
+  const phA = freshPhone(0), phB = freshPhone(7);
+
+  /* 1. sign up ---------------------------------------------------------- */
+  const { ctx: phCtx, page: ph } = await newPhonePage(browser);
+  await ph.click('[data-act="goSignup"]');
+  await ph.waitForSelector("#su_name");
+  await shot(ph, "01-signup");
+  await ph.click('[data-act="goLogin"]');
+  await fillSignup(ph, nameA, phA.local, true);
+  await ph.click('[data-act="signup"]');
+  await ph.waitForSelector(".note", { timeout: 20000 });
+  const banner = (await ph.textContent(".note")).trim();
+  step(`signed up as ${phA.e164} ("${nameA}") — banner: ${banner.slice(0, 60)}…`);
+  check(banner.includes(await T(ph, "review_title")), "no 'being checked' banner after sign-up");
+  const okFlash = await ph.$eval(".ok", (e) => e.textContent.trim()).catch(() => "");
+  check(okFlash === (await T(ph, "signup_done")), `sign-up flash reads "${okFlash}"`);
+  check(sql(`SELECT p.status FROM pharmacy_account p JOIN membership m ON m.organisation_id=p.organisation_id ` +
+            `JOIN app_user u ON u.id=m.user_id WHERE u.phone='${phA.e164}'`) === "ONBOARDING",
+        "the new pharmacy is not ONBOARDING");
+
+  /* 2. the guide ------------------------------------------------------- */
+  const g1 = await ph.$eval("#guide li.now", (e) => e.textContent.trim()).catch(() => null);
+  step(`guide shown, current step: "${g1}"`);
+  check(g1 === (await T(ph, "guide_1")), "the guide does not start at step 1");
+  await shot(ph, "02-store-pending");
+  await ph.fill("#q", "paracetamol");
+  await ph.click('[data-act="search"]');
+  await ph.waitForTimeout(1600);
+  const g2 = await ph.$eval("#guide li.now", (e) => e.textContent.trim()).catch(() => null);
+  check(g2 === (await T(ph, "guide_2")), `after searching the guide says "${g2}"`);
+  await ph.click('.p [data-act="add"]');
+  await ph.waitForTimeout(1200);
+  const g3 = await ph.$eval("#guide li.now", (e) => e.textContent.trim()).catch(() => null);
+  const bar = await ph.$(".cartbar");
+  step(`added one product — guide now "${g3}", cart bar ${bar ? "visible" : "MISSING"}`);
+  check(g3 === (await T(ph, "guide_3")), "the guide did not move to step 3");
+  check(!!bar, "no cart bar after adding");
+
+  /* 3. the cart cannot order yet --------------------------------------- */
+  await ph.click('[data-act="goCart"]');
+  await ph.waitForTimeout(1300);
+  const cartBtn = await ph.$eval('[data-act="checkout"]', (e) => ({ dis: e.disabled, txt: e.textContent.trim() }));
+  const waitLine = await ph.$eval("#guide li.wait", (e) => e.textContent.trim()).catch(() => null);
+  step(`cart button: "${cartBtn.txt}" (${cartBtn.dis ? "disabled" : "ENABLED"}); guide: "${waitLine}"`);
+  check(cartBtn.dis, "an account nobody approved can press the order button");
+  check(cartBtn.txt === (await T(ph, "cannot_order_yet")), "the disabled button does not say why");
+  check(waitLine === (await T(ph, "guide_review")), "the guide does not say ordering waits on approval");
+  await shot(ph, "03-cart-pending");
+
+  /* 4. the review team ------------------------------------------------- */
+  const { ctx: rvCtx, page: rv } = await newPhonePage(browser);
+  await rv.fill("#ph", "+258840000090");
+  await rv.fill("#pw", PW);
+  await rv.click('[data-act="login"]');
+  await rv.waitForSelector('[data-act="openPending"]', { timeout: 20000 });
+  const rvTabs = await rv.$$eval(".tabbar button span", (e) => e.map((x) => x.textContent.trim()));
+  step(`reviewer tabs: [${rvTabs.join(", ")}]`);
+  check(rvTabs[0] === (await T(rv, "tab_pending")) && rvTabs[1] === (await T(rv, "tab_panel")),
+        `reviewer tabs are [${rvTabs}]`);
+  const cards = await rv.$$eval('[data-act="openPending"] .t', (e) => e.map((x) => x.textContent.trim()));
+  // oldest first is the product rule, so on a database with earlier walks
+  // the new pharmacy is found by name rather than by position
+  check(cards.includes(nameA), `the new pharmacy is not on the review list: [${cards.slice(0, 5)}]`);
+  note(`review list: ${cards.length} waiting, "${nameA}" at position ${cards.indexOf(nameA) + 1}`);
+  await shot(rv, "04-review-list");
+  await rv.click(`[data-act="openPending"]:has-text("${nameA}")`);
+  await rv.waitForSelector("#docimg", { timeout: 10000 }).catch(() => {});
+  await rv.waitForTimeout(800);
+  const imgW = await rv.$eval("#docimg", (e) => e.naturalWidth).catch(() => 0);
+  step(`opened it — the Alvará image is ${imgW}px wide`);
+  check(imgW > 0, "the attached Alvará does not display for the reviewer");
+  const tel = await rv.$eval('a[href^="tel:"]', (e) => e.getAttribute("href")).catch(() => null);
+  check(tel === "tel:" + phA.e164, `the owner's number is not a tel: link (${tel})`);
+  await shot(rv, "05-review-detail");
+  await rv.fill("#rev_number", "RET-2026-" + tag);
+  await rv.fill("#rev_issue", "2026-01-15");
+  await rv.fill("#rev_expiry", "2028-01-15");
+  await rv.click('[data-act="approvePharmacy"]');
+  await rv.waitForSelector(".ok", { timeout: 15000 });
+  const approvedMsg = (await rv.textContent(".ok")).trim();
+  step("reviewer: " + approvedMsg);
+  check(approvedMsg === (await T(rv, "approved_ok")), "no approval confirmation for the reviewer");
+
+  /* 5. back on the pharmacy's phone ----------------------------------- */
+  await visible(ph);
+  const bannerGone = !(await ph.$(".note"));
+  const flash = await ph.$eval(".ok", (e) => e.textContent.trim()).catch(() => null);
+  const btn2 = await ph.$eval('[data-act="checkout"]', (e) => ({ dis: e.disabled, txt: e.textContent.trim() }));
+  step(`after approval: banner ${bannerGone ? "gone" : "STILL THERE"}, flash "${flash}", button "${btn2.txt}"`);
+  check(bannerGone, "the 'being checked' banner outlived the approval");
+  check(flash === (await T(ph, "approved_flash")), "no 'you can order now' flash");
+  check(!btn2.dis && btn2.txt === (await T(ph, "confirm_order")), "the order button did not open");
+  await ph.click('[data-act="checkout"]');
+  await ph.waitForSelector(".ok", { timeout: 25000 });
+  const ordered = (await ph.textContent(".ok")).trim();
+  step("ORDER: " + ordered);
+  check(ordered.startsWith(await T(ph, "order_made")), "the first order did not go through");
+
+  /* 6. the timeline --------------------------------------------------- */
+  await ph.click(".card.tap[data-act='openReq']");
+  await ph.waitForSelector(".tl", { timeout: 10000 });
+  const tl = await ph.$$eval(".tl li:not(.side)", (e) => e.map((x) => ({ now: x.classList.contains("now"),
+                                                                     txt: x.textContent.trim() })));
+  step(`timeline: ${tl.length} steps, current = "${(tl.find((x) => x.now) || {}).txt}"`);
+  check(tl.length === 6, `the timeline has ${tl.length} steps`);
+  check(tl[0] && tl[0].now, "step 1 is not the current step for a new order");
+  check(tl[0] && tl[0].txt.includes(await T(ph, "tl_received_x")), "the current step has no explanation");
+  await shot(ph, "06-order-timeline");
+
+  /* 7. the rejection path ---------------------------------------------- */
+  const { ctx: bCtx, page: pb } = await newPhonePage(browser);
+  await fillSignup(pb, nameB, phB.local, false);
+  await pb.click('[data-act="signup"]');
+  await pb.waitForSelector(".note", { timeout: 20000 });
+  const noDoc = (await pb.textContent(".note")).includes(await T(pb, "review_no_doc"));
+  const upl = await pb.$("#rv_file");
+  step(`second pharmacy ${phB.e164} signed up without a photo: banner asks for it=${noDoc}, upload=${!!upl}`);
+  check(noDoc && !!upl, "a pharmacy without a document is not asked for it");
+  await shot(pb, "07-banner-no-document");
+  await rv.click('[data-act="goPending"]').catch(() => {});
+  await rv.click('[data-tab="pending"]');
+  await rv.waitForTimeout(1500);
+  await rv.click(`[data-act="openPending"]:has-text("${nameB}")`);
+  await rv.waitForSelector("#rev_reason");
+  const rejDisabled = await rv.$eval("#rejectbtn", (e) => e.disabled);
+  check(rejDisabled, "reject is live before any reason was written");
+  const approveDisabled = await rv.$eval("#approveform .btn.g", (e) => e.disabled);
+  check(approveDisabled, "approve is live for a pharmacy with no document");
+  await shot(rv, "08-review-no-document");
+  await rv.fill("#rev_reason", "foto ilegível");
+  await rv.click('[data-act="rejectPharmacy"]');
+  await rv.waitForSelector(".ok", { timeout: 15000 });
+  check((await rv.textContent(".ok")).trim() === (await T(rv, "rejected_ok")), "no rejection confirmation");
+  await visible(pb);
+  const errBanner = await pb.$eval(".err.review", (e) => e.textContent).catch(() => "");
+  step(`rejected — the pharmacy sees: ${errBanner.replace(/\s+/g, " ").slice(0, 80)}`);
+  check(errBanner.includes("foto ilegível"), "the rejection reason does not reach the pharmacy");
+  await shot(pb, "09-rejected");
+  await pb.setInputFiles("#rv_file", FIXTURE);
+  await pb.click('[data-act="uploadLicence"]');
+  await pb.waitForSelector(".note", { timeout: 15000 });
+  const sent = await pb.$eval(".ok", (e) => e.textContent.trim()).catch(() => "");
+  step(`re-sent the Alvará — banner back to "being checked", flash "${sent}"`);
+  check(sent === (await T(pb, "licence_sent")), "no confirmation after re-sending");
+  check(!(await pb.$(".err.review")), "the rejection banner is still up after re-sending");
+
+  /* 8. language sweep --------------------------------------------------- */
+  for (const code of ["pt", "ar", "en"]) {
+    await setLang(ph, code);
+    const tlTitles = await ph.$$eval(".tl li", (e) => e.map((x) => x.textContent.trim()));
+    check(tlTitles.length >= 6 && tlTitles.every(Boolean), `${code}: an empty timeline step`);
+    check(!tlTitles.some((x) => /^tl_/.test(x)), `${code}: a raw key in the timeline`);
+  }
+  const { ctx: lCtx, page: lp } = await newPhonePage(browser);
+  await lp.click('[data-act="goSignup"]');
+  for (const code of ["pt", "ar", "en"]) {
+    await lp.click(`[data-lang="${code}"]`);
+    await lp.waitForTimeout(200);
+    const h = (await lp.textContent("h1")).trim();
+    const want = await lp.evaluate((c) => T[c].signup_title, code);
+    step(`${code}: sign-up title "${h}"`);
+    check(h === want, `${code}: the sign-up title is "${h}", expected "${want}"`);
+  }
+
+  /* 9. the same number again ------------------------------------------ */
+  await lp.click('[data-lang="pt"]');
+  await lp.click('[data-act="goLogin"]');
+  await fillSignup(lp, nameA, phA.local.replace(/ /g, ""), false);
+  expectRefusal = true;
+  await lp.click('[data-act="signup"]');
+  await lp.waitForSelector(".err", { timeout: 15000 });
+  expectRefusal = false;
+  const dup = (await lp.textContent(".err")).trim();
+  const signInBtn = await lp.$('.err [data-act="goLogin"]');
+  step(`same number again: "${dup}" — sign-in button ${signInBtn ? "present" : "MISSING"}`);
+  check(dup.startsWith(await T(lp, "phone_taken")), "a duplicate number is not told to sign in");
+  check(!!signInBtn, "no way from the duplicate error to the sign-in screen");
+  await shot(lp, "10-duplicate-phone");
+  await lp.click('.err [data-act="goLogin"]');   // re-found: the screenshots re-rendered it
+  await lp.waitForSelector("#ph");
+  check((await lp.inputValue("#ph")) === phA.e164, "the sign-in screen is not prefilled with his number");
+  await lp.fill("#pw", "segredo-123");
+  await lp.click('[data-act="login"]');
+  await lp.waitForSelector(".grid", { timeout: 20000 });
+  step("signed in with the number exactly as it was typed at sign-up");
+
+  for (const c of [phCtx, rvCtx, bCtx, lCtx]) await c.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
+  if (process.env.SIGNUP_ONLY) {
+    // just the sign-up walk — the full run below includes it at the end
+    await signupWalk(browser);
+    console.log("\n  JavaScript errors: " + errors.length);
+    errors.forEach((e) => console.log("    ! " + e));
+    await browser.close();
+    process.exit(errors.length ? 1 : 0);
+  }
   const ctx = await browser.newContext({ viewport: { width: 420, height: 880 } });
   const page = await ctx.newPage();
 
@@ -805,6 +1091,12 @@ function runJobs() {
   await page.click('[data-tab="store"]');
   await page.waitForTimeout(1000);
   await page.screenshot({ path: "/tmp/claude-0/store-en.png" });
+
+  /* ==== pharmacy self-signup, review, and ordering clarity ===============
+     Signup spec §5.2. A fresh phone every run (from the clock), so the walk
+     is repeatable against the same database. Screenshots of every new screen
+     at phone width, in Portuguese and Arabic, go to SHOTS. */
+  await signupWalk(browser);
 
   console.log("\n  API calls made: " + calls.length);
   console.log("  JavaScript errors: " + errors.length);
