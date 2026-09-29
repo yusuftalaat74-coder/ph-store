@@ -170,6 +170,16 @@ def seed_config_only(session: Session) -> None:
         # product-matching confidence). Same value, only moved into config
         # (A2.10) — same status as CFG-LOGIN-LOCKOUT-MINUTES just above.
         ("CFG-PRICELIST-MAPPING-AUTO-SUGGEST-THRESHOLD", "70", "INT", "backend-introduced (moved constant)"),
+
+        # ---- pharmacy self-signup (signup SPEC §1). Sign-up is the only
+        # unauthenticated write, so it is rate limited from the database
+        # (`signup_attempt`, two uvicorn workers). Every outcome counts, so a
+        # duplicate-phone probe spends the same budget as a real attempt.
+        # Read with a default in code, so a production database that was
+        # never re-seeded still works.
+        ("CFG-SIGNUP-MAX-PER-IP-PER-HOUR", "10", "INT", "A-BE-SIGNUP"),
+        ("CFG-SIGNUP-MAX-PER-PHONE-PER-DAY", "3", "INT", "A-BE-SIGNUP"),
+        ("CFG-LICENCE-UPLOAD-MAX-MB", "10", "INT", "A-BE-SIGNUP"),
     ]
     for key, value, vtype, source in cfg_rows:
         _upsert(session, "config_parameter", "id", {

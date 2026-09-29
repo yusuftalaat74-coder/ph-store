@@ -34,6 +34,11 @@ ADDED_SINCE_THE_SPEC = {
     # request, one distributor, one amount, spent once, with the name of
     # whoever allowed it. (migration 0008)
     "credit_override",
+    # A pharmacy can sign itself up from the phone (signup spec §1). Sign-up
+    # is the only unauthenticated write, and the API runs two workers, so
+    # the rate limiter counts attempts here rather than in process memory.
+    # (migration 0009)
+    "signup_attempt",
 }
 
 
