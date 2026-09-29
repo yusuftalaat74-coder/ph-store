@@ -361,6 +361,16 @@ def checkout(session: Session, *, request_id: str, actor, payment_overrides: dic
     req = session.execute(text("SELECT * FROM request WHERE id=:r"), {"r": request_id}).mappings().first()
     if req is None:
         raise ApiError("NOT_FOUND", "request not found")
+    # A pharmacy that signed itself up can browse and fill a cart at once,
+    # but nothing that commits money happens before a reviewer has read its
+    # Alvará (signup spec §2.7, R-113). Both lanes — the cart and a
+    # WhatsApp list — end here, so this one check covers them both.
+    pharmacy_status = session.execute(
+        text("SELECT status FROM pharmacy_account WHERE id=:p"), {"p": req["pharmacy_id"]}
+    ).scalar()
+    if pharmacy_status not in ("ACTIVE", "LICENCE_EXPIRING"):
+        raise ApiError("PHARMACY_NOT_ACTIVE", "this pharmacy cannot order yet",
+                       details=[{"field": "pharmacy_status", "reason": pharmacy_status}], rule="R-113")
     # SM-01 has two lanes into CONFIRMED and both have to be able to buy:
     #
     #   catalogue   DRAFT --SUBMIT_CART--> CONFIRMED

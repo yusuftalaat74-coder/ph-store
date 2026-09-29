@@ -34,6 +34,7 @@ GET,/v1/invoices
 GET,/v1/invoices/{invoice_id}
 GET,/v1/licences
 GET,/v1/licences/{licence_id}
+GET,/v1/licences/{licence_id}/document
 GET,/v1/licences/{licence_id}/transitions
 GET,/v1/memberships
 GET,/v1/notifications
@@ -41,6 +42,7 @@ GET,/v1/notifications-admin/queue
 GET,/v1/notifications-admin/summary
 GET,/v1/notifications/unread-count
 GET,/v1/notifications/{notification_id}
+GET,/v1/onboarding-review/pharmacies
 GET,/v1/ops/audit-events
 GET,/v1/ops/config
 GET,/v1/ops/config/{key}
@@ -67,6 +69,7 @@ GET,/v1/organisations
 GET,/v1/organisations/{organisation_id}
 GET,/v1/payments
 GET,/v1/pharmacies
+GET,/v1/pharmacies/me/review-status
 GET,/v1/pharmacies/{pharmacy_id}
 GET,/v1/price-lists/template
 GET,/v1/price-lists/{version_id}
@@ -105,6 +108,7 @@ POST,/v1/assistant/ask
 POST,/v1/auth/login
 POST,/v1/auth/logout
 POST,/v1/auth/select-membership
+POST,/v1/auth/signup
 POST,/v1/cart/lines
 POST,/v1/consents/{consent_id}/withdraw
 POST,/v1/credit-facilities
@@ -141,6 +145,9 @@ POST,/v1/memberships/{membership_id}/revoke
 POST,/v1/notifications/dispatch
 POST,/v1/notifications/read-all
 POST,/v1/notifications/{notification_id}/read
+POST,/v1/onboarding-review/pharmacies/{pharmacy_id}/approve
+POST,/v1/onboarding-review/pharmacies/{pharmacy_id}/licence-document
+POST,/v1/onboarding-review/pharmacies/{pharmacy_id}/reject
 POST,/v1/ops/data-subject-requests
 POST,/v1/ops/data-subject-requests/{request_id}/decide
 POST,/v1/ops/mode-switches
@@ -160,6 +167,7 @@ POST,/v1/orders/{order_id}/reject
 POST,/v1/organisations
 POST,/v1/payments
 POST,/v1/pharmacies
+POST,/v1/pharmacies/me/licence
 POST,/v1/pharmacies/{pharmacy_id}/approve
 POST,/v1/pharmacies/{pharmacy_id}/close
 POST,/v1/pharmacies/{pharmacy_id}/reinstate

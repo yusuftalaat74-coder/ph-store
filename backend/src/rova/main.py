@@ -29,6 +29,7 @@ from rova.intake.router import router as intake_router
 from rova.credit.router import router as credit_router
 from rova.notifications.router import router as notifications_router
 from rova.onboarding.router import router as onboarding_router
+from rova.onboarding.signup_router import router as signup_router
 from rova.ops.router import router as ops_router
 from rova.ordering.router import router as ordering_router
 from rova.pricelist.router import router as pricelist_router
@@ -69,6 +70,9 @@ def create_app() -> FastAPI:
     app.include_router(billing_router)
     app.include_router(admin_router)
     app.include_router(pricelist_router)
+    # before onboarding_router: `/v1/pharmacies/me/...` must not be captured
+    # by `/v1/pharmacies/{pharmacy_id}`
+    app.include_router(signup_router)
     app.include_router(onboarding_router)
     app.include_router(intake_router)
     app.include_router(resolution_router)

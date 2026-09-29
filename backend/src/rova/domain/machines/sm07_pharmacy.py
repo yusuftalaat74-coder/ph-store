@@ -5,13 +5,16 @@ from rova.domain.enums import PharmacyStatus, RoleCode
 from rova.domain.fsm import GuardResult, Machine, Transition
 
 _AD_CF = frozenset({RoleCode.PLATFORM_ADMIN, RoleCode.COMPLIANCE_OFFICER})
+# D-6 (signup spec): the same three reviewer roles SM-08 accepts, because
+# SM-08 APPROVE forwards its own actor to this machine's APPROVE.
+_REVIEWERS = frozenset({RoleCode.COMPLIANCE_OFFICER, RoleCode.PLATFORM_ADMIN, RoleCode.OPS_REVIEWER})
 
 
 def _guard_approve(ctx) -> GuardResult:
     row = ctx.session.execute(
         __import__("sqlalchemy").text(
             "SELECT status FROM licence WHERE holder_type='PHARMACY' AND holder_id=:p "
-            "ORDER BY created_at DESC LIMIT 1"
+            "ORDER BY created_at DESC, id DESC LIMIT 1"
         ),
         {"p": ctx.subject_id},
     ).scalar()
@@ -26,9 +29,9 @@ MACHINE = Machine(
     status_column="status",
     transitions=[
         Transition("SM-07", (PharmacyStatus.ONBOARDING,), PharmacyStatus.ACTIVE, "APPROVE",
-                   frozenset({RoleCode.COMPLIANCE_OFFICER}), guard=_guard_approve, rule_refs=("R-113",)),
+                   _REVIEWERS, guard=_guard_approve, rule_refs=("R-113",)),
         Transition("SM-07", (PharmacyStatus.ONBOARDING,), PharmacyStatus.REJECTED, "REJECT_VERIFICATION",
-                   frozenset({RoleCode.COMPLIANCE_OFFICER})),
+                   _REVIEWERS),
         Transition("SM-07", (PharmacyStatus.REJECTED,), PharmacyStatus.ONBOARDING, "RESUBMIT",
                    frozenset({RoleCode.PHARMACY_ADMIN})),
         Transition("SM-07", (PharmacyStatus.ACTIVE, PharmacyStatus.LICENCE_EXPIRING), PharmacyStatus.SUSPENDED,

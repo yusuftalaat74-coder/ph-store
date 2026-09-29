@@ -93,7 +93,14 @@ def login(body: LoginBody, session: Session = Depends(get_session, scope="functi
     ).mappings().all()
 
     selected = memberships[0] if len(memberships) == 1 else None
+    return _open_session(session, user["id"], memberships, selected, body.surface)
 
+
+def _open_session(session: Session, user_id: str, memberships, selected, surface: str) -> dict:
+    """The one place a login becomes tokens: an `auth_session` row with the
+    hashed refresh token, and a short access token. Shared by `login` and by
+    the pharmacy sign-up (`onboarding/signup_router.py`), so a self-created
+    account is signed in exactly the way a seeded one is."""
     org_id = selected["organisation_id"] if selected else None
     roles = list(selected["role_codes"]) if selected else []
 
@@ -105,15 +112,15 @@ def login(body: LoginBody, session: Session = Depends(get_session, scope="functi
             "VALUES (:id, :u, :m, :s, :h, :exp)"
         ),
         {
-            "id": ses_id, "u": user["id"], "m": selected["id"] if selected else None, "s": body.surface,
+            "id": ses_id, "u": user_id, "m": selected["id"] if selected else None, "s": surface,
             "h": hashlib.sha256(refresh.encode()).hexdigest(),
-            "exp": now() + _session_idle_delta(session, body.surface),
+            "exp": now() + _session_idle_delta(session, surface),
         },
     )
 
     access = issue_access_token(
-        user_id=user["id"], membership_id=selected["id"] if selected else None, organisation_id=org_id,
-        roles=roles, surface=body.surface, session_id=ses_id,
+        user_id=user_id, membership_id=selected["id"] if selected else None, organisation_id=org_id,
+        roles=roles, surface=surface, session_id=ses_id,
     )
     return {
         "access_token": access,
@@ -172,6 +179,11 @@ def me(principal: Principal = Depends(get_principal), session: Session = Depends
         text("SELECT current_value FROM mode_switch WHERE switch_key='PRIMARY_INTERFACE' AND scope_type='GLOBAL'")
     ).scalar()
     active_vendor_count = session.execute(text("SELECT count(*) FROM vendor_account WHERE status='ACTIVE'")).scalar()
+    # The client decides from this whether to show the "being checked"
+    # banner and whether the cart button can order (signup spec §2.2).
+    pharmacy_status = session.execute(
+        text("SELECT status FROM pharmacy_account WHERE id=:p"), {"p": principal.pharmacy_id}
+    ).scalar() if principal.pharmacy_id else None
     return {
         "user_id": principal.user_id,
         "membership_id": principal.membership_id,
@@ -179,6 +191,7 @@ def me(principal: Principal = Depends(get_principal), session: Session = Depends
         "roles": sorted(principal.roles),
         "surface": principal.surface,
         "pharmacy_id": principal.pharmacy_id,
+        "pharmacy_status": pharmacy_status,
         "vendor_id": principal.vendor_id,
         "primary_interface": primary_interface,
         "active_vendor_count": active_vendor_count,

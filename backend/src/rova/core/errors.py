@@ -18,6 +18,17 @@ CODES = {
     # client reacts differently from any other guard: it reloads, shows the
     # difference, and asks.
     "PRICE_MOVED": 409,
+    # A pharmacy that signs itself up gets its own error for a number that
+    # already has an account, because the client answers it with "sign in
+    # instead" rather than a generic conflict (owner decision: this is the
+    # one fact sign-up is allowed to reveal).
+    "PHONE_ALREADY_REGISTERED": 409,
+    # Sign-up is the only unauthenticated write; it is rate limited per IP
+    # and per phone from the database (two uvicorn workers).
+    "RATE_LIMITED": 429,
+    # Checkout by a pharmacy whose account a reviewer has not approved yet
+    # (or that was suspended/closed). Browsing and the cart keep working.
+    "PHARMACY_NOT_ACTIVE": 403,
     "NOT_IMPLEMENTED": 501,
     "INTERNAL": 500,
 }

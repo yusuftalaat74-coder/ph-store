@@ -15,7 +15,12 @@ from rova.core.clock import now
 from rova.domain.enums import LicenceStatus, RoleCode
 from rova.domain.fsm import Ctx, GuardResult, Machine, Transition
 
-_CF = frozenset({RoleCode.COMPLIANCE_OFFICER})
+# D-6 (signup spec): the pilot has one review team, so PlatformAdmin and
+# OpsReviewer may open/approve/reject a licence too. The audit trail and the
+# state_transition row still record who acted. The HTTP routes
+# `/v1/licences/{id}/approve` etc. keep ComplianceOfficer-only RBAC; the wider
+# set is reached through `/v1/onboarding-review/...`.
+_CF = frozenset({RoleCode.COMPLIANCE_OFFICER, RoleCode.PLATFORM_ADMIN, RoleCode.OPS_REVIEWER})
 
 SUBJECT = "licence"
 
