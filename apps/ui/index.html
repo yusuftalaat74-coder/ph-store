@@ -1682,8 +1682,10 @@ function orderDetail(){
   '<p class="sub">' + esc(tStatus(o.status)) + "</p>" +
   '<div class="card">' +
     '<span class="t">' + esc(t("lines")) + "</span>" +
+    // the medicine by name; the WhatsApp text he typed when nothing was
+    // resolved; the id only when the server sent neither
     (o.lines || []).map(l => '<div class="row"><span class="s bidi">' +
-      esc(l.source_span || l.index_product_id || "—") + "</span><span>" +
+      esc(lineLabel(l)) + "</span><span>" +
       l.qty_requested + "</span></div>").join("") +
   "</div>" +
   '<button class="btn" data-act="reorder"' + (S.busy ? " disabled" : "") + ">" +
@@ -1912,7 +1914,11 @@ function reviewBanner(){
   if (st === "REJECTED")
     return '<div class="err review" id="reviewbanner">' +
       '<span class="t">' + sentence(t("rejected_title")) + "</span><br>" +
-      sentence(t("rejected_reason")) + ' <span class="bidi">' + esc(r.rejection_reason || "—") + "</span><br>" +
+      sentence(t("rejected_reason")) +
+      // its own block, in its own direction: the reason is usually Portuguese
+      // under an Arabic label, and on one line the two fight over the colon
+      '<div dir="auto" style="font-weight:700;margin:4px 0 8px;unicode-bidi:isolate">' +
+        esc(r.rejection_reason || "—") + "</div>" +
       sentence(t("rejected_next")) +
       licenceUpload() +
     "</div>";
@@ -1988,6 +1994,11 @@ function timeline(o){
 function canReceive(){
   const r = (S.me && S.me.roles) || [];
   return r.indexOf("PharmacyReceiver") >= 0 || r.indexOf("PharmacyAdmin") >= 0;
+}
+function lineLabel(l){
+  const name = l.brand_name || l.inn;
+  if (name) return [name, l.strength, l.form].filter(Boolean).join(" · ");
+  return l.source_span || l.index_product_id || "—";
 }
 function channelLabel(ch){ return T.en["ch_" + ch] !== undefined ? t("ch_" + ch) : (ch || ""); }
 
@@ -2946,6 +2957,18 @@ document.addEventListener("click", function(ev){
    Failures are swallowed on purpose: this fires on every tab switch and on
    every unlock, and a red banner because the shop's connection dropped for
    a second is worse than a slightly stale badge. */
+/* While the account waits on the review team, ask once a minute whether
+   it has been approved — the phone may sit on the counter with the app
+   open, and the pharmacist should not have to reopen it to find out. */
+setInterval(function(){
+  if (!S.token || S.isReviewer || S.busy || document.visibilityState !== "visible") return;
+  if (!S.review || S.review.can_checkout) return;
+  const was = S.review.pharmacy_status;
+  // redraw only on a change: a redraw for nothing would take the caret out
+  // of whatever he is typing
+  loadReview().then(function(){ if (S.review && S.review.pharmacy_status !== was) render(); }).catch(function(){});
+}, 60000);
+
 document.addEventListener("visibilitychange", function(){
   if (document.visibilityState !== "visible" || !S.token) return;
   if (S.isReviewer) {
