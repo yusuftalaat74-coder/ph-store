@@ -38,8 +38,8 @@ def _setup_fixture(db_engine, suffix: str) -> dict:
         ))
         conn.execute(text(
             "INSERT INTO pharmacy_account (id, organisation_id, region_code, licence_type, trade_name, "
-            "address, latitude, longitude) VALUES "
-            f"('pha_flow_{suffix}', 'org_flow_p_{suffix}', 'MAPUTO_CIDADE', 'A', 'Pharmacy Flow', 'X', 0, 0)"
+            "address, latitude, longitude, status) VALUES "
+            f"('pha_flow_{suffix}', 'org_flow_p_{suffix}', 'MAPUTO_CIDADE', 'A', 'Pharmacy Flow', 'X', 0, 0, 'ACTIVE')"
         ))
         for tag in ("a", "b"):
             conn.execute(text(

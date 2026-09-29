@@ -22,8 +22,8 @@ def _base_pharmacy_and_product(conn, suffix: str):
     ))
     conn.execute(text(
         "INSERT INTO pharmacy_account (id, organisation_id, region_code, licence_type, trade_name, address, "
-        "latitude, longitude) VALUES "
-        f"('pha_rs_{suffix}', 'org_rs_p_{suffix}', 'MAPUTO_CIDADE', 'A', 'P', 'X', 0, 0)"
+        "latitude, longitude, status) VALUES "
+        f"('pha_rs_{suffix}', 'org_rs_p_{suffix}', 'MAPUTO_CIDADE', 'A', 'P', 'X', 0, 0, 'ACTIVE')"
     ))
     conn.execute(text(
         "INSERT INTO index_product (id, inn, form, strength, pack_size, manufacturer, aim_status, "

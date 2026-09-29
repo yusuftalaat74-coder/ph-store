@@ -100,8 +100,8 @@ def test_no_json_response_field_serialises_a_known_money_column_as_a_number(clie
         ))
         conn.execute(text(
             "INSERT INTO pharmacy_account (id, organisation_id, region_code, licence_type, trade_name, address, "
-            "latitude, longitude) VALUES "
-            "('pha_money', 'org_money_p', 'MAPUTO_CIDADE', 'A', 'PM', 'X', -25.969200, 32.573200)"
+            "latitude, longitude, status) VALUES "
+            "('pha_money', 'org_money_p', 'MAPUTO_CIDADE', 'A', 'PM', 'X', -25.969200, 32.573200, 'ACTIVE')"
         ))
         conn.execute(text(
             "INSERT INTO index_product (id, inn, form, strength, pack_size, manufacturer, aim_status, "

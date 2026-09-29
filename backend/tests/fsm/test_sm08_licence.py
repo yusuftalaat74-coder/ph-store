@@ -136,3 +136,37 @@ def test_expire_guard_and_cascade_to_suspended(session, licence, pharmacy):
         text("SELECT status, suspension_cause FROM pharmacy_account WHERE id=:p"), {"p": pharmacy}
     ).mappings().one()
     assert holder["status"] == "SUSPENDED" and holder["suspension_cause"] == "LICENCE_EXPIRED"
+
+
+@pytest.mark.parametrize("role", ["PlatformAdmin", "OpsReviewer"])
+def test_review_team_can_open_review_approve_and_reject(session, pharmacy, role):
+    """Signup spec D-6: OPEN_REVIEW / APPROVE / REJECT accept the whole review
+    team, and APPROVE still drives the holder through SM-07 with that actor."""
+    reviewer = Principal(user_id=None, roles=frozenset({role}))
+    ids = []
+    for _ in range(2):
+        lic_id = new_id("lic")
+        session.execute(text(
+            "INSERT INTO licence (id, holder_type, holder_id, type, number, issue_date, expiry_date, "
+            "document_ref, status) VALUES (:id, 'PHARMACY', :h, 'RETAIL_A', 'LIC-R', '2020-01-01', "
+            "'2099-01-01', 'ref', 'SUBMITTED')"), {"id": lic_id, "h": pharmacy})
+        ids.append(lic_id)
+    assert MACHINE.apply(session, ids[0], "OPEN_REVIEW", reviewer)["status"] == "UNDER_REVIEW"
+    assert MACHINE.apply(session, ids[0], "REJECT", reviewer)["status"] == "REJECTED"
+    MACHINE.apply(session, ids[1], "OPEN_REVIEW", reviewer)
+    assert MACHINE.apply(session, ids[1], "APPROVE", reviewer)["status"] == "VALID"
+    assert session.execute(text("SELECT status FROM pharmacy_account WHERE id=:p"),
+                           {"p": pharmacy}).scalar() == "ACTIVE"
+
+
+def test_a_valid_licence_must_carry_number_and_dates(session, pharmacy):
+    """0009: number/dates are nullable while the licence is waiting (the
+    reviewer types them), and a CHECK refuses VALID without them."""
+    from sqlalchemy.exc import IntegrityError
+    lic_id = new_id("lic")
+    session.execute(text(
+        "INSERT INTO licence (id, holder_type, holder_id, type, status) "
+        "VALUES (:id, 'PHARMACY', :h, 'RETAIL_A', 'SUBMITTED')"), {"id": lic_id, "h": pharmacy})
+    MACHINE.apply(session, lic_id, "OPEN_REVIEW", COMPLIANCE)
+    with pytest.raises(IntegrityError):
+        MACHINE.apply(session, lic_id, "APPROVE", COMPLIANCE)

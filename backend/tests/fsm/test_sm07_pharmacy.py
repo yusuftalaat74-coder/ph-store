@@ -98,3 +98,25 @@ def test_illegal_transition_matrix(session, pharmacy):
         session, MACHINE, pharmacy, PLATFORM_ADMIN,
         extra_by_state={"SUSPENDED": {"suspension_cause": "MANUAL_INCIDENT"}},
     )
+
+
+OPS_REVIEWER = Principal(user_id=None, roles=frozenset({"OpsReviewer"}))
+
+
+@pytest.mark.parametrize("reviewer", [PLATFORM_ADMIN, OPS_REVIEWER], ids=["PlatformAdmin", "OpsReviewer"])
+def test_review_team_can_approve_and_reject(session, pharmacy, reviewer):
+    """Signup spec D-6: the pilot has one review team, so PlatformAdmin and
+    OpsReviewer decide a pharmacy as well as ComplianceOfficer."""
+    _make_approvable(session, pharmacy)
+    assert MACHINE.apply(session, pharmacy, "APPROVE", reviewer)["status"] == "ACTIVE"
+
+
+@pytest.mark.parametrize("reviewer", [PLATFORM_ADMIN, OPS_REVIEWER], ids=["PlatformAdmin", "OpsReviewer"])
+def test_review_team_can_reject_verification(session, pharmacy, reviewer):
+    assert MACHINE.apply(session, pharmacy, "REJECT_VERIFICATION", reviewer)["status"] == "REJECTED"
+
+
+def test_pharmacy_admin_still_cannot_reject_itself(session, pharmacy):
+    with pytest.raises(ApiError) as exc:
+        MACHINE.apply(session, pharmacy, "REJECT_VERIFICATION", PHARMACY_ADMIN)
+    assert exc.value.code == "FORBIDDEN"

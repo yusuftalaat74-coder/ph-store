@@ -24,8 +24,8 @@ def _setup_fixture(db_engine, suffix: str):
         ))
         conn.execute(text(
             "INSERT INTO pharmacy_account (id, organisation_id, region_code, licence_type, trade_name, "
-            "address, latitude, longitude) VALUES "
-            f"('pha_idem_{suffix}', 'org_idem_p_{suffix}', 'MAPUTO_CIDADE', 'A', 'P', 'X', 0, 0)"
+            "address, latitude, longitude, status) VALUES "
+            f"('pha_idem_{suffix}', 'org_idem_p_{suffix}', 'MAPUTO_CIDADE', 'A', 'P', 'X', 0, 0, 'ACTIVE')"
         ))
         conn.execute(text(
             "INSERT INTO index_product (id, inn, form, strength, pack_size, manufacturer, aim_status, "

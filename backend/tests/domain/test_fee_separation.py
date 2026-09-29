@@ -48,7 +48,7 @@ def test_goods_total_equals_sum_of_lines_and_is_never_a_fee(session):
     ))
     session.execute(text(
         "INSERT INTO pharmacy_account (id, organisation_id, region_code, licence_type, trade_name, address, "
-        "latitude, longitude) VALUES ('pha_fs', 'org_fs_p', 'MAPUTO_CIDADE', 'A', 'P', 'X', 0, 0)"
+        "latitude, longitude, status) VALUES ('pha_fs', 'org_fs_p', 'MAPUTO_CIDADE', 'A', 'P', 'X', 0, 0, 'ACTIVE')"
     ))
     session.execute(text(
         "INSERT INTO index_product (id, inn, form, strength, pack_size, manufacturer, aim_status, "
