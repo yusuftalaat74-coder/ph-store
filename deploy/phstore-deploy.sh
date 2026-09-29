@@ -20,8 +20,10 @@
 #   2b. makes sure uploaded files (licence photos, price lists) survive a
 #      recreate: when the api has no volume at ROVA_STORAGE_DIR, copies what
 #      the container holds to /opt/phstore/storage, writes
-#      docker-compose.storage.yml (a bind mount of that directory) and adds
-#      it to COMPOSE_FILE in .env (backup: .env.bak-<stamp>)
+#      docker-compose.storage.yml (a bind mount of that directory at
+#      /data/phstore-storage, outside the code tree, plus ROVA_STORAGE_DIR
+#      pointing there) and adds it to COMPOSE_FILE in .env (backup:
+#      .env.bak-<stamp>)
 #   3. checks the code to deploy actually contains the expected migration
 #      (clone: on GitHub; build: in the checkout after `git pull`)
 #   4. rolls the code: clone → recreate api (it clones + migrates on boot),
@@ -116,17 +118,33 @@ if grep -qi traefik <<<"$api_block"; then info "api carries Traefik labels — k
 # the repository's compose file mounts a named volume there; the clone setup's
 # compose file may not. Without a mount, every recreate — this script's own
 # step 4 included — throws the files away. So when the api has no mount at
-# that path, this script adds one: a bind mount of $PHSTORE_DIR/storage,
-# declared in docker-compose.storage.yml and added to COMPOSE_FILE in .env so
-# that a plain `docker compose up -d` by hand keeps it too. Files already in
-# the running container are copied out first.
+# that path, this script adds one: a bind mount of $PHSTORE_DIR/storage at
+# /data/phstore-storage (outside the code tree) with ROVA_STORAGE_DIR pointed
+# there, declared in docker-compose.storage.yml and added to COMPOSE_FILE in
+# .env so that a plain `docker compose up -d` by hand keeps it too. Files
+# already in the running container are copied out first.
 storage_dir="$(grep -E 'ROVA_STORAGE_DIR' <<<"$api_block" | head -n1 | sed -E 's/.*ROVA_STORAGE_DIR:? *"?([^"]*)"?.*/\1/' || true)"
-if [[ -z "$storage_dir" || "$storage_dir" != /* ]]; then
-  # relative or unset: only the container knows where that resolves to
-  resolved="$("${DC[@]}" exec -T api python -c 'import os; from rova.config import get_settings; print(os.path.abspath(get_settings().storage_dir))' 2>/dev/null | tr -d '\r' || true)"
-  [[ "$resolved" == /* ]] && storage_dir="$resolved"
+if [[ "$storage_dir" != /* ]] && "${DC[@]}" ps --status running --services 2>/dev/null | grep -qx api; then
+  # not set in the compose file, or relative: ask the running container. The
+  # image may set it (the repository's Dockerfile does); otherwise the API's
+  # default is ./var/storage relative to where uvicorn was started — which
+  # in the clone setup is a `cd` inside the container's command, not the
+  # image's WORKDIR, so the cwd is read off the uvicorn process itself.
+  in_container="$("${DC[@]}" exec -T api sh -c 'printf %s "${ROVA_STORAGE_DIR:-}"' 2>/dev/null | tr -d '\r' || true)"
+  [[ -n "$in_container" ]] && storage_dir="$in_container"
+  if [[ "$storage_dir" != /* ]]; then
+    uvicorn_cwd="$("${DC[@]}" exec -T api sh -c 'for p in /proc/[0-9]*; do tr "\0" " " < "$p/cmdline" 2>/dev/null | grep -q uvicorn && { readlink "$p/cwd"; break; }; done' 2>/dev/null | tr -d '\r' | head -n1 || true)"
+    if [[ "$uvicorn_cwd" == /* ]]; then
+      rel="${storage_dir:-./var/storage}"; rel="${rel#./}"
+      storage_dir="${uvicorn_cwd%/}/${rel}"
+    fi
+  fi
 fi
 STORAGE_OVERLAY=docker-compose.storage.yml
+# The mount goes to a path of its own, NOT into the clone: in the clone setup
+# a directory that already exists under /srv/app would make the container's
+# `git clone` refuse to start. The overlay also points ROVA_STORAGE_DIR there.
+STORAGE_TARGET=/data/phstore-storage
 NEED_STORAGE_MOUNT=0
 if [[ "$storage_dir" != /* ]]; then
   printf '\033[33m    WARNING: cannot tell where the api keeps uploaded files (ROVA_STORAGE_DIR is not set and\n'
@@ -135,7 +153,7 @@ elif grep -qE "target: ${storage_dir}$|:${storage_dir}(:|$)" <<<"$api_block"; th
   info "uploaded files: api mounts $storage_dir — kept"
 else
   NEED_STORAGE_MOUNT=1
-  say "uploaded files: api has NO mount at $storage_dir — will bind-mount $PHSTORE_DIR/storage there ($STORAGE_OVERLAY)"
+  say "uploaded files: api has NO mount at $storage_dir — will bind-mount $PHSTORE_DIR/storage at $STORAGE_TARGET and point ROVA_STORAGE_DIR there ($STORAGE_OVERLAY)"
 fi
 
 ensure_storage_mount() {
@@ -158,9 +176,9 @@ ensure_storage_mount() {
   fi
 
   # the overlay: one bind mount for api (and jobs, which shares the image)
-  tmp="$(printf '# Written by phstore-deploy.sh on %s.\n# Keeps uploaded licence photos and price-list files across container recreates.\n# Listed in COMPOSE_FILE (.env); do not remove it from there.\nservices:\n  api:\n    volumes:\n      - %s:%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$host_dir" "$storage_dir")"
+  tmp="$(printf '# Written by phstore-deploy.sh on %s.\n# Keeps uploaded licence photos and price-list files across container recreates:\n# a bind mount outside the code tree, and ROVA_STORAGE_DIR pointed at it.\n# Listed in COMPOSE_FILE (.env); do not remove it from there.\nservices:\n  api:\n    environment:\n      ROVA_STORAGE_DIR: %s\n    volumes:\n      - %s:%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$STORAGE_TARGET" "$host_dir" "$STORAGE_TARGET")"
   if (( has_jobs )); then
-    tmp+="$(printf '\n  jobs:\n    volumes:\n      - %s:%s\n' "$host_dir" "$storage_dir")"
+    tmp+="$(printf '\n  jobs:\n    environment:\n      ROVA_STORAGE_DIR: %s\n    volumes:\n      - %s:%s\n' "$STORAGE_TARGET" "$host_dir" "$STORAGE_TARGET")"
   fi
   info "writing $STORAGE_OVERLAY:"
   sed 's/^/        | /' <<<"$tmp"
@@ -183,9 +201,12 @@ ensure_storage_mount() {
       rm -f "$STORAGE_OVERLAY"
       die "'docker compose config' rejected the storage overlay — .env restored, nothing recreated"
     fi
-    "${DC[@]}" config 2>/dev/null | awk '/^  api:/{f=1;print;next} f&&/^  [^ ]/{f=0} f' \
-      | grep -qE "target: ${storage_dir}$" || die "the overlay did not take: api still has no mount at $storage_dir"
-    info "api now mounts $host_dir at $storage_dir"
+    api_after="$("${DC[@]}" config 2>/dev/null | awk '/^  api:/{f=1;print;next} f&&/^  [^ ]/{f=0} f')"
+    grep -qE "target: ${STORAGE_TARGET}$" <<<"$api_after" \
+      || die "the overlay did not take: api still has no mount at $STORAGE_TARGET"
+    grep -qE "ROVA_STORAGE_DIR: *\"?${STORAGE_TARGET}\"?$" <<<"$api_after" \
+      || die "the overlay did not take: api's ROVA_STORAGE_DIR is not $STORAGE_TARGET"
+    info "api now mounts $host_dir at $STORAGE_TARGET (ROVA_STORAGE_DIR)"
   fi
 }
 
