@@ -29,7 +29,7 @@ The signature is verified before the file is written, against the same rules
 a phone applies — an APK that cannot be verified here will not install there.
 
 Usage:
-    python3 scripts/build_apk.py [--out apps/PH-Store-v3.0.apk]
+    python3 scripts/build_apk.py [--out apps/PH-Store-v4.3.apk]
 """
 from __future__ import annotations
 
@@ -327,7 +327,7 @@ def verify_v2(apk: bytes) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=str(ROOT / "apps" / "PH-Store-v3.0.apk"))
+    ap.add_argument("--out", default=str(ROOT / "apps" / "PH-Store-v4.3.apk"))
     ap.add_argument("--api-base", default="http://api.novaraca.com:8099",
                     help="what the Servidor field starts on inside the APK")
     args = ap.parse_args()
