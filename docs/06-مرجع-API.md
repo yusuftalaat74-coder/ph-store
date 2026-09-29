@@ -257,6 +257,24 @@ Select Membership
 
 الاستجابات: `200` `422`
 
+## تسجيل الصيدلية ذاتياً والمراجعة
+
+صيدلية بتعمل حسابها من الموبايل، وبتتصفح وتملى السلة فوراً؛ الطلب (`checkout`)
+بيرجع `403 PHARMACY_NOT_ACTIVE` لحد ما فريق المراجعة يوافق.
+
+```
+POST /v1/auth/signup                                              عام · multipart · 201 بتوكنات · 409 PHONE_ALREADY_REGISTERED · 429 RATE_LIMITED
+GET  /v1/pharmacies/me/review-status                              الصيدلية · حالة الحساب والرخصة وسبب الرفض
+POST /v1/pharmacies/me/licence                                    PharmacyAdmin · multipart licence_file · أول رفع أو إعادة إرسال بعد الرفض
+GET  /v1/licences/{licence_id}/document                           المراجعين + PharmacyAdmin صاحب الرخصة · الملف نفسه
+GET  /v1/onboarding-review/pharmacies?status=ONBOARDING|REJECTED|ALL   المراجعين · الأقدم أولاً
+POST /v1/onboarding-review/pharmacies/{pharmacy_id}/approve       المراجعين · {licence_number, issue_date, expiry_date, licence_type?, notes?}
+POST /v1/onboarding-review/pharmacies/{pharmacy_id}/reject        المراجعين · {reason}
+POST /v1/onboarding-review/pharmacies/{pharmacy_id}/licence-document   المراجعين · إرفاق الرخصة نيابةً عن الصيدلية
+```
+
+المراجعين = `PlatformAdmin` · `OpsReviewer` · `ComplianceOfficer`.
+
 ## الفهرس الدوائي
 
 ### `GET /v1/catalogue/products/{product_id}`
