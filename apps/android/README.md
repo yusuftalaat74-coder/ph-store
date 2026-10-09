@@ -87,3 +87,7 @@ uninstall problem applies to real users.
 The current key was generated on 24 September 2026 and does not match the one
 that signed `PH-Store-v2.0.apk` — that key was never saved. Anyone holding v2.0
 has to uninstall it before installing a later build.
+
+## v4.4 — African Tech attribution
+
+The bundled account screen now includes African Tech development attribution and the company website. Version code 44 installs as an update over v4.3 using the existing pilot signing certificate. The UI, API address, and native shell otherwise keep the existing behavior.
