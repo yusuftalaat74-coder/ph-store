@@ -45,7 +45,7 @@ chunks; it is also how the `<provider>` was added (`--file-provider`).
 ## Building
 
 ```bash
-python3 scripts/build_apk.py --out apps/PH-Store-v4.3.apk --api-base http://api.novaraca.com:8099
+python3 scripts/build_apk.py --out apps/PH-Store-v4.4.apk --api-base http://api.novaraca.com:8099
 ```
 
 No Android SDK is needed. The script assembles the archive, signs it with both
