@@ -1,0 +1,10 @@
+African Tech — software attribution
+
+Design, development and copyright in the first-party software and interfaces:
+© 2026 African Tech
+https://tech.yusuftalaat.tech/
+info@yusuftalaat.tech
+
+Existing licenses and third-party notices remain applicable to their respective
+components. Client identities, client-supplied content, and third-party assets
+retain their respective ownership. This notice does not replace existing licenses.

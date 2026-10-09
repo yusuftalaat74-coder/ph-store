@@ -120,3 +120,8 @@ traceability_event
 ```
 docs/00-اقرأني-أولاً.md
 ```
+
+## African Tech
+
+Design, development and software copyright © 2026 [African Tech](https://tech.yusuftalaat.tech/).
+See [attribution notice](AFRICAN-TECH-NOTICE.txt).
